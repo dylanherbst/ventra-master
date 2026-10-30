@@ -36,6 +36,7 @@ test('fresh PostgreSQL migration, real DB roles and tenant isolation (fixture Au
       grant usage on schema public,auth to authenticated,anon;
       grant execute on function auth.uid(),auth.jwt() to authenticated,anon;`);
     await db.exec(await readFile('../../supabase/migrations/202610160001_s01.sql', 'utf8'));
+    await db.exec(await readFile('../../supabase/migrations/202610300001_courses.sql', 'utf8'));
     const a = '11111111-1111-4111-8111-111111111111', b = '22222222-2222-4222-8222-222222222222';
     const sa = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', sb = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
     await db.query('insert into auth.users values ($1),($2)', [a,b]);
@@ -48,6 +49,12 @@ test('fresh PostgreSQL migration, real DB roles and tenant isolation (fixture Au
     async function scalar(sql: string, params: unknown[] = []) { return (await db.query<Record<string, unknown>>(sql,params)).rows[0]?.result; }
     await actor(a,sa);
     const wa = await scalar("select public.create_workspace('Alpha') as result") as string;
+    const courseId='eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee';
+    const course={title:'SQL fixture',summary:'Private',lessons:[{id:'one',title:'Intro',content:'Learn',durationMinutes:'10'}]};
+    assert.equal(await scalar('select public.save_course($1,$2,$3,0) as result',[wa,courseId,course]),1);
+    assert.equal(await scalar('select public.save_course($1,$2,$3,1) as result',[wa,courseId,course]),2);
+    await assert.rejects(db.query('select public.save_course($1,$2,$3,1)',[wa,courseId,course]),/Revision conflict/);
+    await assert.rejects(db.query('update public.course_drafts set revision=99'),/permission denied/);
     await db.query('select public.save_profile($1,$2,0)', [wa,profile]);
     const oid = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
     await db.query('select public.save_offer($1,$2,$3,0)', [wa,oid,offer]);
@@ -57,6 +64,8 @@ test('fresh PostgreSQL migration, real DB roles and tenant isolation (fixture Au
     await assert.rejects(db.query('select public.save_offer($1,$2,$3,0)',[wa,'dddddddd-dddd-4ddd-8ddd-dddddddddddd',{...offer,amountMinor:null}]), /constraint/);
     await assert.rejects(db.query('select public.save_profile($1,$2,1)',[wa,{...profile,pathways:['business'],primary:'business'}]), /active pathways/);
     await actor(b,sb);
+    assert.equal(await scalar('select count(*)::int as result from public.course_drafts'),0);
+    await assert.rejects(db.query('select public.save_course($1,$2,$3,2)',[wa,courseId,course]),/Owner access/);
     const wb = await scalar("select public.create_workspace('Beta') as result") as string;
     assert.equal(await scalar('select count(*)::int as result from public.offers'),0);
     assert.equal(await scalar('select count(*)::int as result from public.business_profiles'),0);
