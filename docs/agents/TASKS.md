@@ -15,3 +15,23 @@ The only task board. Update a row when its state changes, with evidence. States:
 | P2-2 | Phase 2: Stripe webhook (signature verification, order mapping, idempotency) `/api/stripe/webhook` | Chief of Staff (direct) | Verified locally (not yet accepted by owner); real Stripe events NOT verified | `chore/plugin-setup` | `ventra-verify` all steps; 281 unit tests; real HTTP: signed event accepted, retry deduplicated, tampered/unsigned rejected (400), live-mode event refused, other events ignored | Orders are held in server memory only (lost on restart): a persistent store needs an owner decision (database table plus a server-side key). Needs `STRIPE_WEBHOOK_SECRET` from the Stripe test dashboard; no real Stripe event received |
 
 Existing Course Creator planning notes: `COURSE_CREATOR.md`, `COURSE_CONNECTIONS.md`, `COURSE_NEXT_PHASE.md` (may be stale; verify against the code before use).
+
+## Option 2 programme (owner approved 2026-11-09): new UI onto VENTRA-FEATURES, six products
+
+Coordinator: Cowork session (Claude). Coding happens on a cloud copy of the branch; commits land here via patches after a secret scan. Worktree `VENTRA-LIQUID-GLASS`, branch `feature/liquid-glass-ui` (from `e011f27`). Production branch untouched.
+
+| ID | Task | Owner | State | Branch / commit | Evidence | Blockers |
+| --- | --- | --- | --- | --- | --- | --- |
+| O2-0 | Verify production baseline at `e011f27` | Coordinator | Verified locally | `feature/ventra-website` @ e011f27 | lint clean, typecheck clean, 601/601 tests, `next build` ok (cloud copy, Node 22) | none |
+| O2-1 | Liquid Glass design system + app shell + Home, AI Team, Bookings, More, Notifications | `ventra-frontend` | Implemented; NOT yet independently verified by `ventra-qa` | `feature/liquid-glass-ui` bdb7d8b..9ec7559 | lint, typecheck, 601/601, build pass; 32 screenshots 320/390/1440 light+dark, no overflow; `docs/design/DECISIONS.md` | Needs QA run of the proposed UI regression suite; owner to approve mauve wall vs rulebook near-white canvas |
+| O2-2 | QA regression baseline + proposed smoke suite (17 checks, 17/17 pass on e011f27) | `ventra-qa` | Verified locally | read-only | `/home/claude/qa-out/` in the coordinator's workspace; to be committed as `apps/web/test/ui-regression.test.ts` | Flaky test `local-service-client-portal-draft.test.ts:111` (same-millisecond timestamps) to fix |
+| O2-3 | Fix: `lp-access` cookie path `/api/workspace` means outbox, settings, integrations-status and courses routes always 401 in the browser | `ventra-backend` | Assigned | | QA finding (Medium), `app/api/workspace/route.ts:9`, `lib/workspace-route.ts:25` | none |
+| O2-4 | Six-product gap analysis | `ventra-backend` + `ventra-feature` | Verified locally (report) | read-only | Coordinator holds the report; key fact: `lib/scope-freeze.ts` freezes products 3–6 in production | Owner decision: reconcile six-product plan with `SCOPE_FREEZE.md` (unfreeze list) |
+| O2-5 | `integration_connections` table + per-workspace provider config (Google, Meta, Twilio, chat, voice out of process env) | `ventra-backend` | Assigned | | Gap analysis: root blocker for a second business | encryption-key env decision |
+| O2-6 | Google Calendar: owner obtains refresh token, sets 4 Vercel vars; then OAuth connect/callback per workspace | owner then `ventra-setup` | Assigned | | Connections plan §2 | owner 15 min; O2-5 for per-workspace |
+| O2-7 | Meta: owner creates app, tokens, webhook (Standard Access); App Review + Business Verification when first gym signs | owner then `ventra-setup` | Assigned | | Connections plan §1 | owner 45 min; review later |
+| O2-8 | Twilio AU regulatory bundle, then buy mobile number (~US$8.25/mo) | owner | Assigned | | Connections plan §3 | needs owner approval (identity docs, spend) |
+| O2-9 | Vapi account + assistant, apply receptionist migration | owner then `ventra-setup` | Assigned | | Connections plan §4 | needs owner approval (spend) |
+| O2-10 | Anthropic credits + re-save 4 Vercel secrets as Secret | owner | Assigned | | Connections plan §5 | needs owner approval (spend) |
+| O2-11 | Owner read API: contacts, threads, calls, appointments; then Leads/Inbox screen on real data | `ventra-backend` then `ventra-frontend` | Assigned | | Gap analysis Setter (c)1 | none |
+| O2-12 | Master Control: extend roster to the six agents + coordinator; add import/status endpoint; investigate Claude Code dispatch bridge | `ventra-research` | Assigned | | `~/master-control/server.mjs:10,16` roster fixed; data dir protected from the coordinator | owner: which data dir (desktop app vs web) |
