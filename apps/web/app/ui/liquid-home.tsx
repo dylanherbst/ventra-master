@@ -43,6 +43,6 @@ export default function LiquidHome() {
       menu={[{ id: 'leads', label: 'Open leads', icon: 'leads', href: '/customers' }, { id: 'inbox', label: 'Inbox', icon: 'message', href: '/inbox' }, { id: 'connect', label: 'Connect a channel', icon: 'plug', href: '/settings?section=integrations' }]} />
     <StatCard icon="headset" tone="magenta" label="AI Receptionist tasks" value={dash} badge={<Badge tone="violet" icon="clock">Coming soon</Badge>} href="/ai-team" caption="No calls are answered yet"
       menu={[{ id: 'team', label: 'Open AI Team', icon: 'sparkle', href: '/ai-team' }]} />
-    <AnalyticsCard className="vg-span-2" title="Booking analytics" note="Sample data · connect a calendar for your real figures" points={SAMPLE_POINTS} metrics={SAMPLE_METRICS.map(m => ({ ...m, label: m.label + ' (sample)' }))} />
+    <AnalyticsCard title="Booking analytics" note="Sample data · connect a calendar for your real figures" points={SAMPLE_POINTS} metrics={SAMPLE_METRICS} />
   </div>;
 }
