@@ -2,7 +2,7 @@
 
 Shared state between Claude Code and Codex. The assistant that stops updates this file; the one that starts reads it. Template and rules: `docs/agents/CODEX_HANDOFF.md`.
 
-- **Updated:** 2026-11-08
+- **Updated:** 2026-11-09
 - **Last editor:** claude
 - **Repo:** /Users/dylan/Developer/VENTRA-FEATURES
 
@@ -56,7 +56,14 @@ books/moves/cancels, qualifies new callers, transfers or takes messages. On `fea
 - Library files: `docs/design/ventra-ui/` (tokens.css, glass.css, components.js on `window.VentraGlass`, components.d.ts, tokens.json). Port to TSX keeping `vg-*` class names; wire via `apps/web/app/design-system/liquid-glass/` (not done yet).
 - Live design system: https://claude.ai/artifact/1BSxDcrQ9HNoTR2XdUsskY · UI guide canvas: https://claude.ai/artifact/2sik8p22KKEJfZ9W8jK6J4 · PDF/ZIP: `docs/design/VENTRA-App-UI-Guide.*`.
 - Applies to the app only; `apps/web/app/site/**` (marketing website) is unchanged.
-- Not started: porting the app shell and Home to this look (owner said go after approving the kit).
+- 2026-11-09 (Cowork VM, branch `feature/liquid-glass-ui`, commits 9ed36d2, 5c59e60, 4cbf4be, 4cc87d8): first increment shipped.
+  - Design system: `apps/web/app/design-system/liquid-glass/` = `tokens.css` (scoped to `.vg-app`, dark via `data-theme` on html or root), `glass.css` (kit CSS, Google font import dropped), `shell.css` (layout, menu, rows, tiles, legacy bridge), `icons.tsx` (Lucide-style inline SVG), `components.tsx` (AppFrame, TopBar, BottomNav, SideNav, GlassCard, StatCard, AnalyticsCard, GlassButton, IconButton, Chip, Badge, SearchField, TextField, SelectPill, SegmentedTabs, Toggle, Checkbox, IconTile, Wordmark, PromoCard, EmptyState, PageHeading, ListRow, ProductTile), `menu.tsx` (portalled anchored GlassMenu), `nav.ts` (five items + `activeNav` + `isLiquidRoute`), `lighting.ts`, `index.ts`.
+  - Shell: `app/ui/liquid-shell.tsx` replaces `ventra-shell.tsx` in `app/(ventra)/layout.tsx` and `app/workspace/layout.tsx` (`ventra-shell.tsx` and `ventra-home.tsx` are kept, unused by routes, because `test/ventra-home.test.ts` and `test/feature-registry.test.ts` pin them). Legacy pages render inside `.ventra-app.vg-legacy[data-theme]` so their styles keep applying. `/tools/**` still use the old shell.
+  - Routes: Home `/` → `app/ui/liquid-home.tsx`; new `/ai-team` (`liquid-ai-team.tsx`, status from `GET /api/front-office/settings`), `/ai-team/settings` (renders the existing `tools/front-office-settings` editor), `/bookings` (`liquid-bookings.tsx`, honest empty state), `/more` (`liquid-more.tsx`), `/notifications` (`liquid-notifications.tsx`, existing NotificationsCentre). Nav map: Leads → `/customers` (also lights for `/inbox`, `/sales`); More also covers `/settings`, `/services`, `/insights`, `/business`, `/create`, `/grow`, `/onboarding`, `/workspace`. Every old route still resolves.
+  - Spec vs rulebook reconciliations: `docs/design/DECISIONS.md`.
+  - Verified (Node 22.23.4): `eslint . --max-warnings 0` pass; `tsc --noEmit` pass; `node --experimental-strip-types --test test/*.test.ts` 601 pass, 0 fail; `next build` exit 0. Playwright against `next start`: `/`, `/ai-team`, `/bookings`, `/more`, `/inbox` at 390 (DPR 2) and 1440, light and dark, plus `/`, `/more` at 320 and `/workspace`, `/ai-team/settings`, `/customers`, `/settings`, `/notifications` at 390 → `/home/claude/vf-shots/` (32 PNGs + `report.json`). scrollWidth == clientWidth on every page (no horizontal overflow); last content bottom above the bottom nav on `/`, `/more`, `/ai-team`, `/inbox`, `/settings`; stat and account menus anchor inside the viewport, Escape returns focus; period select persists for the visit; theme switch stores `ventra.theme.v1`; reduced motion removes toggle transitions; both AgentCard toggles disabled. No page errors (the `/api/workspace` 503 in this VM is the missing Supabase env).
+  - Not done: Leads list screen (rulebook 5B); restyling legacy page content (Customers, Inbox, Settings, Grow, Business, Services, Onboarding, Insights, Sales) beyond the chrome; `/tools/**` still on the old shell; real booking and conversation counts need a client-readable API (none exists); unread count on the bell; glass login redesign (left as approved, inside the new shell); `PromoCard`/`SearchField`/`SegmentedTabs`/`TextField` ported but unused on screens; refraction filter (`enableRefraction`) not ported (optional in spec).
+  - Next: Leads screen on `/customers` data (LeadRow, filter rail); port Customers/Inbox content; a small `GET` for bookings/conversation counts so Home shows real numbers; owner to decide whether `/tools/front-office-settings` should move into the customer app properly (today `/ai-team/settings` reuses it).
 
 ## Acceptance criteria
 
