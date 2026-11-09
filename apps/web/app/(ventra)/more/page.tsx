@@ -1,2 +1,2 @@
-import { MoreHub } from '../../ui/ventra-hubs';
-export default function Page(){return <MoreHub/>;}
+import LiquidMore from '../../ui/liquid-more';
+export default function Page(){return <LiquidMore/>;}

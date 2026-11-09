@@ -1,2 +1,2 @@
-import VentraHome from '../ui/ventra-home';
-export default function Home(){return <VentraHome/>;}
+import LiquidHome from '../ui/liquid-home';
+export default function Home(){return <LiquidHome/>;}
