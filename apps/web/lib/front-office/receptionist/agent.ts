@@ -161,7 +161,7 @@ export async function receptionistSession(d: Omit<ReceptionistDeps, 'llm' | 'con
   async function handoff(owner: Agent, intent: string, summary: string, nextAction: string) {
     const c = ctx as Ctx | null;
     if (!c) return;
-    const h = checkedHandoff({ contact: { id: c.contact.id, name: plainText(c.contact.name, 160) || null, phone: c.contact.phone, email: c.contact.phone ? deliverableEmail(c.contact.email) : c.contact.email, state: c.contact.state }, channel: 'voice', intent: intent || 'call back', answers: c.contact.answers, summary: summary || 'See the call.', nextAction, from: 'receptionist', owner });
+    const h = checkedHandoff({ contact: { id: c.contact.id, name: plainText(c.contact.name, 160) || null, phone: c.contact.phone, email: c.contact.phone ? deliverableEmail(c.contact.email) : c.contact.email, state: c.contact.state }, channel: 'voice', intent: intent || 'call back', answers: Object.fromEntries(Object.entries(c.contact.answers).map(([k, v]) => [k, plainText(v, 1000)])), summary: plainText(summary, 1500) || 'See the call.', nextAction, from: 'receptionist', owner });
     await d.rpc('fo_record_handoff', { ...a, contact: c.contact.id, handoff: h });
   }
   /** Second factor before a booking is moved or cancelled (identity.ts): the caller number alone is never enough.
@@ -299,8 +299,10 @@ export async function receptionistSession(d: Omit<ReceptionistDeps, 'llm' | 'con
         const msg = plainText(input.message, 1500) || 'Please call back.';
         const from = c?.contact.phone ?? d.call.caller ?? 'number withheld';
         const urgent = input.urgent === true;
-        await handoff('human', urgent ? 'urgent call back' : 'call back', `Phone message${urgent ? ' (urgent)' : ''} from ${name || c?.contact.name || 'a caller'} on ${from}: ${msg}`, 'Call the caller back');
-        const note = `${s.businessName} AI receptionist: ${urgent ? 'URGENT ' : ''}message from ${name || c?.contact.name || 'a caller'} (${from}): ${msg}`.slice(0, 600);
+        // A name already stored on the contact is customer text too: one line at the point of use.
+        const msgFrom = name || plainText(c?.contact.name, 160) || 'a caller';
+        await handoff('human', urgent ? 'urgent call back' : 'call back', `Phone message${urgent ? ' (urgent)' : ''} from ${msgFrom} on ${from}: ${msg}`, 'Call the caller back');
+        const note = `${s.businessName} AI receptionist: ${urgent ? 'URGENT ' : ''}message from ${msgFrom} (${from}): ${msg}`.slice(0, 600);
         // Staff notifications go out only when live sending is on (the senders enforce FRONT_OFFICE_SEND_LIVE).
         if (s.staffPhone) await d.send(s.staffPhone, note.slice(0, 320)).catch(() => undefined);
         if (s.staffEmail) await d.email(s.staffEmail, `${urgent ? 'Urgent: ' : ''}phone message for ${s.businessName}`, note).catch(() => undefined);
@@ -335,7 +337,7 @@ export async function receptionistSession(d: Omit<ReceptionistDeps, 'llm' | 'con
           if (nameToSave(name)) c.contact.name = name;
           if (okEmail && !isDeliverableEmail(c.contact.email)) c.contact.email = email;
         }
-        const who = name || c?.contact.name || 'a caller';
+        const who = name || plainText(c?.contact.name, 160) || 'a caller';
         const phoneNow = c?.contact.phone ?? d.call.caller ?? null, emailNow = okEmail ? email : deliverableEmail(c?.contact.email);
         const from = phoneNow ?? 'number withheld';
         const details = [`needs ${need}`, where && `where: ${where}`, when && `when: ${when}`, budget && `budget: ${budget}`, emailNow && `email: ${emailNow}`].filter(Boolean).join('; ');

@@ -191,7 +191,7 @@ export async function runSetterTurn(contactId: string, d: SetterDeps): Promise<S
   async function handoff(owner: Agent, intent: string, summary: string, nextAction: string) {
     const h: Handoff = checkedHandoff({
       contact: { id: contactId, name: plainText(ctx.contact.name, 160) || null, phone: ctx.contact.phone, email: ctx.contact.email, state },
-      channel, intent: plainText(intent, 200) || 'follow up', answers: ctx.contact.answers, summary: plainText(summary, 1500) || 'See the conversation.', nextAction, from: 'setter', owner,
+      channel, intent: plainText(intent, 200) || 'follow up', answers: Object.fromEntries(Object.entries(ctx.contact.answers).map(([k, v]) => [k, plainText(v, 1000)])), summary: plainText(summary, 1500) || 'See the conversation.', nextAction, from: 'setter', owner,
     });
     await d.rpc('fo_record_handoff', { ...a, contact: contactId, handoff: h });
     handedTo = owner;
@@ -346,7 +346,7 @@ export async function runSetterTurn(contactId: string, d: SetterDeps): Promise<S
         return `Not booked: ${r?.note ?? 'the booking could not be completed.'} Tell the contact a person will confirm a time.`;
       }
       case 'handoff_receptionist':
-        await handoff('receptionist', str(input.intent, 200), str(input.summary, 4000), 'Answer the customer');
+        await handoff('receptionist', str(input.intent, 200), plainText(input.summary, 1500), 'Answer the customer');
         return 'Handed to the Receptionist. Tell the contact the team will help them shortly.';
       case 'escalate_human': {
         const bc = input.booking_change;
@@ -354,12 +354,12 @@ export async function runSetterTurn(contactId: string, d: SetterDeps): Promise<S
         if (change) {
           // A-54: the Setter cannot move or cancel a booking, so a person does it. The hand-off is a 'transfer' through the
           // permission check; the contact hears a fixed line that never says the booking changed.
-          const summary = `Wants to ${change} their booking (${bookingLine ?? 'no upcoming booking on file'}): ${str(input.summary, 3500) || 'see the conversation'}`;
+          const summary = `Wants to ${change} their booking (${bookingLine ?? 'no upcoming booking on file'}): ${plainText(input.summary, 1000) || 'see the conversation'}`;
           const say = await toPerson(`${change} booking`, summary, change === 'reschedule' ? 'A person agrees a new time with the contact and moves the booking' : 'A person cancels the booking and confirms with the contact');
           forcedReply = say || (store && mode === 'enquiry_only' ? decide(mode, change).say : '') || BOOKING_CHANGE_SAY[change];
           return 'Passed to the team.';
         }
-        const say = await toPerson(str(input.intent, 200), str(input.summary, 4000), 'A person replies to the contact');
+        const say = await toPerson(str(input.intent, 200), plainText(input.summary, 1500), 'A person replies to the contact');
         // A booked contact: the fixed line, never model wording after a hand-off.
         if (returning) { forcedReply = say || RETURNING_HANDOFF_SAY; return 'Passed to the team.'; }
         if (say) { forcedReply = say; return 'Passed to the team.'; }

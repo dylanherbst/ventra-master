@@ -174,11 +174,8 @@ test('X1 prompt injection, Setter, owner_approval and enquiry_only (Live path ov
   }
 });
 
-// G12 (A-52, lab-fidelity gap): the Setter Lab holds a booking at the model boundary (setter/lab.ts:396, gatedModel replaces the
-// book_time call with the held words as text). When the SAME model response also carries another tool call, the loop goes on
-// and the model's next text ("You are booked!") becomes the lab reply, so the Live AI Test can show a booking promise that
-// production would not send: production's runSetterTurn ends the turn on the held booking and sends decide()'s words
-// (setter/agent.ts:327,400). Fixed in A-69: gatedModel now keeps the held words. The production route is covered by the X1 H-AGENT and H-DB tests above.
+// G12 (A-52, fixed in A-69): when a held book_time shares a model response with another tool call, the Setter Lab must keep
+// the held words, never the model's next text ("You are booked!"). The production route is covered by the X1 H-AGENT and H-DB tests above.
 test('X1 G12 lab Live path, booking and another tool call in one model response: the held words, never the model\'s "You are booked!"', async () => {
   const start = await offerTimes(h.fakeCalendar(), LAB_CONFIG.availability, LAB_NOW, 12);
   const base = await runLabTurn(newLab('owner_approval'), { message: QUALIFY });
