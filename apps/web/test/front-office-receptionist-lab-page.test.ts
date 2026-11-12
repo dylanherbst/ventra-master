@@ -196,7 +196,10 @@ test('source: the action takes no user id, reads the session on the server, and 
   const live = readFileSync(new URL('../app/tools/receptionist-lab/live.ts', import.meta.url), 'utf8');
   const page = readFileSync(new URL('../app/tools/receptionist-lab/live-call.tsx', import.meta.url), 'utf8');
   assert.match(actions, /export async function sendLiveTurn\(state: ReceptionistLabState, says: string\)/);
-  assert.match(actions, /cookies\(\)\)\.get\('lp-access'\)/);
+  // A-34: the cookie is read in one shared server-only helper (setter-lab/sandbox.ts readToken), which the action passes in.
+  const sandbox = readFileSync(new URL('../app/tools/setter-lab/sandbox.ts', import.meta.url), 'utf8');
+  assert.match(sandbox, /cookies\(\)\)\.get\('lp-access'\)/);
+  assert.match(actions, /token: readToken/);
   for (const src of [actions, live, page]) {
     assert.doesNotMatch(src, /userId/);
     assert.doesNotMatch(src, /anthropicLlm|meteredLlm|lib\/front-office\/llm'|runReceptionistTurn\b/);

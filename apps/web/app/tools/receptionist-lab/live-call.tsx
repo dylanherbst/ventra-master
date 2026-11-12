@@ -1,7 +1,8 @@
 'use client';
 import { useRef, useState, useSyncExternalStore, useTransition } from 'react';
-import { endLiveCall, getLiveUsage, sendLiveTurn, startLiveCall } from './actions';
+import { deleteCallScenario, endLiveCall, getLiveUsage, loadCallScenario, resetLiveLab, saveCallScenario, sendLiveTurn, startLiveCall } from './actions';
 import type { LiveCallResult } from './live';
+import type { LabPersistence, LabScenarioInfo } from '../../../lib/front-office/contracts';
 import type { ReceptionistLabState } from '../../../lib/front-office/receptionist/lab-live';
 import type { LabUsageToday } from '../../../lib/front-office/lab-usage';
 import type { LiveAiState } from '../setter-lab/live-auth';
@@ -17,7 +18,12 @@ const LIVE_AI_LABEL: Record<LiveAiState, string> = { unknown: 'CONFIGURED (serve
 const json = (v: unknown) => JSON.stringify(v, null, 2);
 const never = () => () => {};
 
-export default function LiveCall({ modelConfigured, initial, initialError, initialUsage }: { modelConfigured: boolean; initial: ReceptionistLabState | null; initialError: string | null; initialUsage: LabUsageToday }) {
+export default function LiveCall({ modelConfigured, initial, initialError, initialUsage, initialPersistence = { mode: 'memory', reason: 'Lab sandbox status not loaded yet; memory only.' }, initialScenarios = [] }: { modelConfigured: boolean; initial: ReceptionistLabState | null; initialError: string | null; initialUsage: LabUsageToday; initialPersistence?: LabPersistence; initialScenarios?: LabScenarioInfo[] }) {
+  const [persistence, setPersistence] = useState<LabPersistence>(initialPersistence);
+  const [scenarios, setScenarios] = useState<LabScenarioInfo[]>(initialScenarios);
+  const [scenarioName, setScenarioName] = useState('');
+  const [notice, setNotice] = useState<string | null>(null);
+  const db = persistence.mode === 'database';
   const canListen = useSyncExternalStore(never, () => speechSupport().listen, () => false);
   const canSpeak = useSyncExternalStore(never, () => speechSupport().speak, () => false);
   const [state, setState] = useState<ReceptionistLabState | null>(initial);
@@ -40,7 +46,9 @@ export default function LiveCall({ modelConfigured, initial, initialError, initi
   const canTalk = modelConfigured && liveAi !== 'not_configured' && !!state && !closed && !pending;
 
   const apply = (r: LiveCallResult) => {
-    setError(r.error);
+    setError(r.error); setNotice(r.notice ?? null);
+    if (r.persistence) setPersistence(r.persistence);
+    if (r.scenarios) setScenarios(r.scenarios);
     if (r.state) setState(r.state);
     if (r.liveAi && r.liveAi !== 'unknown') setLiveAi(r.liveAi);
     if (r.signIn) setSignIn(r.signIn);
@@ -118,7 +126,8 @@ export default function LiveCall({ modelConfigured, initial, initialError, initi
       <li data-testid="live-sign-in">Sign-in: <strong>{SIGN_IN_LABEL[signIn]}</strong></li>
       <li data-testid="live-stt">Speech-to-text ({LANG}): <strong>{canListen ? (listening ? 'LISTENING' : 'AVAILABLE') : 'NOT AVAILABLE (type instead)'}</strong></li>
       <li data-testid="live-tts">Spoken replies ({LANG}): <strong>{canSpeak ? (speakOn ? 'ON' : 'OFF') : 'NOT AVAILABLE (read the transcript)'}</strong></li>
-      <li>Store, calendar, SMS and email: <strong>IN-MEMORY (sandboxed, nothing sent)</strong></li>
+      <li data-testid="live-persistence">Persistence: <strong>{db ? 'SANDBOX DATABASE' : 'MEMORY ONLY'}</strong>{persistence.mode === 'database' ? ` (your lab sandbox workspace ${persistence.workspaceId}; the caller, messages and bookings are real rows in it)` : ` (${persistence.reason})`}</li>
+      <li>Store: <strong>{db ? 'LAB SANDBOX (real fo_* functions)' : 'IN-MEMORY'}</strong>; calendar, SMS and email: <strong>IN-MEMORY, nothing sent</strong></li>
       <li>Business: <strong>DEMO BUSINESS SETTINGS (chosen on the server)</strong></li>
     </ul>
 
@@ -126,6 +135,21 @@ export default function LiveCall({ modelConfigured, initial, initialError, initi
     <p data-testid="live-usage-today">{usageTodayLine(usage)}</p>
     <p>{usage.persistent ? '' : 'NOT PERSISTENT. '}{usage.note}</p>
     <button type="button" disabled={pending} onClick={() => start(refreshUsage)}>Refresh usage</button>
+
+    <fieldset data-testid="live-scenarios">
+      <legend>Reset and saved scenarios</legend>
+      <button type="button" disabled={pending} onClick={() => { stopListening(); setSummaryFailed(false); start(async () => { try { apply(await resetLiveLab()); } catch { setError('The lab could not reach the server.'); } }); }}>Reset sandbox and start a new call</button>
+      {!db && <p>Saving needs the lab sandbox. {persistence.mode === 'memory' ? persistence.reason : ''}</p>}
+      <p><label htmlFor="live-scenario-name">Scenario name</label>{' '}
+        <input id="live-scenario-name" maxLength={80} value={scenarioName} onChange={e => setScenarioName(e.target.value)} />{' '}
+        <button type="button" disabled={pending || !db || !state || !scenarioName.trim()} onClick={() => { if (state) start(async () => { try { apply(await saveCallScenario(state, scenarioName)); } catch { setError('The lab could not reach the server.'); } }); }}>Save scenario</button></p>
+      {scenarios.length === 0 ? <p>No saved scenarios.</p> : <ul>{scenarios.map(sc => <li key={sc.id}>
+        {sc.name} (revision {sc.revision}, {sc.contacts} contact{sc.contacts === 1 ? '' : 's'}, {sc.appointments} booking{sc.appointments === 1 ? '' : 's'}){' '}
+        <button type="button" disabled={pending || !db} onClick={() => start(async () => { try { apply(await loadCallScenario(sc.name)); } catch { setError('The lab could not reach the server.'); } })}>Load</button>{' '}
+        <button type="button" disabled={pending || !db} onClick={() => start(async () => { try { apply(await deleteCallScenario(sc.name)); } catch { setError('The lab could not reach the server.'); } })}>Delete</button>
+      </li>)}</ul>}
+    </fieldset>
+    {notice && <p role="status" data-testid="live-notice">{notice}</p>}
 
     <h3>Call</h3>
     <p>

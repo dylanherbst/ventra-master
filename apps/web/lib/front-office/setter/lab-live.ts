@@ -17,6 +17,7 @@ import type { OperatingMode } from '../contracts';
 import { defaultLabUsageStore, labDailyCapAud, labDay, liveCapReached, meteredLlm, priceFor } from '../lab-usage';
 import type { LabUsageStore } from '../lab-usage';
 import { anthropicConfigFromEnv, anthropicLlm } from '../llm';
+import type { LabBackend } from '../lab-session';
 import { runLabTurnWith } from './lab';
 // meteredLlm lives in lab-usage.ts so the brand that runLabTurnWith checks can only be applied there.
 export { liveCapReached, meteredLlm };
@@ -36,6 +37,8 @@ export type LiveLabDeps = {
   usage?: LabUsageStore;
   /** Per-call timeout for the provider (default 30 s). */
   timeoutMs?: number;
+  /** The user's lab sandbox (lab-session.ts). Absent = the in-memory store. Still sandboxed: nothing is sent. */
+  backend?: LabBackend;
 };
 
 export const LIVE_NOT_CONFIGURED = 'Live AI is not configured on this server (no model key or model name). Use Demo mode.';
@@ -81,7 +84,7 @@ export async function runLiveLabTurn(state: LabState, input: { message: string; 
   };
   const fetchImpl = anthropicOnlyFetch(deps.fetch ?? ((...a: Parameters<typeof fetch>) => globalThis.fetch(...a)));
   const base = meteredLlm(anthropicLlm(config, fetchImpl, deps.timeoutMs ?? 30_000), { model: config.model, day, capAud, store, clock, u });
-  const next = await runLabTurnWith(state, input, { base, model: 'live' });
+  const next = await runLabTurnWith(state, input, { base, model: 'live', backend: deps.backend });
   const turn = next.turns.at(-1);
   if (turn) turn.usage = u;
   return next;

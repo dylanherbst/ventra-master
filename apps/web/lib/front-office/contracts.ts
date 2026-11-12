@@ -605,3 +605,24 @@ export function parseList<T>(input: unknown, parse: (v: unknown) => ParseResult<
   }
   return { ok: true, value: out };
 }
+
+// ---------------------------------------------------------------------------------------------------------------
+// Setter Lab and Receptionist Lab sandbox (task A-34). The labs write into the signed-in user's lab sandbox workspace
+// (workspaces.kind = 'lab', migration 202611110001) through the real fo_* functions, or fall back to memory.
+
+export const labProductNames = ['setter', 'receptionist'] as const;
+export type LabProductName = (typeof labProductNames)[number];
+
+/** Where a lab keeps its data. 'database': the signed-in user's lab sandbox (visible in /api/front-office/contacts for
+ * that workspace). 'memory': this page only, with a plain-English reason why the sandbox is not in use. */
+export type LabPersistence =
+  | { mode: 'database'; workspaceId: string; created: boolean }
+  | { mode: 'memory'; reason: string };
+
+/** Rows deleted (reset) or restored (load), per table. */
+export type LabRowCountsInfo = Partial<Record<'contacts' | 'calls' | 'messages' | 'events' | 'handoffs' | 'appointments' | 'jobs' | 'outbox' | 'pendingActions', number>>;
+
+/** One saved scenario of a lab (name, revision for conflict checks, rows in the snapshot). */
+export type LabScenarioInfo = {
+  id: string; product: LabProductName; name: string; revision: number; updatedAt: string; contacts: number; appointments: number;
+};

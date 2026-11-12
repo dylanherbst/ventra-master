@@ -19,6 +19,7 @@
 // Live AI Test (task A-23, lab-live.ts) swaps ONLY the scripted model for the real, metered Anthropic model through
 // runLabTurnWith. The store, calendar, SMS sender and gate() wiring above stay exactly the same, so the sandbox holds
 // whatever the model says and whatever *_LIVE switches are set.
+import { randomBytes } from 'node:crypto';
 import { bookSlot, offerTimes } from '../booking';
 import type { CalendarEventInput, CalendarProvider } from '../calendar/google';
 import type { Interval } from '../calendar/slots';
@@ -32,6 +33,8 @@ import { handleInboundSms } from '../orchestrator';
 import type { ChannelAuth, Rpc } from '../orchestrator';
 import { approvePendingAction, createMemoryPendingActionStore, gate, rejectPendingAction } from '../pending-actions';
 import type { ActionExecutor, PendingActionRecord } from '../pending-actions';
+import { sandboxRpc } from '../lab-session';
+import type { LabBackend } from '../lab-session';
 import type { SmsSender } from '../sms-send';
 import { canTransition, isContactState } from '../state';
 import type { ContactState } from '../state';
@@ -153,7 +156,7 @@ const uuid = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, '0
 // it matters here (state machine, opt-out, duplicate message ids, one booking per calendar event).
 
 /** Exported for tests. */
-export function labStore(s: LabState) {
+export function labStore(s: LabState, backend?: LabBackend) {
   const t = s.tables;
   const writes: LabWrite[] = [];
   const w = (rpc: string, detail: string) => { writes.push({ rpc, detail }); };
@@ -163,7 +166,7 @@ export function labStore(s: LabState) {
     if (!c) throw new Error('Contact not found.');
     return c;
   };
-  const rpc: Rpc = async (fn, a) => {
+  const memoryRpc: Rpc = async (fn, a) => {
     if (a.channel !== LAB_AUTH.channel || a.channel_key !== LAB_AUTH.key) throw new Error('Channel not recognised.');
     switch (fn) {
       case 'fo_ingest_sms': {
@@ -253,7 +256,40 @@ export function labStore(s: LabState) {
   const send: SmsSender = async (to, body) => { s.wouldSend.push({ to, body, sent: false }); w('sms', `would send to ${to} (not sent)`); return { sent: false, sid: null }; };
   const pending = createMemoryPendingActionStore({ workspaceId: LAB_WORKSPACE, modes: () => ({ setter: s.mode, receptionist: 'enquiry_only' }), now: () => s.now, newId: () => uuid(++s.seq) });
   pending.items.push(...s.pending);
-  return { rpc, writes, calendar, send, pending };
+  // Sandbox database mode (task A-34): the same pipeline over the real fo_* functions of the user's lab sandbox. The
+  // in-memory tables are then only a mirror (mirrorFromSandbox) so the page and withPerson keep working. The calendar,
+  // the held-action queue and the recording SMS sender stay in the lab state; nothing is sent.
+  const rpc: Rpc = backend ? sandboxRpc(backend.rpc, writes) : memoryRpc;
+  return { rpc, writes, calendar, send, pending, auth: backend ? backend.auth : LAB_AUTH, backend: backend ?? null };
+}
+
+/** Copies one contact's row, messages, next booking and hand-offs from the sandbox database into the lab state (what the
+ * page shows). Read only: fo_contact_context. */
+async function mirrorFromSandbox(s: LabState, db: Ctx, contactId: string): Promise<void> {
+  const backend = db.backend;
+  if (!backend) return;
+  const ctx = await backend.rpc('fo_contact_context', { channel: backend.auth.channel, channel_key: backend.auth.key, contact: contactId }) as {
+    contact: { id: string; name: string | null; phone: string | null; email: string | null; state: ContactState; optedOut: boolean; answers: Record<string, string> };
+    messages: { direction: 'inbound' | 'outbound'; body: string; agent: string | null; at: string }[];
+    appointment: { id: string; starts: string; ends: string } | null;
+    handoffs: { from: string; owner: string; intent: string; summary: string }[];
+  };
+  const t = s.tables, c = ctx.contact;
+  const row: LabContact = { id: c.id, name: c.name, phone: c.phone, email: c.email, state: c.state, optedOut: c.optedOut === true, answers: { ...c.answers } };
+  const i = t.contacts.findIndex(x => x.id === c.id);
+  if (i >= 0) t.contacts[i] = row; else t.contacts.push(row);
+  t.messages = [...t.messages.filter(m => m.contact_id !== c.id), ...ctx.messages.map(m => ({ contact_id: c.id, direction: m.direction, body: m.body, agent: m.agent, prompt_version: null, msg_id: null, at: String(m.at) }))];
+  const appts: LabAppointment[] = ctx.appointment ? [{ id: ctx.appointment.id, contact_id: c.id, starts: String(ctx.appointment.starts), ends: String(ctx.appointment.ends), status: 'booked', event_id: '' }] : [];
+  if (!appts.length && c.state === 'booked') {
+    // fo_contact_context only returns bookings that end after the database's real now(); the lab's clock is fixed in the
+    // past, so a lab booking is found from the lab calendar's events instead (fo_booking_for_event, read only).
+    for (const e of s.calendar) {
+      const id = await backend.rpc('fo_booking_for_event', { channel: backend.auth.channel, channel_key: backend.auth.key, calendar_provider: 'google', event_id: e.id });
+      if (typeof id === 'string') appts.push({ id, contact_id: c.id, starts: new Date(e.start).toISOString(), ends: new Date(e.end).toISOString(), status: 'booked', event_id: e.id });
+    }
+  }
+  t.appointments = [...t.appointments.filter(a => a.contact_id !== c.id), ...appts];
+  t.handoffs = [...t.handoffs.filter(h => h.contact_id !== c.id), ...ctx.handoffs.map(h => ({ contact_id: c.id, from: h.from, owner: h.owner, intent: h.intent, summary: h.summary }))];
 }
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -418,14 +454,14 @@ const detected = (answers: Record<string, string>) => ({ needs: answers.problem 
 
 /** One customer message through the real inbound router and Setter, with the scripted model. Returns the next lab state
  * (the input is not changed). */
-export async function runLabTurn(state: LabState, input: { message: string; mode?: OperatingMode }): Promise<LabState> {
-  return runLabTurnWith(state, input, { base: scriptedSetterModel(), model: 'scripted' });
+export async function runLabTurn(state: LabState, input: { message: string; mode?: OperatingMode }, backend?: LabBackend): Promise<LabState> {
+  return runLabTurnWith(state, input, { base: scriptedSetterModel(), model: 'scripted', backend });
 }
 
 /** The same turn with a given base model. Used by lab-live.ts (Live AI Test), which passes the metered Anthropic model
  * and is the only place that may pass a paid one. Whatever the model is, it only ever reaches the lab's in-memory store,
  * calendar and recording SMS sender, and every book_time goes through gate() first. */
-export async function runLabTurnWith(state: LabState, input: { message: string; mode?: OperatingMode }, m: { base: Llm; model: LabModel }): Promise<LabState> {
+export async function runLabTurnWith(state: LabState, input: { message: string; mode?: OperatingMode }, m: { base: Llm; model: LabModel; /** The user's lab sandbox (lab-session.ts); absent = in-memory store. */ backend?: LabBackend }): Promise<LabState> {
   // A live (paid) model must come through lab-live.ts meteredLlm, which checks the daily cap before every call.
   if (m.model === 'live' && !isMetered(m.base)) throw new Error('Live AI Test refused: the model is not metered against the daily cap.');
   const s = checkedLab(state);
@@ -433,16 +469,19 @@ export async function runLabTurnWith(state: LabState, input: { message: string; 
   if (s.turns.length >= LAB_LIMITS.turns) throw new Error(`This lab conversation has reached ${LAB_LIMITS.turns} messages. Start a new one.`);
   const message = input.message.trim().slice(0, 1000);
   if (!message) throw new Error('Type a message first.');
-  const db = labStore(s);
+  const db = labStore(s, m.backend);
   const n = s.turns.length + 1;
+  // In the sandbox database a message id must stay unique across lab sessions of the same sandbox.
+  const sid = `SMlab${String(n).padStart(6, '0')}${m.backend ? randomBytes(4).toString('hex') : ''}`;
   const turn: LabTurn = { n, customer: message, reply: null, model: m.model, route: '', contactId: null, state: null, answers: {}, missing: [], detected: detected({}), objection: OBJECTION_NOTE, offer: `${LAB_CONFIG.meetingTitle} (${LAB_CONFIG.where}), the one offer in the Setter config. The pipeline does not pick a different offer per lead.`, tools: [], handedTo: null, writes: db.writes, booking: null, error: null };
   try {
     let setterContact: string | null = null;
     // setterHooks: the same hooks as web chat, so a booked contact writing again gets the returning-booked answer (A-54).
-    const r = await handleInboundSms(db.rpc, LAB_AUTH, { from: s.phone, to: '+61400000000', body: message, messageSid: `SMlab${String(n).padStart(6, '0')}` }, setterHooks(c => { setterContact = c; }));
+    const r = await handleInboundSms(db.rpc, db.auth, { from: s.phone, to: m.backend?.address ?? '+61400000000', body: message, messageSid: sid }, setterHooks(c => { setterContact = c; }));
     turn.route = r.route.agent ? `${r.route.agent}: ${r.route.reason}` : `no agent: ${r.route.reason}`;
     turn.contactId = r.contact;
     turn.reply = r.reply;
+    await mirrorFromSandbox(s, db, r.contact);
     if (setterContact && withPerson(s.tables.handoffs.filter(h => h.contact_id === setterContact))) {
       // Task A-61: live parity. The live routes pass the permission check, so runSetterTurn stays silent while a person
       // owns the conversation (agent.ts withPerson). The lab does the same from its own handoff records: the message is
@@ -457,7 +496,7 @@ export async function runLabTurnWith(state: LabState, input: { message: string; 
       // already free of keys and provider bodies) so the tester sees why.
       const caught: { message?: string } = {};
       const llm: Llm = async (req) => { try { return await gated(req); } catch (e) { caught.message = e instanceof Error ? e.message : 'The AI model call failed.'; throw e; } };
-      const out = await runSetterTurn(contactId, { llm, rpc: db.rpc, auth: LAB_AUTH, calendar: db.calendar, send: db.send, config: LAB_CONFIG, now: s.now, channel: 'sms' });
+      const out = await runSetterTurn(contactId, { llm, rpc: db.rpc, auth: db.auth, calendar: db.calendar, send: db.send, config: LAB_CONFIG, now: s.now, channel: 'sms' });
       turn.reply = out.reply; turn.handedTo = out.handedTo;
       if (out.modelFailure) turn.error = `${caught.message ?? `The AI model call failed (${out.modelFailure}).`} The fixed fallback reply was sent and the lead was handed to a person.`;
       if (turn.booking?.decision === 'perform') turn.booking.booked = out.booked;
@@ -466,7 +505,8 @@ export async function runLabTurnWith(state: LabState, input: { message: string; 
     turn.error = e instanceof Error ? e.message : 'The turn failed.';
   }
   for (const t of turn.tools) if (t.result === null) t.result = '(Not passed back to the model: the turn ended after this tool.)';
-  const c = s.tables.contacts.find(x => x.id === turn.contactId);
+  if (turn.contactId) { try { await mirrorFromSandbox(s, db, turn.contactId); } catch { turn.error = turn.error ?? 'The sandbox database could not be read back after this turn.'; } }
+  const c =s.tables.contacts.find(x => x.id === turn.contactId);
   if (c) {
     turn.state = c.state; turn.answers = { ...c.answers };
     turn.missing = LAB_CONFIG.questions.filter(q => q.required && !c.answers[q.id]).map(q => q.id);
@@ -478,17 +518,18 @@ export async function runLabTurnWith(state: LabState, input: { message: string; 
 }
 
 /** The owner approves or rejects a held action. Approve runs the original booking once (bookSlot, then reminders). */
-export async function decideLabAction(state: LabState, id: string, decision: 'approve' | 'reject'): Promise<LabState> {
+export async function decideLabAction(state: LabState, id: string, decision: 'approve' | 'reject', backend?: LabBackend): Promise<LabState> {
   const s = checkedLab(state);
-  const db = labStore(s);
+  const db = labStore(s, backend);
   const execute: ActionExecutor = async ({ payload, contactId }) => {
     if (payload?.kind !== 'book' || !contactId) return { ok: false, note: 'The lab only performs held bookings.' };
     const c = s.tables.contacts.find(x => x.id === contactId);
     if (!c) return { ok: false, note: 'Contact not found.' };
-    if (c.state !== 'qualified' && canTransition(c.state, 'qualified')) await db.rpc('fo_set_state', { channel: LAB_AUTH.channel, channel_key: LAB_AUTH.key, contact: c.id, new_state: 'qualified', agent_name: 'setter', reason: 'Owner approved the booking' });
+    if (c.state !== 'qualified' && canTransition(c.state, 'qualified')) await db.rpc('fo_set_state', { channel: db.auth.channel, channel_key: db.auth.key, contact: c.id, new_state: 'qualified', agent_name: 'setter', reason: 'Owner approved the booking' });
     const start = Date.parse(payload.start);
-    const r = await bookSlot({ calendar: db.calendar, rpc: db.rpc, auth: LAB_AUTH, send: db.send, availability: LAB_CONFIG.availability, contact: c, start, now: s.now, businessName: LAB_CONFIG.businessName, where: LAB_CONFIG.where, meetingTitle: LAB_CONFIG.meetingTitle });
-    if (!r.duplicate) await scheduleReminders(db.rpc, LAB_AUTH, c.id, r.appointment, start, s.now);
+    const r = await bookSlot({ calendar: db.calendar, rpc: db.rpc, auth: db.auth, send: db.send, availability: LAB_CONFIG.availability, contact: c, start, now: s.now, businessName: LAB_CONFIG.businessName, where: LAB_CONFIG.where, meetingTitle: LAB_CONFIG.meetingTitle });
+    if (!r.duplicate) await scheduleReminders(db.rpc, db.auth, c.id, r.appointment, start, s.now);
+    await mirrorFromSandbox(s, db, c.id);
     return { ok: true, note: r.duplicate ? 'Already booked.' : `Booked ${formatSlot(start, LAB_CONFIG.availability.timeZone)}. Confirmation logged; not sent (lab).` };
   };
   const out = decision === 'approve' ? await approvePendingAction(db.pending, id, LAB_OWNER, execute) : await rejectPendingAction(db.pending, id, LAB_OWNER);

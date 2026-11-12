@@ -15,6 +15,10 @@
 // Operating modes: the phone Receptionist does not yet consult decide() for book / reschedule / cancel (only
 // request_quote does), so neither does the lab: it is the same pipeline. Each tool call carries simulate.ts's
 // ModeDecision ('automatic', enforced: false) so the page can say so plainly.
+import { randomBytes } from 'node:crypto';
+import { sandboxRpc } from '../lab-session';
+import type { LabBackend } from '../lab-session';
+import type { ChannelAuth, Rpc } from '../orchestrator';
 import { isMetered, labDailyCapAud, labDay, liveCapReached, meteredLlm, priceFor, defaultLabUsageStore } from '../lab-usage';
 import type { LabUsageStore } from '../lab-usage';
 import { anthropicConfigFromEnv, anthropicLlm } from '../llm';
@@ -71,30 +75,80 @@ export type ReceptionistLabDeps = {
   clock?: () => number;
   usage?: LabUsageStore;
   timeoutMs?: number;
+  /** The user's lab sandbox over its voice channel (lab-session.ts voice). Absent = the in-memory store. */
+  backend?: LabBackend;
 };
 
 const E164 = /^\+[1-9][0-9]{6,14}$/, CALL_ID = /^[A-Za-z0-9_-]{8,100}$/;
 
+// ---------------------------------------------------------------------------------------------------------------
+// The lab's database: the in-memory simulation store (default) or the user's lab sandbox (task A-34, lab-session.ts) over
+// the real fo_* functions of its voice channel. In sandbox mode the lab state's tables are a read-back mirror so the page,
+// the validators and the post-call summary work unchanged. The calendar and the recording senders stay in the lab state.
+type LabDb = { rpc: Rpc; auth: ChannelAuth; sim: ReturnType<typeof simulationStore> | null; backend: LabBackend | null };
+function openDb(settings: AgentSettings, s: { caller: string | null; tables?: SimTables; seq?: number }, backend?: LabBackend): LabDb {
+  if (backend) return { rpc: sandboxRpc(backend.rpc, []), auth: backend.auth, sim: null, backend };
+  const sim = simulationStore(settings, { caller: s.caller }, settings.bookingMinutes, s.tables ? { tables: s.tables, seq: s.seq ?? 0 } : undefined);
+  return { rpc: sim.rpc, auth: SIM_AUTH, sim, backend: null };
+}
+const dbAuth = (db: LabDb) => ({ channel: db.auth.channel, channel_key: db.auth.key });
+
+/** Copies the call, the contact, its messages, next booking and hand-offs from the sandbox into the lab state (read only). */
+async function mirrorSandbox(s: ReceptionistLabState, db: LabDb, contactId: string | null, outcomes: string[], ended: { reason: string; summary: string; transcript: string } | null): Promise<void> {
+  const backend = db.backend;
+  if (!backend) return;
+  const t = s.tables;
+  const prev = t.fo_calls.find(k => k.provider_call_id === s.callId);
+  const call = { id: prev?.id ?? s.callId, provider_call_id: s.callId, contact_id: contactId ?? prev?.contact_id ?? null, caller: s.caller, outcomes: [...new Set([...(prev?.outcomes ?? []), ...outcomes])], ended_reason: ended?.reason ?? prev?.ended_reason ?? null, summary: ended?.summary ?? prev?.summary ?? null, transcript: ended?.transcript ?? prev?.transcript ?? null, ended: ended !== null || prev?.ended === true };
+  t.fo_calls = [call];
+  if (!call.contact_id) return;
+  const ctx = await backend.rpc('fo_contact_context', { ...dbAuth(db), contact: call.contact_id }) as {
+    contact: SimTables['fo_contacts'][number];
+    messages: { direction: 'inbound' | 'outbound'; body: string; agent: string | null }[];
+    appointment: { id: string; starts: string; ends: string } | null;
+    handoffs: Record<string, unknown>[];
+  };
+  const c = ctx.contact;
+  t.fo_contacts = [{ id: c.id, phone: c.phone, name: c.name, email: c.email, state: c.state, optedOut: c.optedOut === true, answers: { ...c.answers } }];
+  t.fo_messages = ctx.messages.map(m => ({ contact_id: c.id, direction: m.direction, body: m.body, agent: m.agent, prompt_version: null, provider_id: null }));
+  const appts: SimTables['fo_appointments'] = ctx.appointment ? [{ id: ctx.appointment.id, contact_id: c.id, starts: String(ctx.appointment.starts), ends: String(ctx.appointment.ends), status: 'booked', provider_event_id: '' }] : [];
+  if (!appts.length) {
+    // fo_contact_context hides bookings that ended before the database's real now(); the lab's clock is fixed in the past.
+    for (const e of s.calendar) {
+      if (e.cancelled) continue;
+      const id = await backend.rpc('fo_booking_for_event', { ...dbAuth(db), calendar_provider: 'google', event_id: e.id });
+      if (typeof id === 'string') appts.push({ id, contact_id: c.id, starts: new Date(e.start).toISOString(), ends: new Date(e.end).toISOString(), status: 'booked', provider_event_id: e.id });
+    }
+  }
+  t.fo_appointments = appts;
+  t.handoffs = ctx.handoffs.map(h => ({ ...h }));
+}
+
 /** A new lab call: the call row and contact are created and the fixed greeting is said (no model, no cost). */
-export async function startReceptionistLab(opts: { caller?: string | null; settings?: AgentSettings; now?: number } = {}): Promise<ReceptionistLabState> {
+export async function startReceptionistLab(opts: { caller?: string | null; settings?: AgentSettings; now?: number; backend?: LabBackend } = {}): Promise<ReceptionistLabState> {
   const caller = opts.caller === undefined ? RECEPTIONIST_LAB_CALLER : opts.caller;
   if (caller !== null && !E164.test(caller)) throw new Error('The test caller number must be in +61 format.');
   const settings = opts.settings ?? demoSettings();
-  const db = simulationStore(settings, { caller });
-  const a = { channel: SIM_AUTH.channel, channel_key: SIM_AUTH.key };
-  await db.rpc('fo_voice_turn', { ...a, call_id: RECEPTIONIST_LAB_CALL_ID, caller, turn: 0, message: null });
+  const db = openDb(settings, { caller }, opts.backend);
+  const a = dbAuth(db);
+  // In the sandbox every call needs its own provider call id (the database keeps calls from earlier lab sessions).
+  const callId = opts.backend ? `call_lab_${randomBytes(6).toString('hex')}` : RECEPTIONIST_LAB_CALL_ID;
+  const first = await db.rpc('fo_voice_turn', { ...a, call_id: callId, caller, turn: 0, message: null }) as { contact?: string | null } | null;
   const text = greeting(settings);
-  await db.rpc('fo_voice_reply', { ...a, call_id: RECEPTIONIST_LAB_CALL_ID, message: text, prompt: RECEPTIONIST_GREETING_VERSION });
-  return {
-    v: 1, callId: RECEPTIONIST_LAB_CALL_ID, caller, seq: db.seq(), now: opts.now ?? SIM_NOW,
+  await db.rpc('fo_voice_reply', { ...a, call_id: callId, message: text, prompt: RECEPTIONIST_GREETING_VERSION });
+  const state: ReceptionistLabState = {
+    v: 1, callId, caller, seq: db.sim?.seq() ?? 0, now: opts.now ?? SIM_NOW,
     conversation: [{ role: 'assistant', content: text }],
-    tables: structuredClone(db.tables), calendar: [], calendarLog: [], wouldSend: [],
+    tables: db.sim ? structuredClone(db.sim.tables) : { fo_calls: [], fo_contacts: [], fo_messages: [], fo_appointments: [], fo_jobs: [], fo_events: [], handoffs: [] },
+    calendar: [], calendarLog: [], wouldSend: [],
     turns: [{ n: 0, caller: null, said: text, route: 'greeting', model: null, prompt: RECEPTIONIST_GREETING_VERSION, tools: [], outcomes: [], action: null, transferTo: null, latencyMs: 0, error: null }],
     ended: null,
   };
+  await mirrorSandbox(state, db, first?.contact ?? null, [], null);
+  return state;
 }
 
-const arr = (v: unknown) => Array.isArray(v);
+const arr =(v: unknown) => Array.isArray(v);
 /** Lab state as sent back by the page: shape and size checked, then deep-copied. Anything else is refused. */
 export function checkedReceptionistLab(v: unknown): ReceptionistLabState {
   const bad = () => new Error('This lab call could not be read. Start a new call.');
@@ -141,7 +195,7 @@ const isTurn = (t: unknown) => isObj(t) && Number.isSafeInteger(t.n) && isStrOrN
 
 /** One caller turn through the real Receptionist with any model (the scripted one in tests). A 'live' model must be
  * metered against the daily cap (meteredLlm), or it is refused before anything runs. */
-export async function runReceptionistLabTurnWith(state: ReceptionistLabState, input: { says: string }, m: { base: Llm; model: ReceptionistLabModel; settings?: AgentSettings; clock?: () => number }): Promise<ReceptionistLabState> {
+export async function runReceptionistLabTurnWith(state: ReceptionistLabState, input: { says: string }, m: { base: Llm; model: ReceptionistLabModel; settings?: AgentSettings; clock?: () => number; backend?: LabBackend }): Promise<ReceptionistLabState> {
   if (m.model === 'live' && !isMetered(m.base)) throw new Error('Live AI Test refused: the model is not metered against the daily cap.');
   const s = checkedReceptionistLab(state);
   // A transfer or hang-up ends the call, as on the phone.
@@ -152,10 +206,11 @@ export async function runReceptionistLabTurnWith(state: ReceptionistLabState, in
   if (!says) throw new Error('Say something first.');
   const clock = m.clock ?? Date.now, t0 = clock();
   const settings = m.settings ?? demoSettings();
-  const db = simulationStore(settings, { caller: s.caller }, settings.bookingMinutes, { tables: s.tables, seq: s.seq });
+  const db = openDb(settings, { caller: s.caller, tables: s.tables, seq: s.seq }, m.backend);
   const cal = simulatedCalendar(s.calendar);
   const senders = recordingSenders();
-  const a = { channel: SIM_AUTH.channel, channel_key: SIM_AUTH.key };
+  const a = dbAuth(db);
+  let contactId: string | null = null;
 
   s.conversation.push({ role: 'user', content: says });
   const n = s.conversation.filter(c => c.role === 'user').length;
@@ -164,8 +219,9 @@ export async function runReceptionistLabTurnWith(state: ReceptionistLabState, in
   try {
     // As vapi-route.ts vapiChat: record the caller's words on the call, then the Receptionist turn.
     const r = await db.rpc('fo_voice_turn', { ...a, call_id: s.callId, caller: s.caller, turn: n, message: says }) as { contact: string | null };
+    contactId = r?.contact ?? null;
     const llm = recordingModel(m.base, n, tools, () => undefined);
-    const gen = runReceptionistTurn({ llm, rpc: db.rpc, auth: SIM_AUTH, calendar: cal.provider, send: senders.send, email: senders.email, settings, now: s.now, call: { id: s.callId, caller: s.caller, contact: r?.contact ?? null }, conversation: [...s.conversation] });
+    const gen = runReceptionistTurn({ llm, rpc: db.rpc, auth: db.auth, calendar: cal.provider, send: senders.send, email: senders.email, settings, now: s.now, call: { id: s.callId, caller: s.caller, contact: r?.contact ?? null }, conversation: [...s.conversation] });
     let step = await gen.next();
     while (!step.done) {
       const out = step.value;
@@ -185,8 +241,9 @@ export async function runReceptionistLabTurnWith(state: ReceptionistLabState, in
   turn.latencyMs = Math.max(0, clock() - t0);
   if (turn.said) s.conversation.push({ role: 'assistant', content: turn.said.slice(0, RECEPTIONIST_LAB_LIMITS.line) });
   s.turns.push(turn);
-  s.tables = structuredClone(db.tables); s.seq = db.seq();
+  if (db.sim) { s.tables = structuredClone(db.sim.tables); s.seq = db.sim.seq(); }
   s.calendar = cal.snapshot(); s.calendarLog.push(...cal.log); s.wouldSend.push(...senders.out);
+  try { await mirrorSandbox(s, db, contactId, turn.outcomes, null); } catch { turn.error = turn.error ?? 'The sandbox database could not be read back after this turn.'; }
   return s;
 }
 
@@ -212,7 +269,7 @@ export async function runLiveReceptionistTurn(state: ReceptionistLabState, input
   };
   const fetchImpl = anthropicOnlyFetch(deps.fetch ?? ((...x: Parameters<typeof fetch>) => globalThis.fetch(...x)));
   const base = meteredLlm(anthropicLlm(config, fetchImpl, deps.timeoutMs ?? 30_000), { model: config.model, day, capAud, store, clock, u });
-  const next = await runReceptionistLabTurnWith(state, input, { base, model: 'live', settings: deps.settings, clock });
+  const next = await runReceptionistLabTurnWith(state, input, { base, model: 'live', settings: deps.settings, clock, backend: deps.backend });
   const turn = next.turns.at(-1);
   if (turn) turn.usage = u;
   return next;
@@ -272,17 +329,18 @@ function summaryOf(s: ReceptionistLabState): ReceptionistCallSummary {
 
 /** Hang up: the summary and transcript are saved on the call record (fo_voice_end, as the phone's end-of-call report
  * does) and the state is closed. No model, no cost. */
-export async function endReceptionistLabCall(state: ReceptionistLabState, opts: { settings?: AgentSettings } = {}): Promise<ReceptionistLabState> {
+export async function endReceptionistLabCall(state: ReceptionistLabState, opts: { settings?: AgentSettings; backend?: LabBackend } = {}): Promise<ReceptionistLabState> {
   const s = checkedReceptionistLab(state);
   if (s.ended) return s;
   const summary = summariseReceptionistLabCall(s);
   const settings = opts.settings ?? demoSettings();
-  const db = simulationStore(settings, { caller: s.caller }, settings.bookingMinutes, { tables: s.tables, seq: s.seq });
+  const db = openDb(settings, { caller: s.caller, tables: s.tables, seq: s.seq }, opts.backend);
   const reason = summary.outcome.endedBy === 'transfer' ? 'assistant-forwarded-call' : summary.outcome.endedBy === 'end' ? 'assistant-ended-call' : 'customer-ended-call';
   const transcript = s.conversation.map(c => `${c.role === 'assistant' ? 'AI' : 'User'}: ${c.content}`).join('\n');
-  const end = await db.rpc('fo_voice_end', { channel: SIM_AUTH.channel, channel_key: SIM_AUTH.key, call_id: s.callId, caller: s.caller, reason, call_summary: summary.outcome.text.slice(0, 4000), call_transcript: transcript.slice(0, 20000) }) as { contact: string | null; outcomes: string[] | null; first?: boolean } | null;
-  if (end) await recordDroppedCall(db.rpc, SIM_AUTH, end, { id: s.callId, caller: s.caller, reason, transcript });
-  s.tables = structuredClone(db.tables); s.seq = db.seq();
+  const end = await db.rpc('fo_voice_end', { ...dbAuth(db), call_id: s.callId, caller: s.caller, reason, call_summary: summary.outcome.text.slice(0, 4000), call_transcript: transcript.slice(0, 20000) }) as { contact: string | null; outcomes: string[] | null; first?: boolean } | null;
+  if (end) await recordDroppedCall(db.rpc, db.auth, end, { id: s.callId, caller: s.caller, reason, transcript });
+  if (db.sim) { s.tables = structuredClone(db.sim.tables); s.seq = db.sim.seq(); }
+  else await mirrorSandbox(s, db, end?.contact ?? s.tables.fo_calls[0]?.contact_id ?? null, end?.outcomes ?? [], { reason, summary: summary.outcome.text.slice(0, 4000), transcript: transcript.slice(0, 20000) });
   s.ended = { reason, summary };
   return s;
 }

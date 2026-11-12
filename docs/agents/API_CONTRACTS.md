@@ -139,6 +139,38 @@ nothing placed, booked or sent. Shapes: `ReceptionistLabState`, `ReceptionistCal
   speech-to-text (Web Speech API, `en-AU`) and spoken replies (`speechSynthesis`, `en-AU`) are optional, keyboard input
   always works.
 
+### Setter Lab and Receptionist Lab sandbox (A-34, test pages only)
+EXISTS. Server Actions (not REST routes) in `apps/web/app/tools/setter-lab/actions.ts` and
+`apps/web/app/tools/receptionist-lab/actions.ts`. Shared types live in `lib/front-office/contracts.ts`: `LabPersistence`,
+`LabScenarioInfo`, `LabProductName`, `LabRowCountsInfo`. Logic: `lib/front-office/lab-session.ts` (`openLabSession`,
+`sandboxRpc`, `sandboxEmail`), `apps/web/app/tools/setter-lab/sandbox.ts` (token to session, reset, scenarios) over
+`lib/supabase/lab-sandbox.ts` (A-25, the `fo_lab_*` functions, migration 202611110001).
+- Where data lives: `LabPersistence = { mode: "database", workspaceId, created } | { mode: "memory", reason }`. Database mode
+  needs BOTH the server-only env secret `FRONT_OFFICE_LAB_KEY_SECRET` (at least 32 characters; the per-user lab channel key is
+  an HMAC of the user id under it; never sent to the browser) AND a server-verified signed-in user. Otherwise the lab keeps its
+  in-memory store and `reason` says why in plain English (secret not set / too short / not signed in / database not
+  available). The page shows DEMO and "Persistence: MEMORY ONLY (reason)". Nothing is created or written in memory mode.
+- Database mode: the Setter Lab runs the real pipeline over the sandbox's `lab:sms:<id>` channel, the Receptionist Lab live
+  call over its `lab:voice:<id>` channel, using the real `fo_*` functions (contacts, messages, bookings, jobs, hand-offs). A lab
+  booking is therefore a row in the sandbox workspace and is returned by `GET /api/front-office/contacts?workspace=<sandbox id>`
+  for its owner. The calendar, the held-action queue (Setter) and the recording senders stay in the lab state; nothing is sent
+  and `FRONT_OFFICE_*_LIVE` switches are not read. The fixture simulation on the Receptionist page (`runLab`) stays in memory.
+- Sandbox contacts only take test email domains (`example.com/net/org`, `*.test`, `*.example`, `*.invalid`, `*.localhost`). An
+  email the model writes that looks real is stored as `<name>@lab-sandbox.test` and the turn records a write line saying so; the
+  turn does not fail.
+- Setter actions: `getLabSession()` -> `{ persistence, scenarios }`; `startLab(mode)` and `resetLab(mode)` delete the sandbox
+  conversation rows (database mode) and return a fresh state; `sendMessage`, `sendLiveMessage`, `decideAction` as before, now
+  also `persistence`; `saveScenario(state, name)`, `loadScenario(name)`, `deleteScenario(name)` -> `LabResult`
+  `{ state, error, persistence?, scenarios?, notice?, liveAi? }`. Scenarios (max 20 per lab, name 1 to 80 characters) store the
+  lab state plus a snapshot of the sandbox rows; load resets the sandbox and restores them in one transaction.
+- Receptionist actions: `getReceptionistLabSession()`, `startLiveCall()`, `sendLiveTurn(state, says)`, `endLiveCall(state)`,
+  `resetLiveLab()`, `saveCallScenario(state, name)`, `loadCallScenario(name)`, `deleteCallScenario(name)` -> `LiveCallResult`
+  `{ state, error, liveAi?, signIn?, persistence?, scenarios?, notice? }`. In database mode the page does not start a call on
+  load (no writes on a page visit); each call gets its own `call_lab_<hex>` id.
+- Known limit: `fo_contact_context` only returns bookings that end after the database's real clock, while the labs use a fixed
+  lab time in the past. The lab pages therefore find the booking from the lab calendar (`fo_booking_for_event`), but the Setter's
+  returning-booked answer (which reads the context) will say there is no upcoming booking in database mode.
+
 ## Planned endpoints
 
 All planned endpoints: signed-in, `?workspace=<id>`, common errors above, lists capped and newest first unless stated.

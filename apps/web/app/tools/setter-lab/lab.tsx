@@ -1,10 +1,10 @@
 'use client';
 import { useState, useTransition } from 'react';
-import { decideAction, getLabUsage, sendLiveMessage, sendMessage, startLab } from './actions';
+import { decideAction, deleteScenario, getLabUsage, loadScenario, resetLab, saveScenario, sendLiveMessage, sendMessage, startLab } from './actions';
 import type { LabResult } from './actions';
 import type { LabState } from '../../../lib/front-office/setter/lab';
 import type { LabUsageToday } from '../../../lib/front-office/lab-usage';
-import type { OperatingMode } from '../../../lib/front-office/contracts';
+import type { LabPersistence, LabScenarioInfo, OperatingMode } from '../../../lib/front-office/contracts';
 import type { LiveAiState } from './live-auth';
 import { turnBadge, turnUsageLine, usageTodayLine } from './format';
 
@@ -24,7 +24,11 @@ const MODES: { id: OperatingMode; label: string }[] = [
 ];
 const json = (v: unknown) => JSON.stringify(v, null, 2);
 
-export default function SetterLab({ initial, initialUsage }: { initial: LabState; initialUsage: LabUsageToday }) {
+export default function SetterLab({ initial, initialUsage, initialPersistence = { mode: 'memory', reason: 'Lab sandbox status not loaded yet; memory only.' }, initialScenarios = [] }: { initial: LabState; initialUsage: LabUsageToday; initialPersistence?: LabPersistence; initialScenarios?: LabScenarioInfo[] }) {
+  const [persistence, setPersistence] = useState<LabPersistence>(initialPersistence);
+  const [scenarios, setScenarios] = useState<LabScenarioInfo[]>(initialScenarios);
+  const [scenarioName, setScenarioName] = useState('');
+  const [notice, setNotice] = useState<string | null>(null);
   const [state, setState] = useState<LabState>(initial);
   const [mode, setMode] = useState<OperatingMode>(initial.mode);
   const [labRun, setLabRun] = useState<LabRun>('demo');
@@ -33,7 +37,14 @@ export default function SetterLab({ initial, initialUsage }: { initial: LabState
   const [message, setMessage] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
-  const apply = (r: LabResult) => { setError(r.error); if (r.state) setState(r.state); if (r.liveAi && r.liveAi !== 'unknown') setLiveAi(r.liveAi); };
+  const apply = (r: LabResult) => {
+    setError(r.error); setNotice(r.notice ?? null);
+    if (r.state) { setState(r.state); setMode(r.state.mode); }
+    if (r.liveAi && r.liveAi !== 'unknown') setLiveAi(r.liveAi);
+    if (r.persistence) setPersistence(r.persistence);
+    if (r.scenarios) setScenarios(r.scenarios);
+  };
+  const db = persistence.mode === 'database';
   const run = (f: () => Promise<LabResult>) => start(async () => { try { apply(await f()); } catch { setError('The lab could not reach the server.'); } });
   const refreshUsage = async () => { try { setUsage(await getLabUsage()); } catch { /* keep the last known figures */ } };
   const runLive = (m: string) => start(async () => {
@@ -46,7 +57,7 @@ export default function SetterLab({ initial, initialUsage }: { initial: LabState
 
   return <main>
     <h1>Setter Test Lab</h1>
-    <p><strong data-testid="page-mode">{live ? 'LIVE AI TEST' : 'DEMO'}</strong> Runs your messages through the real AI Setter pipeline (inbound router, Setter tools, booking, permission check) with an in-memory store and calendar. Nothing is sent, nothing is booked in a real calendar, nothing is written to Supabase. {live ? 'Live AI Test uses the real AI model (paid, estimated cost shown) and needs you to be signed in.' : 'Demo uses a scripted model and needs no sign-in.'}</p>
+    <p><strong data-testid="page-mode">{live ? 'LIVE AI TEST' : 'DEMO'}</strong> Runs your messages through the real AI Setter pipeline (inbound router, Setter tools, booking, permission check) with an in-memory calendar. Nothing is sent and nothing is booked in a real calendar. {db ? 'Contacts, messages and bookings are written to your own lab sandbox workspace (test data only).' : 'Nothing is written to Supabase (memory only).'} {live ? 'Live AI Test uses the real AI model (paid, estimated cost shown) and needs you to be signed in.' : 'Demo uses a scripted model and needs no sign-in.'}</p>
 
     <fieldset data-testid="lab-run">
       <legend>Test mode</legend>
@@ -60,7 +71,8 @@ export default function SetterLab({ initial, initialUsage }: { initial: LabState
     <ul data-testid="connections">
       <li>Model: <strong>{live ? 'REAL (Live AI Test)' : 'SCRIPTED'}</strong>{live ? '' : ' (keyword rules)'}.</li>
       <li data-testid="live-ai-state">Live AI: <strong>{LIVE_AI_LABEL[liveAi]}</strong></li>
-      <li>Store: <strong>IN-MEMORY</strong> (this page only; reload or New conversation clears it)</li>
+      <li data-testid="persistence">Persistence: <strong>{db ? 'SANDBOX DATABASE' : 'MEMORY ONLY'}</strong>{persistence.mode === 'database' ? ` (your lab sandbox workspace ${persistence.workspaceId}; contacts and bookings are real rows in it)` : ` (${persistence.reason})`}</li>
+      <li>Store: <strong>{db ? 'LAB SANDBOX (real fo_* functions)' : 'IN-MEMORY'}</strong> {db ? '(the calendar and the held-action queue stay in this page)' : '(this page only; reload or New conversation clears it)'}</li>
       <li>Channel: <strong>LAB</strong> (SMS shape, nothing sent)</li>
       <li>Calendar: <strong>IN-MEMORY</strong></li>
     </ul>
@@ -76,8 +88,23 @@ export default function SetterLab({ initial, initialUsage }: { initial: LabState
         {MODES.map(m => <label key={m.id}><input type="radio" name="mode" value={m.id} checked={mode === m.id} onChange={() => setMode(m.id)} /> {m.label} </label>)}
       </p>
       <p data-testid="gate-note">Booking permission check shown here is the intended wiring; the production Setter does not call it yet (task A-8).</p>
-      <button type="button" disabled={pending} onClick={() => { setMessage(''); run(() => startLab(mode)); }}>New conversation</button>
+      <button type="button" disabled={pending} onClick={() => { setMessage(''); run(() => startLab(mode)); }}>New conversation</button>{' '}
+      <button type="button" disabled={pending} onClick={() => { setMessage(''); run(() => resetLab(mode)); }}>Reset sandbox</button>
     </fieldset>
+
+    <fieldset data-testid="scenarios">
+      <legend>Saved scenarios</legend>
+      {!db && <p>Saving needs the lab sandbox. {persistence.mode === 'memory' ? persistence.reason : ''}</p>}
+      <label htmlFor="scenario-name">Name</label>{' '}
+      <input id="scenario-name" maxLength={80} value={scenarioName} onChange={e => setScenarioName(e.target.value)} />{' '}
+      <button type="button" disabled={pending || !db || !scenarioName.trim()} onClick={() => run(() => saveScenario(state, scenarioName))}>Save scenario</button>
+      {scenarios.length === 0 ? <p>No saved scenarios.</p> : <ul>{scenarios.map(s => <li key={s.id}>
+        {s.name} (revision {s.revision}, {s.contacts} contact{s.contacts === 1 ? '' : 's'}, {s.appointments} booking{s.appointments === 1 ? '' : 's'}){' '}
+        <button type="button" disabled={pending || !db} onClick={() => run(() => loadScenario(s.name))}>Load</button>{' '}
+        <button type="button" disabled={pending || !db} onClick={() => run(() => deleteScenario(s.name))}>Delete</button>
+      </li>)}</ul>}
+    </fieldset>
+    {notice && <p role="status" data-testid="notice">{notice}</p>}
 
     <form onSubmit={e => { e.preventDefault(); const m = message; setMessage(''); if (live) runLive(m); else run(() => sendMessage(state, m, mode)); }}>
       <label htmlFor="msg">Customer says</label><br />
