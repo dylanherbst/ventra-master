@@ -15,6 +15,17 @@ Dylan asked for the mobile app preview link to be sent to him on Telegram. Send 
 
 ## Master Coordinator (auto)
 
+- Last cycle: c-a3429447 at 2026-11-13 04:40 AWST · 4 dispatched (A-65, A-62, A-50, A-53) + 4 reviews · 4 verified and committed · 1 new owner decision (A-79)
+- Integration branch: agent/develop @ 599b2522 (cc44355a A-65 · 252a3d4b A-62 · 045e4e9c A-50 · 599b2522 A-53); board commit follows
+- Verification: ventra-verify PASSED after each of A-62, A-50, A-53 (lint, typecheck, unit tests, build, workspace integration; course + launcher FROZEN, P0-7).
+- Changes (tests only, plus one comment in jobs.ts): scenario suites now say plainly which checks are scripted (not real-model coverage); the 000 emergency rule is asserted by its text; S12b is its own scenario; the recorder never hides the original failure. New live-model QA file (A-53) runs only with FRONT_OFFICE_QA_LIVE=1, a key and a model id, capped (default 100 calls / A$3); never run by the coordinator. A-28 umbrella closed.
+- OWNER: A-79 decide email-runner reminders/rescues (email first even with a mobile; SMS fallback not consent-checked as transactional; recommendation keep). Optional: run the live QA file yourself (chargeable).
+- Running / implemented (needs reconciling next cycle): none.
+- Blocked, needs the owner: A-79, A-64, A-14 (blocks A-7/A-56/A-13), A-60, A-12, P0-10, P0-7, W-1 browser check (localhost:3020 still needs approval; blocks all W- tasks), M-1/M-2/M-4 review; lab secret FRONT_OFFICE_LAB_KEY_SECRET (see previous cycle).
+- Next up: A-80 (A-53 nits), A-11 (WhatsApp inbound remains, Meta exists; owner should be ventra-voice), lab-usage price table lacks Claude 5.x ids (new task), M-3 Reels when budget allows.
+
+### Previous cycle c-4f349d12
+
 - Last cycle: c-4f349d12 at 2026-11-13 04:15 AWST · 2 reconciled (A-27, A-63) + 2 dispatched (A-34, A-78) + 2 reviews · 4 verified and committed · 1 owner action (lab secret)
 - Integration branch: agent/develop @ 26d51e5e (e01a0994 A-63 · 4aed25bb A-27 · 2af933aa A-34 · 26d51e5e A-78); board commit follows
 - Verification: ventra-verify exit 0 after A-78 (lint, typecheck, unit tests, build, workspace integration; course + launcher FROZEN, P0-7). Suite: 1215 total, 1210 pass, 5 todo, 0 fail.
@@ -235,10 +246,10 @@ Tracker Phase 0: 0.1 scope freeze, 0.2 orchestrator, 0.3 lead store + state mach
 ## Git state (auto)
 
 <!-- git-state:start -->
-_Generated 2026-11-13 04:04 by `ventra-handoff snapshot`. Do not hand-edit this block._
+_Generated 2026-11-13 04:31 by `ventra-handoff snapshot`. Do not hand-edit this block._
 - Branch: `agent/develop`
-- HEAD: `26d51e5 fix(front-office): lab actions never return raw database text (safeLabError reuses the rpcFromClient filter) and keep the persistence state on failure; reset and new-conversation say they clear both labs' shared sandbox; live send verifies the caller once; page comments corrected; API_CONTRACTS notes free text in the sandbox [A-78]`
-- Lock: coordinator (pid 38721, 34 min old)
+- HEAD: `599b252 test(front-office): live AI QA scenarios S2, S3, S5, S7, X1, R1, R5, R6, X5 through the real labs and model adapter; skipped unless FRONT_OFFICE_QA_LIVE=1 (no key read, no network otherwise), fetch confined to the model host, call and AUD cap enforced before each call via meteredLlm, fallback replies cannot hide a cap hit [A-53]`
+- Lock: coordinator (pid 52718, 26 min old)
 - Uncommitted changes:
 ```text
  M HANDOFF.md
@@ -247,18 +258,18 @@ _Generated 2026-11-13 04:04 by `ventra-handoff snapshot`. Do not hand-edit this 
 ```
 - Diff stat vs HEAD:
 ```text
- HANDOFF.md                  |  15 ++---
- docs/agents/TASKS.md        |   6 +-
- docs/agents/TASK_BOARD.json | 137 ++++++++++++++++++++++++++++++++++----------
- 3 files changed, 119 insertions(+), 39 deletions(-)
+ HANDOFF.md                  |  11 ++
+ docs/agents/TASKS.md        |  11 +-
+ docs/agents/TASK_BOARD.json | 383 ++++++++++++++++++++++++++++++++++++--------
+ 3 files changed, 338 insertions(+), 67 deletions(-)
 ```
 - Recent commits:
 ```text
-26d51e5 fix(front-office): lab actions never return raw database text (safeLabError reuses the rpcFromClient filter) and keep the persistence state on failure; reset and new-conversation say they clear both labs' shared sandbox; live send verifies the caller once; page comments corrected; API_CONTRACTS notes free text in the sandbox [A-78]
-2af933a feat(front-office): Setter Lab and Receptionist Lab persist to the per-user lab sandbox (real fo_* rpc, reset, save/load/delete scenarios, DEMO/LIVE + persistence indicator); memory fallback with a visible reason when FRONT_OFFICE_LAB_KEY_SECRET is missing or short; model emails swapped to @lab-sandbox.test; lab types in contracts.ts and API_CONTRACTS.md; booking proven visible via GET /api/front-office/contacts [A-34]
-4aed25b feat(front-office): /tools/front-office-lab overview page: links both labs, DEMO/LIVE and connection indicators, operating modes and lab spend read under the owner's own session, cross-channel check that recognises a Setter-qualified contact only after the A-20 identity check and shows nothing before it [A-27]
-e01a099 fix(receptionist): emergency rule says call 000 if unsure and ends the call only after the note offer is answered (receptionist/voice@4); tests use the exported prompt version instead of stale @1/@3 literals; prompt test looks rules up by label and fails loudly [A-63]
-49e51e8 chore(coordinator): cycle c-53ebd485 board and handoff
+599b252 test(front-office): live AI QA scenarios S2, S3, S5, S7, X1, R1, R5, R6, X5 through the real labs and model adapter; skipped unless FRONT_OFFICE_QA_LIVE=1 (no key read, no network otherwise), fetch confined to the model host, call and AUD cap enforced before each call via meteredLlm, fallback replies cannot hide a cap hit [A-53]
+045e4e9 test(front-office): email runner with no email sender falls back to SMS (cancelled without an SMS grant, sent with one); runDueJobs comment says which job kinds go where and that only follow-ups are consent-gated [A-50]
+252a3d4 test(setter): scenario suite labels scripted-text assertions as code-side guards only, drops the G1 replay pin from S5 (kept in S9), splits the G2 chat-route failure into its own S12b scenario; recorder files get a case suffix and a recording failure never masks the scenario's own error [A-62]
+cc44355 test(receptionist): scenario suite labels X5 as a scripted-model check and R9 as keyword smoke, asserts the 000 emergency rule by label instead of a version string, derives R3/R4 seeds and unoffered times from the simulate fixtures and offered set, names turn and tool indices; X5 prompt-leak turn runs no tool [A-65]
+dd5159b chore(coordinator): cycle c-4f349d12 board and handoff
 ```
 <!-- git-state:end -->
 

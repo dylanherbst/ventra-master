@@ -1,12 +1,12 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-12T18:52:52.286Z",
+  "updatedAt": "2026-11-12T20:30:45.654Z",
   "integrationBranch": "agent/develop",
   "lastRun": {
-    "id": "c-4f349d12",
-    "startedAt": "2026-11-12T19:30:11Z",
-    "endedAt": "2026-11-12T20:15:00Z",
-    "summary": "Reconciled A-27 and A-63 (left running by c-4dba26f8): A-27 review pass, A-63 review fail (stale voice@3 pins) fixed once; A-34 labs wired to the lab sandbox (review pass with nits) and A-78 fixed the nits. 4 commits (e01a0994, 4aed25bb, 2af933aa, 26d51e5e), ventra-verify exit 0. Owner: add FRONT_OFFICE_LAB_KEY_SECRET to apps/web/.env.local for database mode."
+    "id": "c-a3429447",
+    "startedAt": "2026-11-12T20:05:11Z",
+    "endedAt": "2026-11-12T20:30:45.654Z",
+    "summary": "4 voice tasks done and committed: A-65 (cc44355a), A-62 (252a3d4b), A-50 (045e4e9c), A-53 (599b2522); each reviewed PASS and ventra-verify PASSED. New: A-79 owner decision (email-runner reminders/consent), A-80 queued (A-53 nits). Website W-1 still blocked (localhost:3020 needs approval)."
   },
   "tasks": [
     {
@@ -3051,10 +3051,26 @@
         "4aed25bb"
       ],
       "evidence": [
-        { "at": "2026-11-12T19:40:00Z", "kind": "diff", "detail": "c-4f349d12 reconcile: untracked check.ts, overview.ts, page.tsx and front-office-lab-page.test.ts from c-4dba26f8 read by the coordinator; complete." },
-        { "at": "2026-11-12T19:55:00Z", "kind": "review", "detail": "ventra-review PASS WITH NITS: owner-session reads with RLS, membership + UUID check, no contact shown before identity passes, no sends. Nits: test title at test:60 says 'other workspace' but only tests duplicate collapse; default isMember/modes/contacts readers untested (fakes only); multiple matches reuse status needs_identity." },
-        { "at": "2026-11-12T20:15:00Z", "kind": "test", "detail": "npm --prefix apps/web test: 1212 tests, 1207 pass, 0 fail, 5 todo. typecheck exit 0, lint exit 0 (--max-warnings 0). ventra-verify earlier this cycle: build PASSED, workspace-integration PASSED, course/launcher FROZEN; unit-tests FAILED only on A-63 stale pins, since fixed." },
-        { "at": "2026-11-12T20:20:00Z", "kind": "commit", "detail": "4aed25bb on agent/develop" }
+        {
+          "at": "2026-11-12T19:40:00Z",
+          "kind": "diff",
+          "detail": "c-4f349d12 reconcile: untracked check.ts, overview.ts, page.tsx and front-office-lab-page.test.ts from c-4dba26f8 read by the coordinator; complete."
+        },
+        {
+          "at": "2026-11-12T19:55:00Z",
+          "kind": "review",
+          "detail": "ventra-review PASS WITH NITS: owner-session reads with RLS, membership + UUID check, no contact shown before identity passes, no sends. Nits: test title at test:60 says 'other workspace' but only tests duplicate collapse; default isMember/modes/contacts readers untested (fakes only); multiple matches reuse status needs_identity."
+        },
+        {
+          "at": "2026-11-12T20:15:00Z",
+          "kind": "test",
+          "detail": "npm --prefix apps/web test: 1212 tests, 1207 pass, 0 fail, 5 todo. typecheck exit 0, lint exit 0 (--max-warnings 0). ventra-verify earlier this cycle: build PASSED, workspace-integration PASSED, course/launcher FROZEN; unit-tests FAILED only on A-63 stale pins, since fixed."
+        },
+        {
+          "at": "2026-11-12T20:20:00Z",
+          "kind": "commit",
+          "detail": "4aed25bb on agent/develop"
+        }
       ],
       "blocker": null,
       "notes": "Owner note 2026-11-10 07:35. Review nits not yet addressed (see evidence); low priority.",
@@ -3066,7 +3082,7 @@
       "phase": "A",
       "module": "shared",
       "owner": "ventra-qa",
-      "state": "queued",
+      "state": "done",
       "priority": 3,
       "dependsOn": [
         "A-23",
@@ -3086,10 +3102,11 @@
       "branch": "agent/develop",
       "worktree": null,
       "startedAt": "2026-11-11T17:20:00Z",
-      "finishedAt": null,
-      "lastRunId": "c-a8a636ff",
+      "finishedAt": "2026-11-12T20:30:52.014Z",
+      "lastRunId": "c-a3429447",
       "runIds": [
-        "c-a8a636ff"
+        "c-a8a636ff",
+        "c-a3429447"
       ],
       "commits": [],
       "evidence": [
@@ -3097,11 +3114,16 @@
           "at": "2026-11-11T17:39:00Z",
           "kind": "note",
           "detail": "c-a8a636ff: ventra-qa wrote the scenario spec (S1-S12, R1-R13, X1-X8, harness map, 8 code gaps G1-G8); saved by coordinator as docs/agents/briefs/A-28_QA_SCENARIOS.md. Implementation split: A-49 Setter file, A-51 Receptionist file, A-52 security file, A-53 live file. Gaps planned as A-54..A-60."
+        },
+        {
+          "at": "2026-11-12T20:30:52.014Z",
+          "kind": "note",
+          "detail": "Umbrella closed: A-49, A-51, A-52 done; review nits A-62/A-65 done; live file A-53 done (599b2522). Demo suites run in npm test (ventra-verify PASSED this cycle)."
         }
       ],
       "blocker": null,
-      "notes": "Owner note 2026-11-10 07:35. Umbrella task: done when A-49, A-51, A-52 are done (A-53 live is on demand).",
-      "updatedAt": "2026-11-11T17:39:00Z"
+      "notes": "Owner note 2026-11-10 07:35. Umbrella task: done when A-49, A-51, A-52 are done (A-53 live is on demand). c-a3429447: A-62, A-65, A-53 done; umbrella waits on A-52 state.",
+      "updatedAt": "2026-11-12T20:30:52.014Z"
     },
     {
       "id": "A-30",
@@ -3420,12 +3442,36 @@
         "2af933aa"
       ],
       "evidence": [
-        { "at": "2026-11-12T19:48:00Z", "kind": "diff", "detail": "16 files: new lib/front-office/lab-session.ts, app/tools/setter-lab/sandbox.ts, test/front-office-lab-sandbox.test.ts (7 tests); edits to both lab pages/actions, contracts.ts, setter/lab.ts, setter/lab-live.ts, receptionist/lab-live.ts, API_CONTRACTS.md, receptionist-lab-page test." },
-        { "at": "2026-11-12T19:50:00Z", "kind": "review", "detail": "ventra-review PASS WITH NITS: secret server-only and never returned; user id from verifiedCaller only, workspace from server session; fo_lab_clear limited to fo_is_lab workspace; no live sends; model email swapped to @lab-sandbox.test. Minor: both labs share one sandbox so reset clears both; New conversation is a destructive reset; fail() paths return raw db text and drop persistence. Nits: double verifiedCaller; page comment inaccurate; free-text note for docs. -> A-78." },
-        { "at": "2026-11-12T19:51:00Z", "kind": "test", "detail": "npm --prefix apps/web test: 1212 tests (+7), 1207 pass, 0 fail, 5 todo; typecheck exit 0; lint exit 0. Test file asserts GET /api/front-office/contacts?workspace=<sandbox> returns the booked contact (test:63-98)." },
-        { "at": "2026-11-12T19:52:00Z", "kind": "build", "detail": "ventra-verify: lint, typecheck, unit-tests, build, workspace-integration PASSED; course/launcher FROZEN; recorded in last-verify.json." },
-        { "at": "2026-11-12T19:53:00Z", "kind": "note", "detail": "First commit attempt refused by the ventra-git secret scanner: false positive on the old constant LAB_KEY_SECRET_ENV, whose value is an env var NAME, not a credential. Coordinator renamed the constant to LAB_KEY_ENV_NAME (2 files); typecheck exit 0 and lab-sandbox test 7/7 pass after. Scanner not changed." },
-        { "at": "2026-11-12T19:53:30Z", "kind": "commit", "detail": "2af933aa on agent/develop" }
+        {
+          "at": "2026-11-12T19:48:00Z",
+          "kind": "diff",
+          "detail": "16 files: new lib/front-office/lab-session.ts, app/tools/setter-lab/sandbox.ts, test/front-office-lab-sandbox.test.ts (7 tests); edits to both lab pages/actions, contracts.ts, setter/lab.ts, setter/lab-live.ts, receptionist/lab-live.ts, API_CONTRACTS.md, receptionist-lab-page test."
+        },
+        {
+          "at": "2026-11-12T19:50:00Z",
+          "kind": "review",
+          "detail": "ventra-review PASS WITH NITS: secret server-only and never returned; user id from verifiedCaller only, workspace from server session; fo_lab_clear limited to fo_is_lab workspace; no live sends; model email swapped to @lab-sandbox.test. Minor: both labs share one sandbox so reset clears both; New conversation is a destructive reset; fail() paths return raw db text and drop persistence. Nits: double verifiedCaller; page comment inaccurate; free-text note for docs. -> A-78."
+        },
+        {
+          "at": "2026-11-12T19:51:00Z",
+          "kind": "test",
+          "detail": "npm --prefix apps/web test: 1212 tests (+7), 1207 pass, 0 fail, 5 todo; typecheck exit 0; lint exit 0. Test file asserts GET /api/front-office/contacts?workspace=<sandbox> returns the booked contact (test:63-98)."
+        },
+        {
+          "at": "2026-11-12T19:52:00Z",
+          "kind": "build",
+          "detail": "ventra-verify: lint, typecheck, unit-tests, build, workspace-integration PASSED; course/launcher FROZEN; recorded in last-verify.json."
+        },
+        {
+          "at": "2026-11-12T19:53:00Z",
+          "kind": "note",
+          "detail": "First commit attempt refused by the ventra-git secret scanner: false positive on the old constant LAB_KEY_SECRET_ENV, whose value is an env var NAME, not a credential. Coordinator renamed the constant to LAB_KEY_ENV_NAME (2 files); typecheck exit 0 and lab-sandbox test 7/7 pass after. Scanner not changed."
+        },
+        {
+          "at": "2026-11-12T19:53:30Z",
+          "kind": "commit",
+          "detail": "2af933aa on agent/develop"
+        }
       ],
       "lastRunId": "c-4f349d12",
       "updatedAt": "2026-11-12T19:40:00Z"
@@ -4250,7 +4296,7 @@
       "phase": "A",
       "module": "setter",
       "owner": "ventra-voice",
-      "state": "queued",
+      "state": "done",
       "priority": 4,
       "dependsOn": [
         "A-49"
@@ -4265,17 +4311,46 @@
       "plan": "ventra-review of A-49 (c-a8a636ff)",
       "branch": "agent/develop",
       "worktree": null,
-      "startedAt": null,
-      "finishedAt": null,
-      "lastRunId": "c-a8a636ff",
+      "startedAt": "2026-11-12T20:10:32.287Z",
+      "finishedAt": "2026-11-12T20:19:06.878Z",
+      "lastRunId": "c-a3429447",
       "runIds": [
-        "c-a8a636ff"
+        "c-a8a636ff",
+        "c-a3429447"
       ],
-      "commits": [],
-      "evidence": [],
+      "commits": [
+        "252a3d4b"
+      ],
+      "evidence": [
+        {
+          "at": "2026-11-12T20:19:06.878Z",
+          "kind": "diff",
+          "detail": "Coordinator read helper diff (recorder rethrows body error first, case-suffixed file names) and setter assertion changes; assert lines 185 -> 184 (2 S5 G1 lines removed as requested, S12b record check added)"
+        },
+        {
+          "at": "2026-11-12T20:19:06.878Z",
+          "kind": "test",
+          "detail": "ventra-verify (coordinator run, A-65 + A-62 in tree): lint, typecheck, unit-tests, build, workspace-integration PASSED; course/launcher FROZEN (P0-7)"
+        },
+        {
+          "at": "2026-11-12T20:19:06.878Z",
+          "kind": "review",
+          "detail": "ventra-review PASS: every relabelled assert kept; S9 still pins G1; nits: case sanitiser could collide on distinct explicit cases; records.push inside try"
+        },
+        {
+          "at": "2026-11-12T20:19:06.878Z",
+          "kind": "note",
+          "detail": "Not run: FRONT_OFFICE_QA_RECORD_DIR run showing new file names (env-prefixed command denied for the specialist)"
+        },
+        {
+          "at": "2026-11-12T20:19:06.878Z",
+          "kind": "commit",
+          "detail": "252a3d4b on agent/develop"
+        }
+      ],
       "blocker": null,
       "notes": "Setter parts of X1, X3, X6 go into A-52 (security file).",
-      "updatedAt": "2026-11-11T18:12:00Z"
+      "updatedAt": "2026-11-12T20:19:06.878Z"
     },
     {
       "id": "A-50",
@@ -4283,7 +4358,7 @@
       "phase": "A",
       "module": "setter",
       "owner": "ventra-voice",
-      "state": "queued",
+      "state": "done",
       "priority": 4,
       "dependsOn": [
         "A-48"
@@ -4300,17 +4375,41 @@
       "plan": "ventra-review of A-48 (c-a8a636ff)",
       "branch": "agent/develop",
       "worktree": null,
-      "startedAt": null,
-      "finishedAt": null,
-      "lastRunId": "c-a8a636ff",
+      "startedAt": "2026-11-12T20:18:22.173Z",
+      "finishedAt": "2026-11-12T20:23:31.833Z",
+      "lastRunId": "c-a3429447",
       "runIds": [
-        "c-a8a636ff"
+        "c-a8a636ff",
+        "c-a3429447"
       ],
-      "commits": [],
-      "evidence": [],
+      "commits": [
+        "045e4e9c"
+      ],
+      "evidence": [
+        {
+          "at": "2026-11-12T20:23:31.833Z",
+          "kind": "diff",
+          "detail": "Coordinator read the diff: jobs.ts comment-only; new test + optional runOn withEmailSender arg (default true). Coordinator corrected the comment (only follow-ups are consent-gated) per review nit"
+        },
+        {
+          "at": "2026-11-12T20:23:31.833Z",
+          "kind": "test",
+          "detail": "consent-wiring file 17/17 pass (16 before); ventra-verify after coordinator edit: lint, typecheck, unit-tests, build, workspace-integration PASSED; course/launcher FROZEN"
+        },
+        {
+          "at": "2026-11-12T20:23:31.833Z",
+          "kind": "review",
+          "detail": "ventra-review PASS; one nit (comment overstated SMS grant for reminders) fixed by coordinator"
+        },
+        {
+          "at": "2026-11-12T20:23:31.833Z",
+          "kind": "commit",
+          "detail": "045e4e9c on agent/develop"
+        }
+      ],
       "blocker": null,
-      "notes": "",
-      "updatedAt": "2026-11-11T17:41:00Z"
+      "notes": "Owner question split out as A-79.",
+      "updatedAt": "2026-11-12T20:23:31.833Z"
     },
     {
       "id": "A-51",
@@ -4387,7 +4486,7 @@
       "phase": "A",
       "module": "receptionist",
       "owner": "ventra-voice",
-      "state": "queued",
+      "state": "done",
       "priority": 4,
       "dependsOn": [
         "A-51"
@@ -4402,17 +4501,46 @@
       "plan": "A-51 review",
       "branch": "agent/develop",
       "worktree": null,
-      "startedAt": null,
-      "finishedAt": null,
-      "lastRunId": "c-b5e908f2",
+      "startedAt": "2026-11-12T20:05:49.526Z",
+      "finishedAt": "2026-11-12T20:11:53.190Z",
+      "lastRunId": "c-a3429447",
       "runIds": [
-        "c-b5e908f2"
+        "c-b5e908f2",
+        "c-a3429447"
       ],
-      "commits": [],
-      "evidence": [],
+      "commits": [
+        "cc44355a"
+      ],
+      "evidence": [
+        {
+          "at": "2026-11-12T20:11:53.190Z",
+          "kind": "diff",
+          "detail": "Coordinator read the full diff (1 file, ~107 lines); added X5_PROMPT_TURN assertion (prompt-leak turn runs no tool) and a spacing fix"
+        },
+        {
+          "at": "2026-11-12T20:11:53.190Z",
+          "kind": "test",
+          "detail": "node --test test/front-office-scenarios-receptionist.test.ts: 18 tests, 14 pass, 4 todo, 0 fail (after coordinator edits)"
+        },
+        {
+          "at": "2026-11-12T20:11:53.190Z",
+          "kind": "lint",
+          "detail": "specialist-run lint exit 0 and typecheck exit 0 before coordinator edits; full suite 1215/1210 pass/5 todo/0 fail (specialist); full ventra-verify run after A-62 in this cycle"
+        },
+        {
+          "at": "2026-11-12T20:11:53.190Z",
+          "kind": "review",
+          "detail": "ventra-review PASS/APPROVE, no weakened assertions; nits: fixture-derived expectations follow fixture changes silently (inherent to the task), R8 title still says Tuesday at ten (now off-grid time), FAQ_TOOL reused in X5, redundant toISOString in R3"
+        },
+        {
+          "at": "2026-11-12T20:11:53.190Z",
+          "kind": "commit",
+          "detail": "cc44355a on agent/develop"
+        }
+      ],
       "blocker": null,
-      "notes": "",
-      "updatedAt": "2026-11-11T18:58:00Z"
+      "notes": "Review nits left as-is (cosmetic).",
+      "updatedAt": "2026-11-12T20:11:53.190Z"
     },
     {
       "id": "A-52",
@@ -4478,7 +4606,7 @@
       "phase": "A",
       "module": "shared",
       "owner": "ventra-voice",
-      "state": "queued",
+      "state": "done",
       "priority": 4,
       "dependsOn": [
         "A-49",
@@ -4494,17 +4622,41 @@
       "plan": "A-28 spec",
       "branch": "agent/develop",
       "worktree": null,
-      "startedAt": null,
-      "finishedAt": null,
-      "lastRunId": "c-a8a636ff",
+      "startedAt": "2026-11-12T20:23:35.675Z",
+      "finishedAt": "2026-11-12T20:30:45.654Z",
+      "lastRunId": "c-a3429447",
       "runIds": [
-        "c-a8a636ff"
+        "c-a8a636ff",
+        "c-a3429447"
       ],
-      "commits": [],
-      "evidence": [],
+      "commits": [
+        "599b2522"
+      ],
+      "evidence": [
+        {
+          "at": "2026-11-12T20:30:45.654Z",
+          "kind": "test",
+          "detail": "Specialist: file run 9 tests, 9 skipped, 0 fail. Coordinator ventra-verify with file in tree: lint, typecheck, unit-tests, build, workspace-integration PASSED; course/launcher FROZEN"
+        },
+        {
+          "at": "2026-11-12T20:30:45.654Z",
+          "kind": "review",
+          "detail": "ventra-review PASS, no blockers: no side effects when unset, no real sends (recording senders), fetch confined to api.anthropic.com, cap enforced before call, secrets not recorded. Nits -> A-80"
+        },
+        {
+          "at": "2026-11-12T20:30:45.654Z",
+          "kind": "note",
+          "detail": "Not run live (owner action, chargeable: FRONT_OFFICE_QA_LIVE=1 + ANTHROPIC_API_KEY + FRONT_OFFICE_MODEL)"
+        },
+        {
+          "at": "2026-11-12T20:30:45.654Z",
+          "kind": "commit",
+          "detail": "599b2522 on agent/develop"
+        }
+      ],
       "blocker": null,
       "notes": "",
-      "updatedAt": "2026-11-11T17:41:00Z"
+      "updatedAt": "2026-11-12T20:30:45.654Z"
     },
     {
       "id": "A-54",
@@ -4983,11 +5135,31 @@
         "e01a0994"
       ],
       "evidence": [
-        { "at": "2026-11-12T19:40:00Z", "kind": "diff", "detail": "c-4f349d12 reconcile: prompt.ts (voice@4, emergency rule) and two test files modified in tree from c-4dba26f8." },
-        { "at": "2026-11-12T19:55:00Z", "kind": "review", "detail": "ventra-review FAIL: front-office-scenarios-receptionist.test.ts:247 and front-office-receptionist-lab.test.ts:57 still pinned voice@3; nit: end_call ordering could hang up before the note offer is answered. ventra-verify unit-tests FAILED, consistent with that." },
-        { "at": "2026-11-12T20:10:00Z", "kind": "diff", "detail": "Sent back once to ventra-voice: lab test now compares to RECEPTIONIST_PROMPT_VERSION; scenario test matches /^receptionist\\/voice@\\d+$/; emergency rule ends 'Once the note is taken or they decline it, say goodbye and call end_call.' Diff inspected by coordinator." },
-        { "at": "2026-11-12T20:15:00Z", "kind": "test", "detail": "npm --prefix apps/web test: 1212 tests, 1207 pass, 0 fail, 5 todo; typecheck exit 0; lint exit 0." },
-        { "at": "2026-11-12T20:20:00Z", "kind": "commit", "detail": "e01a0994 on agent/develop" }
+        {
+          "at": "2026-11-12T19:40:00Z",
+          "kind": "diff",
+          "detail": "c-4f349d12 reconcile: prompt.ts (voice@4, emergency rule) and two test files modified in tree from c-4dba26f8."
+        },
+        {
+          "at": "2026-11-12T19:55:00Z",
+          "kind": "review",
+          "detail": "ventra-review FAIL: front-office-scenarios-receptionist.test.ts:247 and front-office-receptionist-lab.test.ts:57 still pinned voice@3; nit: end_call ordering could hang up before the note offer is answered. ventra-verify unit-tests FAILED, consistent with that."
+        },
+        {
+          "at": "2026-11-12T20:10:00Z",
+          "kind": "diff",
+          "detail": "Sent back once to ventra-voice: lab test now compares to RECEPTIONIST_PROMPT_VERSION; scenario test matches /^receptionist\\/voice@\\d+$/; emergency rule ends 'Once the note is taken or they decline it, say goodbye and call end_call.' Diff inspected by coordinator."
+        },
+        {
+          "at": "2026-11-12T20:15:00Z",
+          "kind": "test",
+          "detail": "npm --prefix apps/web test: 1212 tests, 1207 pass, 0 fail, 5 todo; typecheck exit 0; lint exit 0."
+        },
+        {
+          "at": "2026-11-12T20:20:00Z",
+          "kind": "commit",
+          "detail": "e01a0994 on agent/develop"
+        }
       ],
       "blocker": null,
       "notes": "",
@@ -5032,9 +5204,21 @@
         "26d51e5e"
       ],
       "evidence": [
-        { "at": "2026-11-12T20:08:00Z", "kind": "diff", "detail": "10 files (~140 lines). Coordinator read lab-session.ts safeLabError (allowlist of the labs' own messages, everything else through rpcFromClient's filter -> generic 'The lab sandbox is unavailable. Please retry.') and sandbox.ts deps.verified (verifiedCaller skipped only when the caller was already verified for the same token). Nits: safeLabError calls rpcFromClient through a fake client and has an unreachable '' return." },
-        { "at": "2026-11-12T20:10:00Z", "kind": "test", "detail": "Specialist: full suite 1215 tests, 1210 pass, 0 fail, 5 todo (+3 tests). Coordinator: ventra-verify exit 0: lint, typecheck, unit-tests, build, workspace-integration PASSED; course/launcher FROZEN." },
-        { "at": "2026-11-12T20:12:00Z", "kind": "commit", "detail": "26d51e5e on agent/develop" }
+        {
+          "at": "2026-11-12T20:08:00Z",
+          "kind": "diff",
+          "detail": "10 files (~140 lines). Coordinator read lab-session.ts safeLabError (allowlist of the labs' own messages, everything else through rpcFromClient's filter -> generic 'The lab sandbox is unavailable. Please retry.') and sandbox.ts deps.verified (verifiedCaller skipped only when the caller was already verified for the same token). Nits: safeLabError calls rpcFromClient through a fake client and has an unreachable '' return."
+        },
+        {
+          "at": "2026-11-12T20:10:00Z",
+          "kind": "test",
+          "detail": "Specialist: full suite 1215 tests, 1210 pass, 0 fail, 5 todo (+3 tests). Coordinator: ventra-verify exit 0: lint, typecheck, unit-tests, build, workspace-integration PASSED; course/launcher FROZEN."
+        },
+        {
+          "at": "2026-11-12T20:12:00Z",
+          "kind": "commit",
+          "detail": "26d51e5e on agent/develop"
+        }
       ],
       "blocker": null,
       "notes": "Raw-db-error proof is unit-level (safeLabError + source check), not an end-to-end action test. Not separately reviewed by ventra-review (small, coordinator read the security-relevant diff).",
@@ -5956,6 +6140,79 @@
       "blocker": null,
       "notes": "",
       "updatedAt": "2026-11-12T18:42:57.133Z"
+    },
+    {
+      "id": "A-79",
+      "title": "Owner decision: email-runner reminders and rescues (email first even when a phone exists; SMS fallback without consent check)",
+      "phase": null,
+      "module": "setter",
+      "owner": "ventra-voice",
+      "state": "blocked",
+      "priority": 3,
+      "dependsOn": [],
+      "scope": [
+        "apps/web/lib/front-office/jobs.ts",
+        "apps/web/test/front-office-consent-wiring.test.ts"
+      ],
+      "acceptance": [
+        "Owner decides; behaviour and tests match the decision"
+      ],
+      "plan": "A-48/A-50 review",
+      "branch": "agent/develop",
+      "worktree": null,
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-a3429447",
+      "runIds": [
+        "c-a3429447"
+      ],
+      "commits": [],
+      "evidence": [
+        {
+          "at": "2026-11-12T20:23:31.833Z",
+          "kind": "note",
+          "detail": "Found in A-50: jobBlocked checks consent only for follow-ups; on the email runner reminders go by email when an address and sender exist, else SMS with no grant check"
+        }
+      ],
+      "blocker": {
+        "reason": "Owner: on the email runner should 24h/2h reminders and no-show rescues (a) go by email first even when the contact left a mobile (current), and (b) stay exempt from the SMS consent check when they fall back to SMS (current; transactional messages). Coordinator recommendation: keep both (reminders are transactional), confirm.",
+        "needsApproval": true,
+        "approvalId": null,
+        "since": "2026-11-12T20:23:31.833Z"
+      },
+      "notes": "",
+      "updatedAt": "2026-11-12T20:23:31.833Z"
+    },
+    {
+      "id": "A-80",
+      "title": "A-53 review nits: assertNumbersOnFile also allows numbers from tool results and the caller text; usage.priceKnown from priceFor(model).known and header note that unpriced (newer) models are priced at the top rate so the A$3 cap may trip early; X5 records input only after the break check; tighten IS_AI/CLAIMS_HUMAN regexes",
+      "phase": null,
+      "module": "shared",
+      "owner": "ventra-voice",
+      "state": "queued",
+      "priority": 4,
+      "dependsOn": [],
+      "scope": [
+        "apps/web/test/front-office-scenarios-live.test.ts"
+      ],
+      "acceptance": [
+        "Each nit fixed or declined with a reason",
+        "File still fully skipped without FRONT_OFFICE_QA_LIVE; typecheck, lint pass"
+      ],
+      "plan": "A-53 review",
+      "branch": "agent/develop",
+      "worktree": null,
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-a3429447",
+      "runIds": [
+        "c-a3429447"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "Also consider: lab-usage MODEL_PRICES lacks Claude 5.x ids (lib/front-office/lab-usage.ts, separate task if changed).",
+      "updatedAt": "2026-11-12T20:30:45.654Z"
     }
   ]
 }
