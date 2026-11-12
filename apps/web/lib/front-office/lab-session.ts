@@ -10,7 +10,7 @@
 // 'lab:sms:<id>' / 'lab:voice:<id>' and no provider can deliver to them, and FRONT_OFFICE_*_LIVE switches are not read.
 import type { ChannelAuth, Rpc } from './orchestrator';
 import type { LabPersistence } from './contracts';
-import { ensureLabSandbox, labChannelKey, LabSandboxError } from '../supabase/lab-sandbox';
+import { ensureLabSandbox, labChannelKey, LabSandboxError, rpcFromClient } from '../supabase/lab-sandbox';
 import type { LabRpc, LabSandbox } from '../supabase/lab-sandbox';
 
 /** The server-only env var holding the secret the per-user lab channel key is derived from (at least 32 characters). */
@@ -68,6 +68,20 @@ export async function openLabSession(input: LabSessionInput): Promise<LabSession
   } catch (e) {
     return memory(e instanceof LabSandboxError && /Sign in required/.test(e.message) ? MEMORY_SIGNED_OUT : MEMORY_UNAVAILABLE);
   }
+}
+
+/** The labs' own plain-English validation messages (lab state checks, empty turn); these never carry database detail. */
+const LAB_OWN_MESSAGE = /^(The lab state is not valid \(|Decision must be approve or reject\.|This lab call (could not be read|is too long|has ended)|Say something first\.|This lab conversation has reached \d+ messages\.|Type a message first\.|The test caller number must)/;
+
+/**
+ * The text of an error that may reach the browser. It runs the message through the same filter as rpcFromClient
+ * (lib/supabase/lab-sandbox.ts): messages the fo_lab_* functions raise on purpose pass, anything else (raw PostgREST or
+ * database detail) becomes the generic "The lab sandbox is unavailable. Please retry."
+ */
+export async function safeLabError(e: unknown): Promise<string> {
+  const text = e instanceof Error ? e.message : '';
+  if (LAB_OWN_MESSAGE.test(text)) return text.slice(0, 300);
+  try { await rpcFromClient({ rpc: async () => ({ data: null, error: { message: text } }) })('safe', {}); return ''; } catch (x) { return (x as Error).message; }
 }
 
 // ---------------------------------------------------------------------------------------------------------------

@@ -138,7 +138,7 @@ export default function LiveCall({ modelConfigured, initial, initialError, initi
 
     <fieldset data-testid="live-scenarios">
       <legend>Reset and saved scenarios</legend>
-      <button type="button" disabled={pending} onClick={() => { stopListening(); setSummaryFailed(false); start(async () => { try { apply(await resetLiveLab()); } catch { setError('The lab could not reach the server.'); } }); }}>Reset sandbox and start a new call</button>
+      <button type="button" disabled={pending} onClick={() => { stopListening(); setSummaryFailed(false); start(async () => { try { apply(await resetLiveLab()); } catch { setError('The lab could not reach the server.'); } }); }}>Reset sandbox and start a new call (clears the whole lab sandbox, including the Setter Lab)</button>
       {!db && <p>Saving needs the lab sandbox. {persistence.mode === 'memory' ? persistence.reason : ''}</p>}
       <p><label htmlFor="live-scenario-name">Scenario name</label>{' '}
         <input id="live-scenario-name" maxLength={80} value={scenarioName} onChange={e => setScenarioName(e.target.value)} />{' '}

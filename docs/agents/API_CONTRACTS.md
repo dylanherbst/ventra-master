@@ -158,6 +158,10 @@ EXISTS. Server Actions (not REST routes) in `apps/web/app/tools/setter-lab/actio
 - Sandbox contacts only take test email domains (`example.com/net/org`, `*.test`, `*.example`, `*.invalid`, `*.localhost`). An
   email the model writes that looks real is stored as `<name>@lab-sandbox.test` and the turn records a write line saying so; the
   turn does not fail.
+- Free-text fields (message bodies, hand-off summaries, answers) keep whatever the tester types; nothing in the sandbox is
+  delivered. Both labs share one sandbox per user, so "New conversation" and "Reset sandbox" in either lab clear the other lab's
+  rows too (the button and the notice say so). Error text in action results is filtered like `rpcFromClient` (raw database
+  detail becomes "The lab sandbox is unavailable. Please retry.") and keeps `persistence`.
 - Setter actions: `getLabSession()` -> `{ persistence, scenarios }`; `startLab(mode)` and `resetLab(mode)` delete the sandbox
   conversation rows (database mode) and return a fresh state; `sendMessage`, `sendLiveMessage`, `decideAction` as before, now
   also `persistence`; `saveScenario(state, name)`, `loadScenario(name)`, `deleteScenario(name)` -> `LabResult`

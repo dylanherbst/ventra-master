@@ -88,8 +88,8 @@ export default function SetterLab({ initial, initialUsage, initialPersistence = 
         {MODES.map(m => <label key={m.id}><input type="radio" name="mode" value={m.id} checked={mode === m.id} onChange={() => setMode(m.id)} /> {m.label} </label>)}
       </p>
       <p data-testid="gate-note">Booking permission check shown here is the intended wiring; the production Setter does not call it yet (task A-8).</p>
-      <button type="button" disabled={pending} onClick={() => { setMessage(''); run(() => startLab(mode)); }}>New conversation</button>{' '}
-      <button type="button" disabled={pending} onClick={() => { setMessage(''); run(() => resetLab(mode)); }}>Reset sandbox</button>
+      <button type="button" disabled={pending} onClick={() => { setMessage(''); run(() => startLab(mode)); }}>New conversation (clears the whole lab sandbox, including the Receptionist Lab)</button>{' '}
+      <button type="button" disabled={pending} onClick={() => { setMessage(''); run(() => resetLab(mode)); }}>Reset sandbox (clears both labs' data)</button>
     </fieldset>
 
     <fieldset data-testid="scenarios">

@@ -275,3 +275,50 @@ test('the sandbox cannot be reset or loaded without a sandbox session (memory mo
   const reset = await sandboxGlue.resetSandbox(mem);
   assert.ok(reset.ok && reset.value === null);
 });
+
+// A-66: error text in action results is filtered, persistence is kept, the shared-sandbox warning is plain, and the
+// signed-in check runs once for a live message.
+test('A-66: a database error message never reaches an action result; the labs own validation text and persistence do', async () => {
+  const raw = 'PostgREST 42P01: relation "public.fo_secret_table" does not exist (details: key=abc)';
+  assert.equal(await session.safeLabError(new Error(raw)), 'The lab sandbox is unavailable. Please retry.');
+  assert.equal(await session.safeLabError('not an error'), 'The lab sandbox is unavailable. Please retry.');
+  assert.equal(await session.safeLabError(new Error('Scenario not found.')), 'Scenario not found.');
+  assert.match(await session.safeLabError(new Error('The lab state is not valid (not an object). Start a new conversation.')), /^The lab state is not valid/);
+
+  // Through the server functions: a bad state fails, keeps persistence, and shows the lab's own message only.
+  for (const r of [await actions.sendMessage(null as never, 'hi', 'automatic'), await actions.decideAction(null as never, 'x', 'approve'), await actions.saveScenario(null as never, 'n')]) {
+    assert.equal(r.state, null);
+    assert.match(r.error ?? '', /^The lab state is not valid/);
+    assert.equal(r.persistence?.mode, 'memory', 'persistence is kept on the failure path');
+  }
+  const bad = await actions.decideAction(newLab('automatic'), 'x', 'maybe' as never);
+  assert.equal(bad.error, 'Decision must be approve or reject.');
+  assert.equal(bad.persistence?.mode, 'memory');
+
+  const src = await readFile(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../app/tools/setter-lab/actions.ts'), 'utf8');
+  assert.doesNotMatch(src, /e\.message\.slice/, 'no raw error text in the setter actions');
+  const rsrc = await readFile(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../app/tools/receptionist-lab/actions.ts'), 'utf8');
+  assert.doesNotMatch(rsrc, /e\.message\.slice/, 'no raw error text in the receptionist actions');
+});
+
+test('A-66: the reset notices and buttons say the whole shared lab sandbox is cleared', async () => {
+  const here = path.dirname(fileURLToPath(import.meta.url));
+  const setterSrc = await readFile(path.resolve(here, '../app/tools/setter-lab/actions.ts'), 'utf8');
+  const recSrc = await readFile(path.resolve(here, '../app/tools/receptionist-lab/actions.ts'), 'utf8');
+  assert.match(setterSrc, /clears the whole lab sandbox, including the Receptionist Lab data/);
+  assert.match(recSrc, /clears the whole lab sandbox, including the Setter Lab data/);
+  assert.match(await readFile(path.resolve(here, '../app/tools/setter-lab/lab.tsx'), 'utf8'), /New conversation \(clears the whole lab sandbox, including the Receptionist Lab\)/);
+  assert.match(await readFile(path.resolve(here, '../app/tools/receptionist-lab/live-call.tsx'), 'utf8'), /including the Setter Lab\)<\/button>/);
+});
+
+test('A-66: labSessionFromToken reuses an already verified caller and does not verify twice', async () => {
+  let getUserCalls = 0;
+  const verify = { configured: () => true, authClient: () => ({ auth: { getUser: async () => { getUserCalls++; return { data: { user: { id: USER } }, error: null }; } } }), sessionClient: () => ({ rpc: async () => ({ data: true, error: null }) }) };
+  const env = { [session.LAB_KEY_ENV_NAME]: SECRET };
+  const client = () => ({ rpc: async () => ({ data: null, error: { message: 'boom' } }) });
+  await sandboxGlue.labSessionFromToken('tok', { env, verify, client });
+  assert.equal(getUserCalls, 1, 'without a verified caller it verifies once');
+  getUserCalls = 0;
+  await sandboxGlue.labSessionFromToken('tok', { env, verify, client, verified: { caller: { userId: USER }, error: null } });
+  assert.equal(getUserCalls, 0, 'with the verified caller handed on it does not verify again');
+});

@@ -22,8 +22,8 @@ export default async function ReceptionistLabPage() {
   // Live AI Test (task A-41): only a yes/no that the model is configured reaches the page, never a value.
   // Neither read can break the demo section above: startCall returns a fixed error string instead of throwing, and
   // usageForPage falls back to a NOT READ line if the usage store fails.
-  // Lab sandbox (task A-34): in database mode no call is started on page load (it would write rows on every visit); the
-  // visitor presses New call. In memory mode the greeting call is started in memory as before.
+  // Lab sandbox (task A-34): in database mode no call is started on page load (it would add a call row on every visit); the
+  // visitor presses New call. Opening the page still creates the user's sandbox workspace on first visit (ensureLabSandbox). In memory mode the greeting call is started in memory as before.
   const { persistence, scenarios } = await getReceptionistLabSession();
   const first = persistence.mode === 'database' ? { state: null, error: null } : await startCall();
   const usage = await usageForPage();

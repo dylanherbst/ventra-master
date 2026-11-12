@@ -11,13 +11,15 @@ import { openLabSession, MEMORY_SIGNED_OUT } from '../../../lib/front-office/lab
 import type { LabSession } from '../../../lib/front-office/lab-session';
 import type { LabProductName, LabRowCountsInfo, LabScenarioInfo } from '../../../lib/front-office/contracts';
 import { verifiedCaller } from './live-auth';
-import type { VerifyDeps } from './live-auth';
+import type { CallerResult, VerifyDeps } from './live-auth';
 
 export type SandboxDeps = {
   env?: Record<string, string | undefined>;
   verify?: VerifyDeps;
   /** Builds the Supabase client that carries the user's token (tests pass a fake). */
   client?: (token: string) => { rpc: (fn: string, args: Record<string, unknown>) => PromiseLike<{ data: unknown; error: { message?: string } | null }> };
+  /** A caller the server has already verified for this same token (so verifiedCaller does not run a second time). */
+  verified?: CallerResult;
 };
 
 const defaultClient = (token: string): ReturnType<NonNullable<SandboxDeps['client']>> => createSupabaseClient({
@@ -37,7 +39,7 @@ export async function labSessionFromToken(token: string | undefined | null, deps
   const env = deps.env ?? process.env;
   let userId: string | null = null, rpc: LabRpc | null = null, pipelineRpc: LabRpc | undefined;
   if (typeof token === 'string' && token) {
-    const who = await verifiedCaller(token, deps.verify);
+    const who = deps.verified ?? await verifiedCaller(token, deps.verify);
     if (who.caller) {
       userId = who.caller.userId;
       try { const client = (deps.client ?? defaultClient)(token); rpc = rpcFromClient(client); pipelineRpc = rawRpc(client); } catch { rpc = null; }

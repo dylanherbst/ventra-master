@@ -6,6 +6,7 @@ import type { SimResult } from '../../../lib/front-office/receptionist/simulate'
 import { checkedReceptionistLab } from '../../../lib/front-office/receptionist/lab-live';
 import type { ReceptionistLabState } from '../../../lib/front-office/receptionist/lab-live';
 import type { LabPersistence, LabScenarioInfo } from '../../../lib/front-office/contracts';
+import { safeLabError } from '../../../lib/front-office/lab-session';
 import type { LabSession } from '../../../lib/front-office/lab-session';
 import { labSessionFromToken, readToken, resetSandbox, scenarioDelete, scenarioList, scenarioLoad, scenarioSave } from '../setter-lab/sandbox';
 import { labUsageToday } from '../../../lib/front-office/lab-usage';
@@ -27,7 +28,10 @@ async function session(): Promise<LabSession> {
   try { token = await readToken(); } catch { token = undefined; }
   return labSessionFromToken(token);
 }
-const withSession = (r: LiveCallResult, s: LabSession): LiveCallResult => ({ ...r, persistence: s.persistence });
+// Error text goes through safeLabError (the rpcFromClient filter), so raw database detail never reaches the browser.
+const failed = async (e: unknown, s: LabSession): Promise<LiveCallResult> => ({ state: null, error: (await safeLabError(e)) || 'The lab failed.', persistence: s.persistence });
+const CLEARS_ALL = 'This clears the whole lab sandbox, including the Setter Lab data (both labs share it).';
+const withSession =(r: LiveCallResult, s: LabSession): LiveCallResult => ({ ...r, persistence: s.persistence });
 
 /** Where this lab keeps its data right now, and its saved scenarios (database mode only). */
 export async function getReceptionistLabSession(): Promise<{ persistence: LabPersistence; scenarios: LabScenarioInfo[] }> {
@@ -50,13 +54,14 @@ export async function endLiveCall(state: ReceptionistLabState): Promise<LiveCall
   return withSession(await endCall(state, s.voice ?? undefined), s);
 }
 
-/** Reset: deletes the sandbox's conversation rows (database mode) and starts a fresh call. */
+/** Reset: deletes ALL the sandbox's conversation rows (database mode), the Setter Lab's too (both labs share one sandbox),
+ * and starts a fresh call. */
 export async function resetLiveLab(): Promise<LiveCallResult> {
   const s = await session();
   const r = await resetSandbox(s);
   if (!r.ok) return { state: null, error: r.error, persistence: s.persistence };
   const cleared = r.value ? Object.entries(r.value).filter(([, n]) => n).map(([k, n]) => `${n} ${k}`).join(', ') : '';
-  return { ...withSession(await startCall(s.voice ?? undefined), s), notice: s.persistence.mode === 'database' ? `Sandbox reset${cleared ? ` (cleared ${cleared})` : ''}.` : 'Call cleared (memory only).' };
+  return { ...withSession(await startCall(s.voice ?? undefined), s), notice: s.persistence.mode === 'database' ? `Sandbox reset${cleared ? ` (cleared ${cleared})` : ''}. ${CLEARS_ALL}` : 'Call cleared (memory only).' };
 }
 
 export async function saveCallScenario(state: ReceptionistLabState, name: string): Promise<LiveCallResult> {
@@ -65,7 +70,7 @@ export async function saveCallScenario(state: ReceptionistLabState, name: string
     const r = await scenarioSave(s, 'receptionist', typeof name === 'string' ? name : '', checkedReceptionistLab(state));
     if (!r.ok) return { state: null, error: r.error, persistence: s.persistence };
     return { state: null, error: null, persistence: s.persistence, scenarios: await scenarioList(s, 'receptionist'), notice: `Saved "${r.value.name}" (revision ${r.value.revision}).` };
-  } catch (e) { return { state: null, error: e instanceof Error ? e.message.slice(0, 300) : 'The lab failed.', persistence: s.persistence }; }
+  } catch (e) { return failed(e, s); }
 }
 
 export async function loadCallScenario(name: string): Promise<LiveCallResult> {
@@ -74,7 +79,7 @@ export async function loadCallScenario(name: string): Promise<LiveCallResult> {
     const r = await scenarioLoad(s, 'receptionist', typeof name === 'string' ? name : '');
     if (!r.ok) return { state: null, error: r.error, persistence: s.persistence };
     return { state: checkedReceptionistLab(r.value), error: null, persistence: s.persistence, scenarios: await scenarioList(s, 'receptionist'), notice: `Loaded "${String(name).slice(0, 80)}".` };
-  } catch (e) { return { state: null, error: e instanceof Error ? e.message.slice(0, 300) : 'The lab failed.', persistence: s.persistence }; }
+  } catch (e) { return failed(e, s); }
 }
 
 export async function deleteCallScenario(name: string): Promise<LiveCallResult> {
