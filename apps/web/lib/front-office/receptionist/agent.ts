@@ -19,6 +19,7 @@ import { canTransition, isContactState } from '../state';
 import type { ContactState } from '../state';
 import type { SmsSender } from '../sms-send';
 import { plainText } from '../text';
+import { ASK_TO_VERIFY, REFUSED_UNVERIFIED, VERIFY_ARGS, verifyBookingCaller } from './identity';
 import { RECEPTIONIST_PROMPT_VERSION, receptionistSystemPrompt } from './prompt';
 
 export type VoiceOut = { type: 'text'; text: string } | { type: 'transfer'; number: string } | { type: 'end' };
@@ -43,7 +44,9 @@ export type TurnSummary = { said: string; tools: string[]; outcomes: Outcome[]; 
 type Ctx = {
   contact: { id: string; name: string | null; phone: string | null; email: string | null; state: ContactState; optedOut: boolean; answers: Record<string, string> };
   appointment: { id: string; starts: string; ends: string; status: string } | null;
+  handoffs?: { intent?: string; summary?: string }[];
 };
+const UNVERIFIED_INTENT = 'booking change not verified';
 
 const phoneProp = { type: 'string', description: 'Caller mobile in E.164, e.g. +61412345678. Only if their number is withheld or they gave another one.' };
 export const receptionistTools: ToolSpec[] = [
@@ -51,8 +54,8 @@ export const receptionistTools: ToolSpec[] = [
   { name: 'qualify', description: 'Save the caller’s answers to the qualifying questions by question id, and their name, mobile or email if given.', input_schema: { type: 'object', properties: { answers: { type: 'object', additionalProperties: { type: 'string' } }, name: { type: 'string' }, phone: phoneProp, email: { type: 'string' } }, required: ['answers'] } },
   { name: 'check_availability', description: 'Get two or three open times from the live calendar.', input_schema: { type: 'object', properties: {} } },
   { name: 'book', description: 'Book one of the times from check_availability, using its start value.', input_schema: { type: 'object', properties: { start: { type: 'string' }, phone: phoneProp }, required: ['start'] } },
-  { name: 'reschedule', description: 'Move the caller’s existing booking to one of the times from check_availability.', input_schema: { type: 'object', properties: { start: { type: 'string' } }, required: ['start'] } },
-  { name: 'cancel', description: 'Cancel the caller’s existing booking, after they confirm.', input_schema: { type: 'object', properties: { reason: { type: 'string' } }, required: ['reason'] } },
+  { name: 'reschedule', description: 'Move the caller’s existing booking to one of the times from check_availability. The caller must first confirm who they are: pass the name the booking is under as verify_name, or its day and time as verify_time. The phone number alone is not enough.', input_schema: { type: 'object', properties: { start: { type: 'string' }, ...VERIFY_ARGS }, required: ['start'] } },
+  { name: 'cancel', description: 'Cancel the caller’s existing booking, after they confirm. The caller must first confirm who they are: pass the name the booking is under as verify_name, or its day and time as verify_time. The phone number alone is not enough.', input_schema: { type: 'object', properties: { reason: { type: 'string' }, ...VERIFY_ARGS }, required: ['reason'] } },
   { name: 'take_message', description: 'Take a message for the team, who will call back.', input_schema: { type: 'object', properties: { message: { type: 'string' }, name: { type: 'string' }, phone: phoneProp, urgent: { type: 'boolean' } }, required: ['message'] } },
   { name: 'request_quote', description: 'When the caller asks what a job or service would cost for them ("how much would it cost to…"), capture a quote request for the team: what they need, where, when or their timeframe, their budget if they offer one, and their name, mobile or email. Never give a price, range or estimate yourself: the team sends the quote.', input_schema: { type: 'object', properties: { need: { type: 'string', description: 'What they want done or quoted, in their words.' }, where: { type: 'string', description: 'Where (suburb, address or site), if relevant.' }, when: { type: 'string', description: 'When, or their timeframe.' }, budget: { type: 'string', description: 'Their budget, only if they offered one.' }, name: { type: 'string' }, phone: phoneProp, email: { type: 'string' } }, required: ['need'] } },
   { name: 'transfer', description: 'Put the caller through to a person at the business (urgent, complaint, billing, or they ask for a person).', input_schema: { type: 'object', properties: { reason: { type: 'string' } }, required: ['reason'] } },
@@ -118,7 +121,13 @@ export async function receptionistSession(d: Omit<ReceptionistDeps, 'llm' | 'con
   /** The quote request already captured in this session: whether it was handed off and staff told, and the contact
    * details they were told about. Keeps a second request_quote from duplicating the handoff or the notice. */
   let quoteState: { handedOff: boolean; notified: boolean; phone: string | null; email: string | null; updateSent: boolean } | null = null;
-  const load = async () => { ctx = contactId ? await d.rpc('fo_contact_context', { ...a, contact: contactId }) as Ctx : null; };
+  /** What was stored for each contact when it was first loaded in this session, before any tool ran. */
+  const snapshots = new Map<string, { name: string | null; appt: { id: string; starts: string } | null }>();
+  const load = async () => {
+    ctx = contactId ? await d.rpc('fo_contact_context', { ...a, contact: contactId }) as Ctx : null;
+    const c = ctx as Ctx | null;
+    if (c && !snapshots.has(c.contact.id)) snapshots.set(c.contact.id, { name: c.contact.name, appt: c.appointment ? { id: c.appointment.id, starts: c.appointment.starts } : null });
+  };
   await load();
   const outcome = async (o: Outcome) => {
     if (!outcomes.includes(o)) outcomes.push(o);
@@ -128,8 +137,12 @@ export async function receptionistSession(d: Omit<ReceptionistDeps, 'llm' | 'con
   async function ensureContact(phoneArg: unknown, name?: string): Promise<string | null> {
     const phone = cleanPhone(phoneArg);
     if (phone && E164.test(phone) && d.call.id && (!ctx || ctx.contact.phone !== phone)) {
-      contactId = await d.rpc('fo_voice_contact', { ...a, call_id: d.call.id, phone_number: phone, contact_name: name ?? null }) as string;
+      // The name is saved only after we know whether this contact has a booking (nameToSave): fo_voice_contact would
+      // otherwise name a contact that has no name on file yet, even one holding someone else's booking.
+      contactId = await d.rpc('fo_voice_contact', { ...a, call_id: d.call.id, phone_number: phone, contact_name: null }) as string;
       await load();
+      const c = ctx as Ctx | null, nm = nameToSave(name ?? '');
+      if (c && nm && !c.contact.name) { await d.rpc('fo_save_details', { ...a, contact: c.contact.id, new_answers: {}, contact_name: nm, contact_email: null, contact_phone: null }); c.contact.name = nm; }
     }
     return contactId;
   }
@@ -146,6 +159,47 @@ export async function receptionistSession(d: Omit<ReceptionistDeps, 'llm' | 'con
     if (!c) return;
     const h = checkedHandoff({ contact: { id: c.contact.id, name: plainText(c.contact.name, 160) || null, phone: c.contact.phone, email: c.contact.email, state: c.contact.state }, channel: 'voice', intent: intent || 'call back', answers: c.contact.answers, summary: summary || 'See the call.', nextAction, from: 'receptionist', owner });
     await d.rpc('fo_record_handoff', { ...a, contact: c.contact.id, handoff: h });
+  }
+  /** Second factor before a booking is moved or cancelled (identity.ts): the caller number alone is never enough.
+   * Returns null when the caller is verified, else the words to hand back to the model with nothing changed. A wrong
+   * detail locks the call for the rest of it (no guessing), hands the request to staff once and reveals nothing. */
+  let verifiedFor: string | null = null, locked = false, lockHandedOff = false;
+  /** A wrong detail on THIS call, from an earlier utterance or webhook (each builds a fresh session): the hand-off we
+   * wrote carries a "[call <id>]" marker, read back through fo_contact_context's handoffs. */
+  const callMarker = d.call.id ? `[call ${d.call.id}]` : null;
+  const failedEarlier = () => !!callMarker && ((ctx as Ctx | null)?.handoffs ?? []).some(h => h.intent === UNVERIFIED_INTENT && typeof h.summary === 'string' && h.summary.includes(callMarker));
+  /** The stored name may be replaced only when nothing is at stake: a contact with a booking keeps the name on file
+   * until the caller has been verified, or a spoofer could rename the victim and then "confirm" the new name. */
+  const nameToSave = (name: string): string | null => {
+    const c = ctx as Ctx | null;
+    if (!name) return null;
+    const snap = c && snapshots.get(c.contact.id);
+    return snap?.appt && verifiedFor !== snap.appt.id ? null : name;
+  };
+  async function identityGate(c: Ctx, input: Record<string, unknown>, action: 'move' | 'cancel'): Promise<string | null> {
+    const appt = c.appointment as NonNullable<Ctx['appointment']>;
+    // The details to match are the ones stored when this contact was first loaded, before any tool could change them.
+    const snap = snapshots.get(c.contact.id);
+    // A booking made on this very call by this caller needs no second factor.
+    if (!snap?.appt || snap.appt.id !== appt.id) return null;
+    if (verifiedFor === appt.id) return null;
+    const report = async () => {
+      if (lockHandedOff || failedEarlier()) return;
+      const from = c.contact.phone ?? d.call.caller ?? 'number withheld';
+      await handoff('human', UNVERIFIED_INTENT, `${callMarker ? callMarker + ' ' : ''}Caller on ${from} asked to ${action} a booking but could not confirm the name or the time on it. Nothing was changed. Please check who is calling before changing anything.`, 'Verify the caller, then call back');
+      lockHandedOff = true;
+      const note = `${s.businessName} AI receptionist: caller on ${from} asked to ${action} a booking but could not confirm who they are. Nothing was changed. Please call back and check.`.slice(0, 320);
+      if (s.staffPhone) await d.send(s.staffPhone, note).catch(() => undefined);
+      if (s.staffEmail) await d.email(s.staffEmail, `Booking change not verified for ${s.businessName}`, note).catch(() => undefined);
+      await outcome('message');
+    };
+    if (locked || failedEarlier()) { if (locked) await report(); return REFUSED_UNVERIFIED; } // a failed hand-off is retried
+    const check = verifyBookingCaller(input, snap.name, snap.appt, tz);
+    if (check === 'ok') { verifiedFor = appt.id; return null; }
+    if (check === 'missing') return ASK_TO_VERIFY;
+    locked = true;
+    await report();
+    return REFUSED_UNVERIFIED;
   }
   const missingAnswers = () => s.questions.filter(q => q.required && !(ctx as Ctx | null)?.contact.answers[q.id]).map(q => q.id);
 
@@ -165,9 +219,10 @@ export async function receptionistSession(d: Omit<ReceptionistDeps, 'llm' | 'con
         const ids = new Set(s.questions.map(q => q.id)), answers: Record<string, string> = {};
         for (const [k, v] of Object.entries((input.answers ?? {}) as Record<string, unknown>)) if (ids.has(k) && typeof v === 'string' && v.trim()) answers[k] = v.trim().slice(0, 1000);
         const email = str(input.email, 254), okEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-        const r = await d.rpc('fo_save_details', { ...a, contact: c.contact.id, new_answers: answers, contact_name: plainText(input.name, 160) || null, contact_email: okEmail ? email : null, contact_phone: null }) as { answers?: Record<string, string> } | null;
+        const saveName = nameToSave(plainText(input.name, 160));
+        const r = await d.rpc('fo_save_details', { ...a, contact: c.contact.id, new_answers: answers, contact_name: saveName, contact_email: okEmail ? email : null, contact_phone: null }) as { answers?: Record<string, string> } | null;
         c.contact.answers = r?.answers ?? { ...c.contact.answers, ...answers };
-        if (plainText(input.name, 160)) c.contact.name = plainText(input.name, 160);
+        if (saveName) c.contact.name = saveName;
         const missing = missingAnswers();
         if (!missing.length && ['new', 'contacted', 'qualifying', 'nurture', 'disqualified'].includes(c.contact.state)) { await moveTo('qualified', 'Answered the qualifying questions on a call'); await outcome('qualified'); }
         else if (missing.length && ['new', 'contacted', 'nurture'].includes(c.contact.state)) await moveTo('qualifying', 'Qualifying on a call');
@@ -184,7 +239,8 @@ export async function receptionistSession(d: Omit<ReceptionistDeps, 'llm' | 'con
         if (!ctx) return 'Ask for their mobile number first and pass it as phone.';
         const c = ctx as Ctx;
         if (!d.calendar) return 'The calendar is not connected. Offer to take a message.';
-        if (c.appointment) return `They already have a booking on ${formatSlot(Date.parse(c.appointment.starts), tz)}. Offer to move it instead.`;
+        // Never state the time: the caller is not verified, and the number alone proves nothing.
+        if (c.appointment) return 'They already have a booking. Do not say when. Offer to move it instead, which needs them to confirm the name it is under or its day and time.';
         const missing = missingAnswers();
         if (missing.length) return `Ask these first and save them with qualify: ${missing.join(', ')}.`;
         const start = Date.parse(str(input.start, 40));
@@ -205,6 +261,8 @@ export async function receptionistSession(d: Omit<ReceptionistDeps, 'llm' | 'con
       case 'reschedule': {
         const c = ctx as Ctx | null;
         if (!c?.appointment) return 'I cannot find a booking for this caller. Offer to book a new time or take a message.';
+        const gate = await identityGate(c, input, 'move');
+        if (gate) return gate;
         if (!d.calendar) return 'The calendar is not connected. Offer to take a message.';
         const start = Date.parse(str(input.start, 40));
         if (!offers.length) offers = await offerTimes(d.calendar, availability, d.now, 12);
@@ -223,6 +281,8 @@ export async function receptionistSession(d: Omit<ReceptionistDeps, 'llm' | 'con
       case 'cancel': {
         const c = ctx as Ctx | null;
         if (!c?.appointment) return 'I cannot find a booking for this caller.';
+        const gate = await identityGate(c, input, 'cancel');
+        if (gate) return gate;
         await cancelBooking({ calendar: d.calendar, rpc: d.rpc, auth: d.auth, send: d.send, contact: c.contact, appointment: c.appointment, reason: plainText(input.reason, 400) || 'Cancelled on a call', businessName: s.businessName, timeZone: tz });
         c.appointment = null; c.contact.state = 'qualified';
         await outcome('cancelled');
@@ -266,9 +326,9 @@ export async function receptionistSession(d: Omit<ReceptionistDeps, 'llm' | 'con
         if (when) fields[QUOTE_ANSWER_KEYS.when] = when;
         if (budget) fields[QUOTE_ANSWER_KEYS.budget] = budget;
         if (c) {
-          const r = await d.rpc('fo_save_details', { ...a, contact: c.contact.id, new_answers: fields, contact_name: name || null, contact_email: okEmail ? email : null, contact_phone: null }) as { answers?: Record<string, string> } | null;
+          const r = await d.rpc('fo_save_details', { ...a, contact: c.contact.id, new_answers: fields, contact_name: nameToSave(name), contact_email: okEmail ? email : null, contact_phone: null }) as { answers?: Record<string, string> } | null;
           c.contact.answers = r?.answers ?? { ...c.contact.answers, ...fields };
-          if (name) c.contact.name = name;
+          if (nameToSave(name)) c.contact.name = name;
           if (okEmail && !c.contact.email) c.contact.email = email;
         }
         const who = name || c?.contact.name || 'a caller';
@@ -340,9 +400,11 @@ export async function* runReceptionistTurn(d: ReceptionistDeps): AsyncGenerator<
   const session = await receptionistSession(d);
   const c0 = session.ctx;
   const contactLine = [
-    c0 ? `Caller on record: ${c0.contact.name ?? 'name unknown'}, stage ${c0.contact.state}.` : (d.call.caller ? 'New caller.' : 'Caller’s number is withheld.'),
+    // The name and time on file are kept out of the prompt: the caller number could be spoofed, so nothing on the booking
+    // may be said until they confirm it themselves (identity.ts).
+    c0 ? `Caller number is on record, stage ${c0.contact.state}. The name on file is not shown: do not guess or greet by name.` : (d.call.caller ? 'New caller.' : 'Caller’s number is withheld.'),
     c0 && Object.keys(c0.contact.answers).length ? `Answers on file: ${JSON.stringify(c0.contact.answers)}.` : '',
-    c0?.appointment ? `They have a booking on ${formatSlot(Date.parse(c0.appointment.starts), tz)}.` : '',
+    c0?.appointment ? 'They have a booking on file. Do not say its time or the name on it. To move or cancel it, first ask for the name it is under or its day and time, and pass what they say as verify_name or verify_time.' : '',
     s.faqs.length || hasKnowledge(s) ? '' : 'The business has not added any FAQ answers yet.',
     s.transferNumber ? '' : 'Transfers are not set up: take a message instead.',
   ].filter(Boolean).join('\n');

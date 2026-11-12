@@ -156,7 +156,9 @@ export function simulationStore(settings: AgentSettings, seed: SimSeed, slotMinu
       case 'fo_contact_context': {
         const c = contact(a.contact);
         const appt = t.fo_appointments.find(x => x.contact_id === c.id && x.status === 'booked') ?? null;
-        return structuredClone({ contact: c, appointment: appt && { id: appt.id, starts: appt.starts, ends: appt.ends, status: appt.status } });
+        // Like the database: this contact's hand-offs (the Receptionist reads them to know a call already failed the identity check).
+        const handoffs = (t.handoffs as { contact?: { id?: string }; intent?: string; summary?: string; owner?: string; from?: string }[]).filter(h => h.contact?.id === c.id).map(h => ({ from: h.from, owner: h.owner, intent: h.intent, summary: h.summary }));
+        return structuredClone({ contact: c, appointment: appt && { id: appt.id, starts: appt.starts, ends: appt.ends, status: appt.status }, handoffs });
       }
       case 'fo_save_details': {
         const c = contact(a.contact);
@@ -285,6 +287,16 @@ const URGENT = /\b(urgent|emergency|hurt|injur|bleeding|chest pain|can'?t breath
 const PERSON = /\b(someone|somebody|a person|a human|manager|owner|staff|bill|billing|refund|complain|complaint)\b/i;
 const CANCEL = /\bcancel/i, MOVE = /\b(move|reschedule|change)\b/i, BOOK = /\b(book|trial|appointment|tour|come in|first one|last one|earliest|that one|second one)\b/i, BYE = /\b(bye|that'?s all|that is all|nothing else)\b/i;
 
+/** The second factor, as far as the caller has said it in the transcript ("my name is Sam", "it's Sam"). */
+function verifyFrom(req: LlmRequest): { verify_name?: string } {
+  for (const m of [...req.messages].reverse()) {
+    if (m.role !== 'user' || typeof m.content !== 'string') continue;
+    const n = m.content.match(/\b(?:my name is|name'?s|it'?s|this is|i'?m|i am)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/);
+    if (n) return { verify_name: n[1] };
+  }
+  return {};
+}
+
 /** Keyword rules standing in for the model when the lab is given its own caller lines. Deliberately simple: it only
  * shows how the real tools and safety rules respond, not how well a model talks. */
 export function ruleModel(): Llm {
@@ -295,7 +307,7 @@ export function ruleModel(): Llm {
     if (!results.length) {
       if (URGENT.test(caller)) return reply([tool('transfer', { reason: `Urgent: ${caller.slice(0, 200)}` })]);
       if (PERSON.test(caller)) return reply([tool('transfer', { reason: caller.slice(0, 200) })]);
-      if (CANCEL.test(caller)) return reply([say('One moment. '), tool('cancel', { reason: caller.slice(0, 200) })]);
+      if (CANCEL.test(caller)) return reply([say('One moment. '), tool('cancel', { reason: caller.slice(0, 200), ...verifyFrom(req) })]);
       if (MOVE.test(caller) || BOOK.test(caller)) return reply([say('One moment, let me check. '), tool('check_availability')]);
       if (BYE.test(caller)) return reply([say('Thanks for calling. Bye for now. '), tool('end_call')]);
       return reply([tool('answer_faq', { question: caller.slice(0, 300) })]);
@@ -314,10 +326,12 @@ export function ruleModel(): Llm {
         const offers = offersIn(results);
         if (!offers.length) return reply([say('I can’t see open times right now, so I’ll ask the team to book you in. '), tool('take_message', { message: `Wants a booking: ${caller.slice(0, 300)}` })]);
         const pick = /second/i.test(caller) ? offers[1] ?? offers[0] : /\blast\b/i.test(caller) ? offers.at(-1) : /\b(first|earliest|that one)\b/i.test(caller) ? offers[0] : null;
-        if (pick) return reply([tool(MOVE.test(caller) || /They have a booking on/.test(req.system) ? 'reschedule' : 'book', { start: pick.start })]);
+        if (pick) { const move = MOVE.test(caller) || /They have a booking on file/.test(req.system); return reply([tool(move ? 'reschedule' : 'book', { start: pick.start, ...(move ? verifyFrom(req) : {}) })]); }
         return reply([say(`I have ${offers.map(o => o.label).join(', or ')}. Which suits?`)]);
       }
       case 'book': case 'reschedule': case 'cancel':
+        if (/^Not done yet: before changing a booking/.test(r)) return reply([say('Before I change that, can you tell me the name the booking is under, or its day and time?')]);
+        if (/^Not done, and nothing was changed/.test(r)) return reply([say('I can’t change that booking on this call, so I’ve passed it to the team and someone will call you back.')]);
         return reply([say(/^Ask these first/.test(r) ? 'Before I book you in, can I ask a few quick questions first?' : firstSentence(r))]);
       default: return reply([]);
     }
@@ -410,7 +424,7 @@ export const fixtures: CallFixture[] = [
     contact: { state: 'booked', name: 'Jordan', answers: QUALIFIED, booking: { starts: '2026-11-11T02:00:00.000Z', eventId: 'vbseedbooking0001' } },
     turns: [
       { says: 'Hi, it’s Jordan. I need to move my trial.', script: [[say('One moment, let me check. '), tool('check_availability')], offerLine] },
-      { says: 'The second one works.', script: [[tool('check_availability')], r => [tool('reschedule', { start: (offersIn(r)[1] ?? offersIn(r)[0])?.start ?? '' })], resultLine] },
+      { says: 'The second one works.', script: [[tool('check_availability')], r => [tool('reschedule', { start: (offersIn(r)[1] ?? offersIn(r)[0])?.start ?? '', verify_name: 'Jordan' })], resultLine] },
     ],
   },
   {
@@ -419,7 +433,7 @@ export const fixtures: CallFixture[] = [
     contact: { state: 'booked', name: 'Casey', answers: QUALIFIED, booking: { starts: '2026-11-11T02:00:00.000Z', eventId: 'vbseedbooking0002' } },
     turns: [
       { says: 'I need to cancel my trial on Wednesday.', script: [[say('Just to confirm, you’d like to cancel your trial on Wednesday?')]] },
-      { says: 'Yes please, I’m away that week.', script: [[say('One moment. '), tool('cancel', { reason: 'Away that week' })], resultLine] },
+      { says: 'Yes please, I’m away that week.', script: [[say('One moment. '), tool('cancel', { reason: 'Away that week', verify_name: 'Casey' })], resultLine] },
     ],
   },
   {

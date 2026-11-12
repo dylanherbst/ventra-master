@@ -140,7 +140,7 @@ test('R3 reschedule (H-SIM reschedule, H-LABCALL, H-RTURN): moved not duplicated
     const oldJobs = booked.tables.fo_jobs.filter(j => j.appointment_id === apptId && j.status === 'pending').map(j => j.id);
     assert.ok(oldJobs.length >= 2);
     const moved = await labCall([{ says: 'Can I move that to another time? The second one.', steps: [
-      [tool('check_availability')], r2 => [tool('reschedule', { start: offersFrom(r2[0]?.content).at(-1)?.start ?? '' })], r2 => [say(first(r2))],
+      [tool('check_availability')], r2 => [tool('reschedule', { start: offersFrom(r2[0]?.content).at(-1)?.start ?? '', verify_name: 'Alex' })], r2 => [say(first(r2))],
     ] }], { from: booked });
     c.output(...moved.turns.map(t => t.said));
     assert.match(moved.turns.at(-1)?.tools[1]?.result ?? '', /^Moved to /);
@@ -151,7 +151,7 @@ test('R3 reschedule (H-SIM reschedule, H-LABCALL, H-RTURN): moved not duplicated
     labGlobals(moved);
 
     const seed = { state: 'booked' as const, name: 'Jordan', answers: R_QUALIFIED, booking: { starts: '2026-11-11T02:00:00.000Z', eventId: 'vbseedbooking0009' } };
-    const bad = await receptionistTurn({ contact: seed, steps: [[tool('reschedule', { start: '2026-11-10T14:00:00.000Z' })], r2 => [say(first(r2))]] });
+    const bad = await receptionistTurn({ contact: seed, steps: [[tool('reschedule', { start: '2026-11-10T14:00:00.000Z', verify_name: 'Jordan' })], r2 => [say(first(r2))]] });
     assert.match(bad.tools[0].result ?? '', /not one of the open times/);
     assert.equal(bad.tables.fo_appointments[0].starts, seed.booking.starts, 'booking unchanged');
     assert.deepEqual(bad.cal.log, []);
@@ -177,7 +177,7 @@ test('R4 cancel (H-SIM cancel, H-LABCALL): confirms first (no cancel on turn 1);
     assert.ok(booked.tables.fo_jobs.some(j => j.appointment_id === appt.id && j.status === 'pending'), 'reminders were scheduled');
     const s = await labCall([
       { says: 'Actually I need to cancel that.', steps: [[say('Just to confirm, you would like to cancel your trial?')]] },
-      { says: 'Yes please.', steps: [[say('One moment. '), tool('cancel', { reason: 'Changed plans' })], r2 => [say(first(r2))]] },
+      { says: 'Yes please.', steps: [[say('One moment. '), tool('cancel', { reason: 'Changed plans', verify_name: 'Alex' })], r2 => [say(first(r2))]] },
     ], { from: booked });
     c.output(...s.turns.map(t => t.said));
     assert.deepEqual(s.turns.at(-2)?.tools, [], 'confirm turn runs no tool');
@@ -244,7 +244,7 @@ test('R6 urgent (H-SIM urgent): transfer to the business number; with no transfe
     simGlobals(m);
 
     // G4 fixed by A-57 (voice@2): the emergency rule is in the prompt the model is actually sent.
-    assert.equal(RECEPTIONIST_PROMPT_VERSION, 'receptionist/voice@2');
+    assert.equal(RECEPTIONIST_PROMPT_VERSION, 'receptionist/voice@3');
     assert.match(receptionistSystemPrompt(DEMO, 'now', ''), /life-threatening emergency[^\n]*call 000 now/);
     assert.match(r.turns[1].system ?? '', /\b000\b/, 'the system prompt on the call carries the 000 rule');
     c.actual('transferred; urgent message without a number; 000 rule present');

@@ -10,7 +10,7 @@ const prompt = receptionistSystemPrompt(templateSettings('gym', 'Iron Gym'), 'Mo
 const rule = (re: RegExp) => prompt.split('\n').find(l => re.test(l)) ?? '';
 
 test('prompt version is bumped for the safety and clarity rules', () => {
-  assert.equal(RECEPTIONIST_PROMPT_VERSION, 'receptionist/voice@2');
+  assert.equal(RECEPTIONIST_PROMPT_VERSION, 'receptionist/voice@3');
 });
 
 test('emergency: hang up and call 000 now, never book or take a message instead, then offer a note to the business', () => {

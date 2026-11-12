@@ -159,11 +159,11 @@ test('receptionist: reschedule moves the calendar event and the record; cancel r
   const s = voiceStore('booked'); const cal = fakeCalendar(); const settings = gym();
   s.db.appointment = { id: 'appt-1', starts: '2026-11-11T02:00:00.000Z', ends: '2026-11-11T02:45:00.000Z', status: 'booked' };
   const [first] = await offerTimes(cal, availabilityFor(settings), NOW);
-  await drain(runReceptionistTurn(turnDeps(s, [[tool('check_availability', {})], [tool('reschedule', { start: new Date(first.start).toISOString() })], [say('Done, all moved.')]], settings, undefined, cal)));
+  await drain(runReceptionistTurn(turnDeps(s, [[tool('check_availability', {})], [tool('reschedule', { start: new Date(first.start).toISOString(), verify_time: '2026-11-11T10:00' })], [say('Done, all moved.')]], settings, undefined, cal)));
   assert.deepEqual(cal.moved, [`vbevent0001@${new Date(first.start).toISOString()}`]);
   assert.deepEqual(s.log.moved, [new Date(first.start).toISOString()]); assert.deepEqual(s.log.outcomes, ['rescheduled']);
   assert.ok(s.db.outbound.some(o => o.prompt === 'receptionist/booking-moved@1'));
-  await drain(runReceptionistTurn(turnDeps(s, [[tool('cancel', { reason: 'Away that week' })], [say('That’s cancelled.')]], settings, undefined, cal)));
+  await drain(runReceptionistTurn(turnDeps(s, [[tool('cancel', { reason: 'Away that week', verify_time: new Date(first.start).toISOString() })], [say('That’s cancelled.')]], settings, undefined, cal)));
   assert.deepEqual(cal.cancelled, ['vbevent0001']); assert.equal(s.log.cancelled, 1); assert.equal(s.db.contact.state, 'qualified');
   assert.ok(s.db.outbound.some(o => o.prompt === 'receptionist/booking-cancelled@1'));
 });
