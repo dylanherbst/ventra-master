@@ -25,6 +25,7 @@ import type { LabCaller } from '../setter/lab-live';
 import type { LabTurnUsage } from '../setter/lab';
 import { runReceptionistTurn } from './agent';
 import type { CallerTurn, Outcome } from './agent';
+import { recordDroppedCall } from './dropped';
 import { greeting, RECEPTIONIST_GREETING_VERSION, RECEPTIONIST_PROMPT_VERSION } from './prompt';
 import { demoSettings, recordingModel, recordingSenders, SIM_AUTH, SIM_NOW, simulatedCalendar, simulationStore } from './simulate';
 import type { SimCalendarEvent, SimTables, SimToolCall, WouldSend } from './simulate';
@@ -279,7 +280,8 @@ export async function endReceptionistLabCall(state: ReceptionistLabState, opts: 
   const db = simulationStore(settings, { caller: s.caller }, settings.bookingMinutes, { tables: s.tables, seq: s.seq });
   const reason = summary.outcome.endedBy === 'transfer' ? 'assistant-forwarded-call' : summary.outcome.endedBy === 'end' ? 'assistant-ended-call' : 'customer-ended-call';
   const transcript = s.conversation.map(c => `${c.role === 'assistant' ? 'AI' : 'User'}: ${c.content}`).join('\n');
-  await db.rpc('fo_voice_end', { channel: SIM_AUTH.channel, channel_key: SIM_AUTH.key, call_id: s.callId, caller: s.caller, reason, call_summary: summary.outcome.text.slice(0, 4000), call_transcript: transcript.slice(0, 20000) });
+  const end = await db.rpc('fo_voice_end', { channel: SIM_AUTH.channel, channel_key: SIM_AUTH.key, call_id: s.callId, caller: s.caller, reason, call_summary: summary.outcome.text.slice(0, 4000), call_transcript: transcript.slice(0, 20000) }) as { contact: string | null; outcomes: string[] | null; first?: boolean } | null;
+  if (end) await recordDroppedCall(db.rpc, SIM_AUTH, end, { id: s.callId, caller: s.caller, reason, transcript });
   s.tables = structuredClone(db.tables); s.seq = db.seq();
   s.ended = { reason, summary };
   return s;

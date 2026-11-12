@@ -155,9 +155,9 @@ export async function vapiWebhook(req: NextRequest, channelParam: string | null,
       case 'end-of-call-report':
         if (ev.callId) {
           const reason = ev.endedReason || 'ended';
-          const end = await o.rpc('fo_voice_end', { ...a, call_id: ev.callId, caller: ev.caller, reason, call_summary: ev.summary.slice(0, 4000), call_transcript: ev.transcript.slice(0, 20000) }) as { contact: string | null; outcomes: string[] | null } | null;
-          // G5: a call that dropped before anything was settled becomes one call-back handoff for staff.
-          if (end) await recordDroppedCall(o.rpc, o.auth, end, { id: ev.callId, caller: ev.caller, reason, transcript: ev.transcript }).catch(e => console.error('front-office dropped-call handoff failed:', e instanceof Error ? e.message : 'unknown'));
+          const end = await o.rpc('fo_voice_end', { ...a, call_id: ev.callId, caller: ev.caller, reason, call_summary: ev.summary.slice(0, 4000), call_transcript: ev.transcript.slice(0, 20000) }) as { contact: string | null; outcomes: string[] | null; first?: boolean } | null;
+          // G5: a call that dropped before anything was settled becomes one call-back handoff for staff (first report only).
+          if (end) await recordDroppedCall(o.rpc, o.auth, end, { id: ev.callId, caller: ev.caller, reason, transcript: ev.transcript });
         }
         return json({ received: true });
       default:

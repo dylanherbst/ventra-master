@@ -21,6 +21,7 @@ import { canTransition, isContactState } from '../state';
 import type { ContactState } from '../state';
 import { chunkWriter, parseVapiChat, parseVapiEvent } from '../vapi';
 import { receptionistSession, runReceptionistTurn } from './agent';
+import { recordDroppedCall } from './dropped';
 import type { CallerTurn, TurnSummary } from './agent';
 import { greeting, notLiveMessage, RECEPTIONIST_GREETING_VERSION, RECEPTIONIST_NOT_LIVE_VERSION, RECEPTIONIST_PROMPT_VERSION } from './prompt';
 
@@ -141,11 +142,16 @@ export function simulationStore(settings: AgentSettings, seed: SimSeed, slotMinu
       }
       case 'fo_voice_end': {
         const k = callRow(fn, a.call_id, a.caller);
+        const first = !k.ended; // same as the database: true once per call
         k.ended = true; k.ended_reason = String(a.reason ?? '').slice(0, 120);
         k.summary = String(a.call_summary ?? '').slice(0, 4000) || null; k.transcript = String(a.call_transcript ?? '').slice(0, 20000) || null;
         w(fn, 'fo_calls', 'update', `Call ended (${k.ended_reason}); summary and transcript saved`);
         if (k.contact_id) event(fn, k.contact_id, 'call', `Call ended (${k.ended_reason || 'unknown'})${k.outcomes.length ? ': ' + k.outcomes.join(', ') : ''}`);
-        return { call: k.id, contact: k.contact_id, outcomes: [...k.outcomes] };
+        return { call: k.id, contact: k.contact_id, outcomes: [...k.outcomes], first };
+      }
+      case 'fo_log_dispatch': {
+        if (typeof a.contact === 'string') event(fn, contact(a.contact).id, 'dispatch', String(a.reason ?? '').slice(0, 500));
+        return null;
       }
       case 'fo_contact_context': {
         const c = contact(a.contact);
@@ -571,7 +577,12 @@ export async function simulateCall(fixture: CallFixture, opts: SimOptions = {}):
   const summary = `Simulated summary (on a real call Vapi writes this): the caller ${outcomes.length ? outcomes.map(o => PHRASE[o] ?? o).join(', ') : 'did not complete anything'}.`;
   const report = { message: { type: 'end-of-call-report', endedReason, call: { id: callId, customer: fixture.caller ? { number: fixture.caller } : {} }, artifact: { transcript: transcript.map(l => `${l.who === 'AI' ? 'AI' : 'User'}: ${l.text}`).join('\n'), messages: [] }, analysis: { summary } } };
   const ev = parseVapiEvent(structuredClone(report));
-  if (ev.callId) await db.rpc('fo_voice_end', { ...a, call_id: ev.callId, caller: ev.caller, reason: ev.endedReason || 'ended', call_summary: ev.summary.slice(0, 4000), call_transcript: ev.transcript.slice(0, 20000) });
+  if (ev.callId) {
+    const reason = ev.endedReason || 'ended';
+    const end = await db.rpc('fo_voice_end', { ...a, call_id: ev.callId, caller: ev.caller, reason, call_summary: ev.summary.slice(0, 4000), call_transcript: ev.transcript.slice(0, 20000) }) as { contact: string | null; outcomes: string[] | null; first?: boolean } | null;
+    // Same dropped-call call-back as the live webhook.
+    if (end) await recordDroppedCall(db.rpc, SIM_AUTH, end, { id: ev.callId, caller: ev.caller, reason, transcript: ev.transcript });
+  }
   const finalOutcomes = db.tables.fo_calls.find(k => k.provider_call_id === callId)?.outcomes ?? [];
 
   return {
