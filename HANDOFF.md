@@ -15,6 +15,17 @@ Dylan asked for the mobile app preview link to be sent to him on Telegram. Send 
 
 ## Master Coordinator (auto)
 
+- Last cycle: c-53ebd485 at 2026-11-13 03:15 AWST · 2 reconciled + reworked (A-77, A-18) + 2 built (A-71, A-75) + 2 reviews · 4 verified and committed · 0 new owner blockers
+- Integration branch: agent/develop @ b6ca30d1 (d3f61902 A-77 · 7adac3f4 A-18 · 260bc299 A-71 · b6ca30d1 A-75); board commit follows
+- Verification: ventra-verify exit 0 after A-18 + A-71 (lint, typecheck, unit tests, build, workspace integration; course + launcher FROZEN, P0-7). Final suite: 1193 total, 1188 pass, 5 todo, 0 fail; lint 0; typecheck 0.
+- Behaviour changes: nothing is ever sent, invited or shown to the withheld-caller placeholder address, and a real email the caller gives replaces it (A-77). Held Meta replies now live in the one approval queue (fo_pending_actions); the reply queue page works unchanged through a fo_outbox view; generic approve cannot strand a reply (A-18). Stored customer names and answers are flattened to one line in staff hand-offs/SMS/email (A-71). Setter Lab recognises more ways of asking for a person, not ordinary mentions of people (A-75).
+- OWNER, DEPLOY ORDER: migration 202611130004 (one queue) is LOCAL only; apply it live together with 202611130001-0003 when approving the front-office release (0002 before the A-66 code ships).
+- Running / implemented (needs reconciling next cycle): none.
+- Blocked, needs the owner: unchanged (A-64, W-1 browser check, A-12, A-60, A-14, A-34, P0-10, P0-7). Backup not refreshed (P0-10 still broken).
+- Next up: A-63 (voice@3 emergency nits), A-65, A-62, A-50 (voice nits), A-53 (live QA file), A-27 (feature, check deps).
+
+### Previous cycle c-f2c38241
+
 - Last cycle: c-f2c38241 at 2026-11-13 02:12 AWST · 3 dispatched (A-20, A-73, A-70) · 3 verified and committed · 0 new owner blockers
 - Integration branch: agent/develop @ 31ece45c (a587697b A-20 · 7d6f1e01 A-73 · 31ece45c A-70); board commit follows
 - Verification: ventra-verify exit 0 after each task (lint, typecheck, unit tests, build, workspace integration; course + launcher FROZEN, P0-7). Full suite per specialist/QA: 1169 total, 1164 pass, 5 todo, 0 fail.
@@ -223,10 +234,10 @@ Tracker Phase 0: 0.1 scope freeze, 0.2 orchestrator, 0.3 lead store + state mach
 ## Git state (auto)
 
 <!-- git-state:start -->
-_Generated 2026-11-13 01:59 by `ventra-handoff snapshot`. Do not hand-edit this block._
+_Generated 2026-11-13 02:53 by `ventra-handoff snapshot`. Do not hand-edit this block._
 - Branch: `agent/develop`
-- HEAD: `31ece45 fix(setter): bump prompt versions after the A-59 person-request text (setter/qualify@3, setter/returning-booked@2); Setter Lab only hands off on a real request to talk to a person; tests for booked contacts asking for a person and ordinary messages [A-70]`
-- Lock: coordinator (pid 89816, 32 min old)
+- HEAD: `b6ca30d fix(setter): Setter Lab person-request match broadened to the prompt's PERSON_REQUEST_RULE wording (want/need a human, put me through, transfer me, connect me to someone, staff/team member, representative) with ordinary-sentence negatives; prompt.ts version comment; G12 test asserts the exact held words [A-75]`
+- Lock: coordinator (pid 9919, 22 min old)
 - Uncommitted changes:
 ```text
  M HANDOFF.md
@@ -235,18 +246,18 @@ _Generated 2026-11-13 01:59 by `ventra-handoff snapshot`. Do not hand-edit this 
 ```
 - Diff stat vs HEAD:
 ```text
- HANDOFF.md                  |  11 +++
- docs/agents/TASKS.md        |   9 +-
- docs/agents/TASK_BOARD.json | 236 +++++++++++++++++++++++++++++++++++++++-----
- 3 files changed, 226 insertions(+), 30 deletions(-)
+ HANDOFF.md                  |  11 ++
+ docs/agents/TASKS.md        |   6 +-
+ docs/agents/TASK_BOARD.json | 387 +++++++++++++++++++++++++++++++++++++-------
+ 3 files changed, 345 insertions(+), 59 deletions(-)
 ```
 - Recent commits:
 ```text
-31ece45 fix(setter): bump prompt versions after the A-59 person-request text (setter/qualify@3, setter/returning-booked@2); Setter Lab only hands off on a real request to talk to a person; tests for booked contacts asking for a person and ordinary messages [A-70]
-7d6f1e0 fix(receptionist): missing fo_voice_end first flag leaves a staff-visible dispatch event (no call-back, none for settled calls); duplicates stay quiet; shared logDispatch; tests for sequential duplicates, fo_contact_context failure and exact simulator counts [A-73]
-a587697 feat(receptionist): caller must confirm the booking name or day and time before reschedule/cancel; a wrong detail refuses, changes nothing, hands off to staff once per call (lock persists across turns via call marker), stored name cannot be overwritten by an unverified caller, no booking details leaked; prompt receptionist/voice@3 [A-20]
-74d80b8 chore(coordinator): cycle c-0ba93875 board and handoff
-2689495 fix(receptionist): dropped-call call-back only on the first end-of-call report (fo_voice_end first flag), visible dispatch event when the hand-off fails, Lab and simulator use the same recordDroppedCall, explicit endedReason allow-list incl. exceeded-max-duration [A-66]
+b6ca30d fix(setter): Setter Lab person-request match broadened to the prompt's PERSON_REQUEST_RULE wording (want/need a human, put me through, transfer me, connect me to someone, staff/team member, representative) with ordinary-sentence negatives; prompt.ts version comment; G12 test asserts the exact held words [A-75]
+260bc29 fix(front-office): names already stored on a contact and hand-off answer values are flattened to one line at point of use (Receptionist take_message and quote paths, Setter hand-offs); hand-off summaries capped at 1500 everywhere; test with a newline name seeded in the database [A-71]
+7adac3f feat(front-office): one owner approval queue: held Meta replies move from fo_outbox into fo_pending_actions (kind outbox_reply); fo_outbox becomes a compatible select-only view; outbox functions keep their signatures and send exactly once; generic approve/finish refuse replies and fo_list_actions excludes them; expired replies read as cancelled; a deleted channel never strands a reply; PGlite tests (LOCAL migration, not applied live) [A-18]
+d3f6190 fix(front-office): never send, invite or show the withheld-caller placeholder address (@call.invalid): isDeliverableEmail guards booking attendee, follow-up/job reachability and Setter booking; a real email given on the call replaces the placeholder; dropped-call hand-off says the number was withheld; A-74 test asserts the call stays on the original contact [A-77]
+70ccc02 fix(receptionist): a dropped call from a withheld number with no contact now leaves a staff-visible event: fo_voice_end creates one 'Withheld caller' placeholder contact on the first report (none for settled calls or duplicates) so the existing call-back path runs; PGlite tests (local migration, not applied live) [A-76]
 ```
 <!-- git-state:end -->
 

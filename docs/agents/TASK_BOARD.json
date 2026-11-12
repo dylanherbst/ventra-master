@@ -1,13 +1,12 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-12T17:58:41.080Z",
+  "updatedAt": "2026-11-12T18:52:52.286Z",
   "integrationBranch": "agent/develop",
   "lastRun": {
-    "id": "c-f2c38241",
-    "startedAt": "2026-11-12T17:26:09Z",
-    "endedAt": "2026-11-12T17:58:41.080Z",
-    "summary": "3 committed: A-20 a587697b (caller must confirm booking name or day+time before reschedule/cancel; wrong detail refuses, hands off once per call, no leak; receptionist/voice@3), A-73 7d6f1e01 (missing first flag -> staff event, no call-back), A-70 31ece45c (Setter prompt versions qualify@3/returning-booked@2, narrower Lab person match). ventra-verify exit 0 after each; review + QA passed each. New follow-ups A-74, A-75, A-76. W- still blocked by W-1.",
-    "previousSummary": "6 committed: A-68 4fcb7f40 (fo_save_details guard migration), A-59 87cd18b2 (person request -> hand-off, never claims human), A-67 4677e933 (one plainText helper, names/summaries flattened), A-69 3d59f446 (Setter Lab held-booking parity), A-72 a5203666 (fo_voice_end atomic first flag migration), A-66 26894959 (dropped-call call-back once, visible failure, lab parity). Suite 1142 (1137 pass, 5 todo, 0 fail); ventra-verify exit 0. New follow-ups A-70, A-71, A-73. Two local migrations need the owner to apply live; 202611130002 must be applied before A-66 code ships."
+    "id": "c-53ebd485",
+    "startedAt": "2026-11-12T18:30:10Z",
+    "endedAt": "2026-11-12T19:15:00Z",
+    "summary": "Reconciled A-18 and A-77 (left running by c-dac7ea8b), reviewed, sent back once each, verified and committed; then A-71 and A-75 built, verified and committed. 4 commits, 0 new owner blockers; migration 202611130004 joins 0001-0003 to apply live."
   },
   "tasks": [
     {
@@ -1859,7 +1858,7 @@
       "phase": 1,
       "module": "marketing",
       "owner": "ventra-marketing",
-      "state": "queued",
+      "state": "done",
       "priority": 3,
       "dependsOn": [
         "A-0"
@@ -1874,14 +1873,35 @@
       "plan": "Owner directive 2026-11-09 (Workstream C); marketing/BRIEF.md",
       "branch": "agent/develop",
       "worktree": null,
-      "startedAt": null,
-      "finishedAt": null,
-      "lastRunId": null,
-      "runIds": [],
-      "commits": [],
-      "evidence": [],
+      "startedAt": "2026-11-12T18:00:59.818Z",
+      "finishedAt": "2026-11-12T18:13:50.922Z",
+      "lastRunId": "c-dac7ea8b",
+      "runIds": [
+        "c-dac7ea8b"
+      ],
+      "commits": [
+        "779ee421"
+      ],
+      "evidence": [
+        {
+          "at": "2026-11-12T18:13:50.922Z",
+          "kind": "diff",
+          "detail": "marketing/FUNNEL.md new, 250 lines; only file in scope; read by coordinator: no invented numbers/customers, \"free\" only quotes existing site mailto copy"
+        },
+        {
+          "at": "2026-11-12T18:13:50.922Z",
+          "kind": "note",
+          "detail": "Demo list cross-checked against board states A-3, A-4, A-23, A-23b, A-26, A-41 (all done; internal labs, not public). Owner questions listed: waitlist URL/domain, contact email, analytics tool, lab recording permission. Flag: site demos.tsx SMS preview says \"being switched on for customers\" (owner frontend scope)"
+        },
+        {
+          "at": "2026-11-12T18:13:50.922Z",
+          "kind": "commit",
+          "detail": "779ee421"
+        }
+      ],
       "blocker": null,
-      "notes": "Workstream C (marketing). Independent of A and B; never delays A. Deliverables render to ~/Developer/VENTRA-MARKETING/. Publishing needs owner approval."
+      "notes": "Workstream C (marketing). Independent of A and B; never delays A. Deliverables render to ~/Developer/VENTRA-MARKETING/. Publishing needs owner approval.",
+      "updatedAt": "2026-11-12T18:13:50.922Z"
     },
     {
       "id": "A-14",
@@ -2138,7 +2158,7 @@
       "phase": "A",
       "module": "shared",
       "owner": "ventra-backend",
-      "state": "queued",
+      "state": "done",
       "priority": 3,
       "dependsOn": [
         "A-2"
@@ -2153,17 +2173,67 @@
       "plan": "docs/agents/FRONT_OFFICE_AUDIT.md",
       "branch": "agent/develop",
       "worktree": null,
-      "startedAt": null,
-      "finishedAt": null,
-      "lastRunId": "c-255a1537",
+      "startedAt": "2026-11-12T18:13:53.766Z",
+      "finishedAt": "2026-11-12T19:00:00Z",
+      "lastRunId": "c-53ebd485",
       "runIds": [
-        "c-255a1537"
+        "c-255a1537",
+        "c-dac7ea8b",
+        "c-53ebd485"
       ],
-      "commits": [],
-      "evidence": [],
+      "commits": [
+        "7adac3f4"
+      ],
+      "evidence": [
+        {
+          "at": "2026-11-12T18:39:10.834Z",
+          "kind": "note",
+          "detail": "Reconciled (c-53ebd485): uncommitted supabase/migrations/202611130004_front_office_outbox_merge.sql + apps/web/test/front-office-outbox-queue.test.ts from c-dac7ea8b."
+        },
+        {
+          "at": "2026-11-12T18:39:10.834Z",
+          "kind": "review",
+          "detail": "ventra-review: approve with nits. Function copies faithful to latest defs; view security_invoker, select-only; exactly-once holds. F1 fo_list_actions returns outbox_reply rows the TS contract cannot read; F2 channel_id not-null check vs ON DELETE SET NULL; F3 expired replies read as queued."
+        },
+        {
+          "at": "2026-11-12T18:39:10.834Z",
+          "kind": "test",
+          "detail": "Coordinator: full suite 3 fail in front-office-lab-db.test.ts (fo_outbox no longer a base table: EXPECTED_WORKSPACE_TABLES, reset/scenario counts, A-33 hardening). outbox-queue test 4/4 pass (reviewer run)."
+        },
+        {
+          "at": "2026-11-12T18:39:10.834Z",
+          "kind": "note",
+          "detail": "Sent back to ventra-backend once with the failures + F1-F3; scope widened to front-office-lab-db.test.ts."
+        },
+        {
+          "at": "2026-11-12T18:48:41.753Z",
+          "kind": "diff",
+          "detail": "Rework: lab-db test updated for fo_outbox as a view (one queue holds reply + booking; sandbox delete leaves no reply rows); fo_list_actions redefined from 202611100001 with kind <> 'outbox_reply' only (coordinator compared); outbox_reply shape check no longer requires channel_id; fo_decide_outbox raises 'Channel not found.' before changing status; view shows expired pending as cancelled. +1 PGlite test (channel/workspace delete)."
+        },
+        {
+          "at": "2026-11-12T18:48:41.753Z",
+          "kind": "test",
+          "detail": "Specialist: lab-db 7/7, outbox-queue 5/5, full suite 1190 total 1185 pass 0 fail 5 todo."
+        },
+        {
+          "at": "2026-11-12T18:48:41.753Z",
+          "kind": "test",
+          "detail": "Coordinator: ventra-verify exit 0: lint, typecheck, unit-tests (73s), build, workspace-integration PASSED; course + launcher FROZEN (P0-7)."
+        },
+        {
+          "at": "2026-11-12T18:48:41.753Z",
+          "kind": "note",
+          "detail": "Migration 202611130004 is LOCAL only. OWNER: apply live together with 202611130001-0003 when approving the front-office release (production migration = needs approval). Small nit left: rejecting a reply whose channel was deleted via fo_decide_outbox raises; generic reject still works."
+        },
+        {
+          "at": "2026-11-12T18:48:41.753Z",
+          "kind": "commit",
+          "detail": "7adac3f4 on agent/develop (3 files)"
+        }
+      ],
       "blocker": null,
       "notes": "Workstream A (owner directive 2026-11-09). Never touch apps/web/app/ui, components, design-system, (ventra) layouts or site. From the A-0 audit.",
-      "updatedAt": "2026-11-09T21:18:48.280Z"
+      "updatedAt": "2026-11-12T18:48:41.753Z"
     },
     {
       "id": "A-19",
@@ -5356,7 +5426,7 @@
       "phase": 1,
       "module": "shared",
       "owner": "ventra-voice",
-      "state": "queued",
+      "state": "done",
       "priority": 3,
       "dependsOn": [
         "A-67"
@@ -5373,17 +5443,46 @@
       "plan": "A-28 brief G9/G10",
       "branch": "agent/develop",
       "worktree": null,
-      "startedAt": null,
-      "finishedAt": null,
-      "lastRunId": "c-0ba93875",
+      "startedAt": "2026-11-12T18:44:00Z",
+      "finishedAt": "2026-11-12T19:00:00Z",
+      "lastRunId": "c-53ebd485",
       "runIds": [
-        "c-0ba93875"
+        "c-0ba93875",
+        "c-53ebd485"
       ],
-      "commits": [],
-      "evidence": [],
+      "commits": [
+        "260bc299"
+      ],
+      "evidence": [
+        {
+          "at": "2026-11-12T18:43:06.793Z",
+          "kind": "note",
+          "detail": "Dispatched to ventra-voice (c-53ebd485)."
+        },
+        {
+          "at": "2026-11-12T18:48:41.753Z",
+          "kind": "diff",
+          "detail": "Coordinator read diff: plainText on stored names in take_message/quote, answers flattened (1000 each) in both hand-off builders, Setter summaries str(4000) -> plainText(1500), booking-change prefix 1000. New test front-office-receptionist-stored-names.test.ts (2 tests; quote test fails without fix). G12 stale comment trimmed."
+        },
+        {
+          "at": "2026-11-12T18:48:41.753Z",
+          "kind": "test",
+          "detail": "Specialist full suite 1192 total 1187 pass 0 fail 5 todo; coordinator ventra-verify exit 0 on the combined tree."
+        },
+        {
+          "at": "2026-11-12T18:48:41.753Z",
+          "kind": "note",
+          "detail": "Not done: G12 exact held words assertion (moved to A-75)."
+        },
+        {
+          "at": "2026-11-12T18:48:41.753Z",
+          "kind": "commit",
+          "detail": "260bc299 on agent/develop (4 files)"
+        }
+      ],
       "blocker": null,
       "notes": "Shares the test file with A-69: run one after the other.",
-      "updatedAt": "2026-11-12T16:55:19.289Z"
+      "updatedAt": "2026-11-12T18:48:41.753Z"
     },
     {
       "id": "A-72",
@@ -5510,22 +5609,46 @@
     {
       "module": "receptionist",
       "owner": "ventra-voice",
-      "state": "queued",
+      "state": "done",
       "priority": 3,
       "plan": "review follow-up",
       "branch": "agent/develop",
       "worktree": null,
-      "startedAt": null,
-      "finishedAt": null,
-      "lastRunId": "c-f2c38241",
+      "startedAt": "2026-11-12T18:00:59.818Z",
+      "finishedAt": "2026-11-12T18:13:50.922Z",
+      "lastRunId": "c-dac7ea8b",
       "runIds": [
-        "c-f2c38241"
+        "c-f2c38241",
+        "c-dac7ea8b"
       ],
-      "commits": [],
-      "evidence": [],
+      "commits": [
+        "26ed59bb"
+      ],
+      "evidence": [
+        {
+          "at": "2026-11-12T18:13:50.922Z",
+          "kind": "diff",
+          "detail": "agent.ts +3 (ensureContact returns current contact when locked or failedEarlier()), identity.ts comment, identity test +1 case (contact A fails, switch to B by phone same session and fresh session: refused, one hand-off, nothing leaked, no second contact)"
+        },
+        {
+          "at": "2026-11-12T18:13:50.922Z",
+          "kind": "review",
+          "detail": "ventra-review PASS WITH NITS: first-turn lookup unaffected; nits (comment placement, assert contactId unchanged) moved to A-77"
+        },
+        {
+          "at": "2026-11-12T18:13:50.922Z",
+          "kind": "test",
+          "detail": "ventra-verify exit 0 (lint, typecheck, unit-tests, build, workspace-integration PASSED; course/launcher FROZEN)"
+        },
+        {
+          "at": "2026-11-12T18:13:50.922Z",
+          "kind": "commit",
+          "detail": "26ed59bb"
+        }
+      ],
       "blocker": null,
       "phase": 1,
-      "updatedAt": "2026-11-12T17:58:41.080Z",
+      "updatedAt": "2026-11-12T18:13:50.922Z",
       "id": "A-74",
       "title": "A-20 review nits: treat the call as locked if ANY contact touched on this call has the not-verified marker (or refuse phone= switch after a failed verification); test fail on contact A then switch to B on the same call id; owner decision on first-name-only matching (recommend first name + surname when stored); note non-Latin names verify by time only; decide whether a failed verification hand-off should mute the Setter for that contact",
       "dependsOn": [
@@ -5538,27 +5661,62 @@
       "acceptance": [
         "Cross-contact retry on the same call refused with no extra hand-off (test)",
         "Full suite, typecheck, lint pass"
-      ]
+      ],
+      "notes": "Owner decisions left open (unchanged): first-name-only matching; whether a failed check mutes the Setter."
     },
     {
       "module": "setter",
       "owner": "ventra-voice",
-      "state": "queued",
+      "state": "done",
       "priority": 3,
       "plan": "review follow-up",
       "branch": "agent/develop",
       "worktree": null,
-      "startedAt": null,
-      "finishedAt": null,
-      "lastRunId": "c-f2c38241",
+      "startedAt": "2026-11-12T19:01:00Z",
+      "finishedAt": "2026-11-12T19:12:00Z",
+      "lastRunId": "c-53ebd485",
       "runIds": [
-        "c-f2c38241"
+        "c-f2c38241",
+        "c-53ebd485"
       ],
-      "commits": [],
-      "evidence": [],
+      "commits": [
+        "b6ca30d1"
+      ],
+      "evidence": [
+        {
+          "at": "2026-11-12T18:48:41.753Z",
+          "kind": "note",
+          "detail": "Dispatched to ventra-voice (c-53ebd485), with the A-71 leftover G12 assertion added."
+        },
+        {
+          "at": "2026-11-12T18:52:52.286Z",
+          "kind": "diff",
+          "detail": "Coordinator read lab.ts diff: PERSON regex built from WHO (person/human/owner/manager/someone/staff or team member/representative) + want/need a human, put me through, transfer me, connect me to/with. 8 ordinary-sentence negatives, 11 positives in one new test. prompt.ts comment only (no version change). G12 asserts the exact held 'book' line."
+        },
+        {
+          "at": "2026-11-12T18:52:52.286Z",
+          "kind": "test",
+          "detail": "Coordinator: npm --prefix apps/web test 1193 total, 1188 pass, 0 fail, 5 todo."
+        },
+        {
+          "at": "2026-11-12T18:52:52.286Z",
+          "kind": "lint",
+          "detail": "npm --prefix apps/web run lint exit 0"
+        },
+        {
+          "at": "2026-11-12T18:52:52.286Z",
+          "kind": "typecheck",
+          "detail": "npm --prefix apps/web run typecheck exit 0"
+        },
+        {
+          "at": "2026-11-12T18:52:52.286Z",
+          "kind": "commit",
+          "detail": "b6ca30d1 on agent/develop (4 files)"
+        }
+      ],
       "blocker": null,
       "phase": 1,
-      "updatedAt": "2026-11-12T17:58:41.080Z",
+      "updatedAt": "2026-11-12T18:52:52.286Z",
       "id": "A-75",
       "title": "A-70 review nits: add a negative that actually changed (\"I'll talk to people at the gym\"); broaden the Lab PERSON regex toward production (I want/need a human, put me through/transfer/connect me to someone, staff member/team member/representative); prompt.ts version comment notes @3 (A-59)",
       "dependsOn": [
@@ -5567,32 +5725,58 @@
       "scope": [
         "apps/web/lib/front-office/setter/lab.ts",
         "apps/web/lib/front-office/setter/prompt.ts",
-        "apps/web/test/front-office-setter-lab.test.ts"
+        "apps/web/test/front-office-setter-lab.test.ts",
+        "apps/web/test/front-office-scenarios-security.test.ts"
       ],
       "acceptance": [
         "New positives and negatives tested",
+        "G12 test asserts the exact held words (from A-71)",
         "Full suite, typecheck, lint pass"
       ]
     },
     {
       "module": "receptionist",
       "owner": "ventra-backend",
-      "state": "queued",
+      "state": "done",
       "priority": 3,
       "plan": "review follow-up",
       "branch": "agent/develop",
       "worktree": null,
-      "startedAt": null,
-      "finishedAt": null,
-      "lastRunId": "c-f2c38241",
+      "startedAt": "2026-11-12T18:00:59.818Z",
+      "finishedAt": "2026-11-12T18:13:50.922Z",
+      "lastRunId": "c-dac7ea8b",
       "runIds": [
-        "c-f2c38241"
+        "c-f2c38241",
+        "c-dac7ea8b"
       ],
-      "commits": [],
-      "evidence": [],
+      "commits": [
+        "70ccc022"
+      ],
+      "evidence": [
+        {
+          "at": "2026-11-12T18:13:50.922Z",
+          "kind": "diff",
+          "detail": "new migration 202611130003_front_office_voice_end_withheld.sql (fo_voice_end replaced, same signature/security definer/search_path/grants): first report of a contactless dropped call without a settled outcome creates one \"Withheld caller\" placeholder contact (withheld-<md5 call id>@call.invalid) + created/call events; new PGlite test file front-office-receptionist-db-withheld.test.ts (3 cases)"
+        },
+        {
+          "at": "2026-11-12T18:13:50.922Z",
+          "kind": "review",
+          "detail": "ventra-review PASS WITH NITS; reworked once: settled outcomes skip the placeholder (matches SETTLED in dropped.ts), prefix/exceeded-max-duration and existing-contact cases tested, serial Promise.all labelled honestly"
+        },
+        {
+          "at": "2026-11-12T18:13:50.922Z",
+          "kind": "test",
+          "detail": "ventra-verify exit 0 after rework; specialist full suite 1173 total, 1168 pass, 0 fail, 5 todo (1169 at cycle start)"
+        },
+        {
+          "at": "2026-11-12T18:13:50.922Z",
+          "kind": "commit",
+          "detail": "70ccc022"
+        }
+      ],
       "blocker": null,
       "phase": 1,
-      "updatedAt": "2026-11-12T17:58:41.080Z",
+      "updatedAt": "2026-11-12T18:13:50.922Z",
       "id": "A-76",
       "title": "Dropped call from a withheld number with no contact is silent: fo_voice_end should return a placeholder contact for every call, or add a workspace-level staff event function that needs no contact id (local migration only; owner applies live)",
       "dependsOn": [
@@ -5605,7 +5789,96 @@
       "acceptance": [
         "A withheld, contactless dropped call leaves a staff-visible event (PGlite test)",
         "Full suite, typecheck, lint pass"
-      ]
+      ],
+      "notes": "LOCAL migration only. Owner applies 202611130003 to the live project (after 202611130001/2). Lib nits (placeholder email in send paths, handoff summary wording) moved to A-77."
+    },
+    {
+      "id": "A-77",
+      "title": "A-76/A-74 review nits: never send to the withheld placeholder (@call.invalid) in booking attendee, jobs email and Setter reachability paths; handoff summary says \"number withheld\" instead of \"Captured: name Withheld caller\" and hides the placeholder email; move the identity.ts non-Latin note below the nameMatches description; A-74 test asserts the call stays linked to the original contact and that a number switch works when no check failed",
+      "phase": 1,
+      "module": "receptionist",
+      "owner": "ventra-voice",
+      "state": "done",
+      "priority": 3,
+      "dependsOn": [
+        "A-74",
+        "A-76"
+      ],
+      "scope": [
+        "apps/web/lib/front-office/**",
+        "apps/web/test/front-office-receptionist*.test.ts",
+        "apps/web/test/front-office-setter*.test.ts",
+        "apps/web/test/front-office-booking*.test.ts",
+        "apps/web/test/front-office-jobs*.test.ts"
+      ],
+      "acceptance": [
+        "No send path targets an @call.invalid address (test)",
+        "Handoff for a withheld drop reads naturally (test)",
+        "Full suite, typecheck, lint pass"
+      ],
+      "plan": "ventra-review c-dac7ea8b",
+      "branch": "agent/develop",
+      "worktree": null,
+      "startedAt": "2026-11-12T18:13:53.766Z",
+      "finishedAt": "2026-11-12T19:05:00Z",
+      "lastRunId": "c-53ebd485",
+      "runIds": [
+        "c-dac7ea8b",
+        "c-53ebd485"
+      ],
+      "commits": [
+        "d3f61902"
+      ],
+      "evidence": [
+        {
+          "at": "2026-11-12T18:39:10.834Z",
+          "kind": "note",
+          "detail": "Reconciled (c-53ebd485): previous cycle c-dac7ea8b ended with A-77 work in tree: 8 lib/front-office files (+isDeliverableEmail/deliverableEmail), 2 modified tests, new front-office-jobs-invalid-email.test.ts."
+        },
+        {
+          "at": "2026-11-12T18:39:10.834Z",
+          "kind": "review",
+          "detail": "ventra-review: approve with nits. Regex identical to stored-email checks; only contact send path jobs.ts:254 is screened. Nits: receptionist/agent.ts:336 placeholder email never replaced by a real one; who-label fallbacks jobs.ts:290, setter/agent.ts:163 show the placeholder; dropped.ts:65 spacing."
+        },
+        {
+          "at": "2026-11-12T18:39:10.834Z",
+          "kind": "test",
+          "detail": "Coordinator: npm --prefix apps/web test 1186 total, 1178 pass, 3 fail (all front-office-lab-db.test.ts, caused by A-18), 5 todo. A-77 files pass."
+        },
+        {
+          "at": "2026-11-12T18:39:10.834Z",
+          "kind": "note",
+          "detail": "Sent back to ventra-voice for the review nits (one rework)."
+        },
+        {
+          "at": "2026-11-12T18:42:57.133Z",
+          "kind": "diff",
+          "detail": "Rework: receptionist/agent.ts real email replaces placeholder (in memory; fo_save_details already overwrites), quote hand-off drops placeholder email when a phone exists; who-label uses deliverableEmail in jobs.ts and setter/agent.ts; dropped.ts spacing. Hand-off contact email kept in dropped.ts because checkedHandoff requires phone or email for voice. +3 tests (quote x2, jobs-invalid-email x1)."
+        },
+        {
+          "at": "2026-11-12T18:42:57.133Z",
+          "kind": "test",
+          "detail": "Coordinator: jobs-invalid-email + receptionist-quote/dropped/identity: 62/62 pass. Specialist full suite 1189 total, 1184 pass, 0 fail, 5 todo."
+        },
+        {
+          "at": "2026-11-12T18:42:57.133Z",
+          "kind": "typecheck",
+          "detail": "npm --prefix apps/web run typecheck exit 0"
+        },
+        {
+          "at": "2026-11-12T18:42:57.133Z",
+          "kind": "lint",
+          "detail": "npm --prefix apps/web run lint exit 0"
+        },
+        {
+          "at": "2026-11-12T18:42:57.133Z",
+          "kind": "commit",
+          "detail": "d3f61902 on agent/develop (12 files)"
+        }
+      ],
+      "blocker": null,
+      "notes": "",
+      "updatedAt": "2026-11-12T18:42:57.133Z"
     }
   ]
 }
