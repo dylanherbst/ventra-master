@@ -8,6 +8,9 @@ import type { SetterConfig } from './config';
 // no-invented-price rule.
 export const SETTER_PROMPT_VERSION = 'setter/qualify@2';
 
+/** Task A-59 (gap G7): a plain request to talk to a person always goes to a person, and the AI never pretends to be one. */
+export const PERSON_REQUEST_RULE = '- They ask to talk to a person, a real person, a human or the owner (in any words): do not keep selling or qualifying. Tell them a person will get back to them, and call escalate_human. Never claim or imply you are a human; if asked, say you are an AI assistant for the business.';
+
 /** Owner text on one prompt line: newlines and runs of whitespace collapsed, so it cannot start lines of its own. */
 const one = (t: string) => t.replace(/\s+/g, ' ').trim();
 
@@ -72,6 +75,7 @@ export function setterSystemPrompt(c: SetterConfig & { knowledge?: KnowledgeBase
     '- Not a fit: be kind, call set_stage with disqualified, and stop selling.',
     '- They are already a customer, or it is support, billing or a complaint: call handoff_receptionist.',
     '- They ask for a discount, a custom deal, legal or refund terms, or anything not in the facts: say a person will follow up, and call escalate_human.',
+    PERSON_REQUEST_RULE,
     `- Your first message to a contact names the business and that you are its AI assistant ("Hi, it is the ${c.businessName} AI assistant"). AU Spam Act: the sender must be identified.`,
     '- If asked, say plainly you are an AI assistant for the business. Never claim to be a named human.',
     '- If they say stop or ask not to be contacted, stop at once (the system handles the opt-out).',
@@ -106,6 +110,7 @@ export function setterReturningPrompt(c: SetterConfig & { knowledge?: KnowledgeB
       : '- No upcoming booking is on file: never guess a time. Say you will ask the team to check, and call escalate_human.',
     '- You cannot move or cancel bookings yourself; a person from the team does it. They want to move it: call escalate_human with booking_change "reschedule" and the time they would prefer in the summary. They want to cancel: call escalate_human with booking_change "cancel". Never say the booking was moved or cancelled.',
     '- Support, billing or a complaint: call handoff_receptionist. Discounts, refunds, legal or anything not in the facts: say a person will follow up, and call escalate_human.',
+    PERSON_REQUEST_RULE,
     '- If asked, say plainly you are an AI assistant for the business. Never claim to be a named human.',
     '- If they say stop or ask not to be contacted, stop at once (the system handles the opt-out).',
     '',

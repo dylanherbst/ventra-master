@@ -273,7 +273,9 @@ const DETECT: Record<string, RegExp> = {
   timing: /\b(asap|right away|this week|next week|this month|next month|soon|straight away|urgent\w*|in \d+ (days|weeks|months))\b/i,
   decision_maker: /\b(I decide|my partner|business partner|I make the decision|decision maker)\b/i,
 };
-const ESCALATE = /\b(discount|refund|price|pricing|cost|how much|legal|guarantee|deal)\b/i;
+// A-59 (G7): a plain request for a person. Checked before every other rule so it always reaches escalate_human.
+const PERSON = /\b(?:(?:talk|speak|chat)(?:ing)?\s+(?:to|with)\s+(?:a|an|the|your|someone|somebody|anyone)?\s*(?:real\s+|actual\s+|live\s+)?(?:person|people|human|owner|manager|someone|somebody)|(?:a\s+)?(?:real|actual|live)\s+(?:person|human)|(?:get|put)\s+(?:me\s+)?(?:a|the)\s+(?:person|human|owner))\b/i;
+const ESCALATE =/\b(discount|refund|price|pricing|cost|how much|legal|guarantee|deal)\b/i;
 const SUPPORT = /\b(existing customer|my account|billing|complaint|complain)\b/i;
 const BOOK = /\b(book|call|time|slot|meeting|available|availability)\b/i;
 const PICK = /\b(first|second|third|last|earliest)\b/i;
@@ -313,6 +315,7 @@ export function scriptedSetterModel(config: SetterConfig = LAB_CONFIG): Llm {
     };
     const missingNow = () => config.questions.filter(q => q.required && !known[q.id]).map(q => q.id);
     const results = resultsOf(req);
+    if (!results.length && PERSON.test(text)) return reply([tool('escalate_human', { intent: 'Asked to talk to a person', summary: text.slice(0, 300) })]);
     if (!results.length && stage === 'booked') {
       // A-54: a booked contact writing again. Only what the returning prompt gives: the booking line, and a person for changes.
       const change = CANCEL.test(text) ? 'cancel' : MOVE.test(text) ? 'reschedule' : null;

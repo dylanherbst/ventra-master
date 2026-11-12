@@ -130,6 +130,38 @@ test('after a hand-off to a person the lab AI goes quiet, like the live routes (
   assert.equal(s2.wouldSend.length, 0);
 });
 
+test('G7 (A-59): the Setter prompts carry the talk-to-a-person rule and never claim to be human', async () => {
+  const { setterSystemPrompt, setterReturningPrompt } = await import('../lib/front-office/setter/prompt.ts');
+  const { LAB_CONFIG } = await import('../lib/front-office/setter/lab.ts');
+  const prompts = [setterSystemPrompt(LAB_CONFIG, 'Mon 9 Nov', 'sms'), setterReturningPrompt(LAB_CONFIG, 'Mon 9 Nov', 'sms', null)];
+  for (const p of prompts) {
+    assert.match(p, /ask to talk to a person, a real person, a human or the owner/);
+    assert.match(p, /a person will get back to them, and call escalate_human/);
+    assert.match(p, /Never claim or imply you are a human/);
+    assert.match(p, /say you are an AI assistant for the business/);
+  }
+});
+
+test('G7 (A-59): a plain request for a person hands off to a person, then the AI goes quiet', async () => {
+  const phrases = ['Can I talk to a person?', 'I want a real person please', 'Let me speak to a human', 'Can I talk to the owner?'];
+  for (const message of phrases) {
+    const s1 = await runLabTurn(newLab('automatic'), { message });
+    const t = s1.turns[0];
+    assert.equal(t.error, null, message);
+    assert.deepEqual(t.tools.map(x => x.name), ['escalate_human'], message);
+    assert.equal(t.handedTo, 'human', message);
+    assert.ok(s1.tables.handoffs.some(h => h.owner === 'human'), message);
+    assert.ok(t.reply && !/\bI am (a )?human\b/i.test(t.reply), message);
+    const s2 = await runLabTurn(s1, { message: 'Hello? Anyone?' });
+    assert.equal(s2.turns[1].reply, null, 'goes quiet after the hand-off');
+    assert.deepEqual(s2.turns[1].tools, []);
+    assert.equal(s2.wouldSend.length, 0);
+  }
+  // An ordinary message is not treated as a request for a person.
+  const s = await runLabTurn(newLab('automatic'), { message: 'Hi, I run a gym in Perth.' });
+  assert.deepEqual(s.turns[0].tools.map(x => x.name), ['save_answers']);
+});
+
 test('oversized or tampered state is refused before the pipeline runs', async () => {
   const base = await runLabTurn(newLab('automatic'), { message: 'Hi, I run a gym in Perth.' });
   const tamper = (f: (s: LabState) => void) => { const s = structuredClone(base); f(s); return s; };
