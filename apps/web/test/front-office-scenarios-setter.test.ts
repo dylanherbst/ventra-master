@@ -395,7 +395,7 @@ test('S8 interruption (H-AGENT + H-LAB, automatic): consecutive messages merge, 
 
 // ---------------------------------------------------------------------------------------------------------------
 test('S9 returning customer (H-DB, automatic): a qualified contact is not re-asked; a booked contact is told their booking (G1 closed, A-54)', async () => {
-  await rec.scenario({ id: 'S9', operatingMode: 'automatic', expected: 'qualified: answers in context, no re-ask; booked: reply restates the booking (time, where) with no booking tools, tagged setter/returning-booked@1; nothing re-booked' }, async (c) => {
+  await rec.scenario({ id: 'S9', operatingMode: 'automatic', expected: 'qualified: answers in context, no re-ask; booked: reply restates the booking (time, where) with no booking tools, tagged setter/returning-booked@2; nothing re-booked' }, async (c) => {
     // Qualified contact writes again.
     let s = await h.dbSetup('automatic');
     let restore = h.dbEnv(s.channel, true);

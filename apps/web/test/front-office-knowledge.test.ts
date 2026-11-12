@@ -158,7 +158,7 @@ test('objection rule changes the Receptionist’s reply (same caller line, with 
 });
 
 test('setter prompt: carries services, prices, offers, policies and objection rules; nothing on file says so', () => {
-  assert.equal(SETTER_PROMPT_VERSION, 'setter/qualify@2');
+  assert.equal(SETTER_PROMPT_VERSION, 'setter/qualify@3');
   const p = setterSystemPrompt(setterConfigFor(gym(kb({ objections: [priceRule] }))), 'Mon 9 Nov, 8:30 am', 'sms', NOW);
   assert.ok(!p.includes('Winter special'), 'an offer past its end date is filtered in code, not left to the model');
   const later = setterSystemPrompt(setterConfigFor(gym()), 'later', 'sms', Date.parse('2027-01-01T01:00:00Z'));

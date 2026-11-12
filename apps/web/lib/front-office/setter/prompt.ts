@@ -6,7 +6,7 @@ import type { SetterConfig } from './config';
 
 // @2 (A-16): the business's knowledge base (services and prices, offers, policies, objection rules) and the
 // no-invented-price rule.
-export const SETTER_PROMPT_VERSION = 'setter/qualify@2';
+export const SETTER_PROMPT_VERSION = 'setter/qualify@3';
 
 /** Task A-59 (gap G7): a plain request to talk to a person always goes to a person, and the AI never pretends to be one. */
 export const PERSON_REQUEST_RULE = '- They ask to talk to a person, a real person, a human or the owner (in any words): do not keep selling or qualifying. Tell them a person will get back to them, and call escalate_human. Never claim or imply you are a human; if asked, say you are an AI assistant for the business.';
@@ -87,7 +87,7 @@ export function setterSystemPrompt(c: SetterConfig & { knowledge?: KnowledgeBase
 
 // Task A-54 (gap G1): a contact who is already booked and writes again. Logged with its own version so these replies are
 // never mistaken for qualification replies.
-export const SETTER_RETURNING_PROMPT_VERSION = 'setter/returning-booked@1';
+export const SETTER_RETURNING_PROMPT_VERSION = 'setter/returning-booked@2';
 
 /** The prompt for a booked contact writing again. booking: "<meeting> on <time> (<time zone>), <where>", built in code from
  * the contact's upcoming appointment; null when none is on file. The Setter has no tool that moves or cancels a booking,

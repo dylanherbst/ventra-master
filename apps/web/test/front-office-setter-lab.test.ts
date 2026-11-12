@@ -162,6 +162,19 @@ test('G7 (A-59): a plain request for a person hands off to a person, then the AI
   assert.deepEqual(s.turns[0].tools.map(x => x.name), ['save_answers']);
 });
 
+test('A-70: more ways to ask for a person hand off; ordinary "someone" messages do not', async () => {
+  for (const message of ['Can I talk to someone?', 'can i talk to somebody', 'I would like to speak to a real person', 'chat with a human please']) {
+    const s = await runLabTurn(newLab('automatic'), { message });
+    assert.deepEqual(s.turns[0].tools.map(x => x.name), ['escalate_human'], message);
+    assert.equal(s.turns[0].handedTo, 'human', message);
+  }
+  for (const message of ['Someone recommended you to me', 'Can someone fix my lashes?', 'I talked to people at the gym about you', 'Is anyone there at 5pm?']) {
+    const s = await runLabTurn(newLab('automatic'), { message });
+    assert.ok(!s.turns[0].tools.some(x => x.name === 'escalate_human'), `${message}: no hand-off`);
+    assert.equal(s.turns[0].handedTo, null, message);
+  }
+});
+
 test('oversized or tampered state is refused before the pipeline runs', async () => {
   const base = await runLabTurn(newLab('automatic'), { message: 'Hi, I run a gym in Perth.' });
   const tamper = (f: (s: LabState) => void) => { const s = structuredClone(base); f(s); return s; };

@@ -169,7 +169,7 @@ test('the main Setter prompt is unchanged for unbooked contacts (no returning ru
   await runSetterTurn(CID, a.deps(async (req) => { seen.push((req.tools ?? []).map(t => t.name)); return m.llm(req); }));
   assert.equal(seen[0].length, 6); assert.ok(seen[0].includes('book_time'));
   assert.doesNotMatch(m.systems[0], /Their booking:/);
-  assert.equal(a.db.outbound[0].prompt, 'setter/qualify@2');
+  assert.equal(a.db.outbound[0].prompt, 'setter/qualify@3');
 });
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -198,6 +198,23 @@ test('Setter Lab: a booked contact writing again is told the booking; asking to 
     assert.equal(r.tables.handoffs.at(-1)?.owner, 'human');
     assert.equal(r.tables.appointments.length, 1); assert.equal(r.calendar.length, 1); assert.equal(r.tables.contacts[0].state, 'booked');
     assertNothingSent(r.wouldSend); assertOutboundTagged(r.tables.messages.filter(m => m.direction === 'outbound'));
+  }
+});
+
+test('Setter Lab (A-70): a booked contact asking for a person gets escalate_human and the fixed hand-off words; ordinary messages do not hand off', async () => {
+  for (const message of ['Can I talk to a person?', 'can i talk to someone', 'I want to speak to a real person please', 'Can I speak with a human?']) {
+    const r = await labBooked('automatic');
+    const s = await runLabTurn(r, { message });
+    const x = s.turns.at(-1)!;
+    assert.deepEqual(x.tools.map(y => y.name), ['escalate_human'], message);
+    assert.equal(x.reply, RETURNING_HANDOFF_SAY, message); assert.equal(x.handedTo, 'human', message);
+    assert.equal(s.tables.handoffs.at(-1)?.owner, 'human'); assert.equal(s.tables.appointments.length, 1);
+  }
+  for (const message of ['Someone recommended you to me', 'Can someone fix my lashes?', 'Hi, what time is my call again?']) {
+    const s = await runLabTurn(await labBooked('automatic'), { message });
+    const x = s.turns.at(-1)!;
+    assert.ok(!x.tools.some(y => y.name === 'escalate_human'), `${message}: no hand-off`);
+    assert.equal(x.handedTo, null, message);
   }
 });
 

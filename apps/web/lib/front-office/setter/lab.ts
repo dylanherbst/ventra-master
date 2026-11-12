@@ -274,7 +274,7 @@ const DETECT: Record<string, RegExp> = {
   decision_maker: /\b(I decide|my partner|business partner|I make the decision|decision maker)\b/i,
 };
 // A-59 (G7): a plain request for a person. Checked before every other rule so it always reaches escalate_human.
-const PERSON = /\b(?:(?:talk|speak|chat)(?:ing)?\s+(?:to|with)\s+(?:a|an|the|your|someone|somebody|anyone)?\s*(?:real\s+|actual\s+|live\s+)?(?:person|people|human|owner|manager|someone|somebody)|(?:a\s+)?(?:real|actual|live)\s+(?:person|human)|(?:get|put)\s+(?:me\s+)?(?:a|the)\s+(?:person|human|owner))\b/i;
+const PERSON = /\b(?:(?:talk|speak|chat)(?:ing)?\s+(?:to|with)\s+(?:(?:a|an|the|your)\s+)?(?:(?:real|actual|live)\s+)?(?:person|human|owner|manager|someone|somebody|anyone)|(?:a\s+)?(?:real|actual|live)\s+(?:person|human)|(?:get|put)\s+(?:me\s+)?(?:a|the)\s+(?:person|human|owner))\b/i;
 const ESCALATE =/\b(discount|refund|price|pricing|cost|how much|legal|guarantee|deal)\b/i;
 const SUPPORT = /\b(existing customer|my account|billing|complaint|complain)\b/i;
 const BOOK = /\b(book|call|time|slot|meeting|available|availability)\b/i;
