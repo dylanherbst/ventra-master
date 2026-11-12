@@ -169,11 +169,11 @@ const ENV_KEYS = [
 
 /** Clears every front-office switch, then points the route at the chat channel with the fake model and calendar.
  * live false leaves FRONT_OFFICE_CHAT_LIVE off (the honest "not switched on" path). */
-export function dbEnv(channel: string, live: boolean) {
+export function dbEnv(channel: string, live: boolean, key: string = KEY) {
   const saved = Object.fromEntries(ENV_KEYS.map(k => [k, process.env[k]])), supa = setEnv(configuredEnv);
   for (const k of ENV_KEYS) delete process.env[k];
   Object.assign(process.env, {
-    FRONT_OFFICE_CHAT_CHANNEL_ID: channel, FRONT_OFFICE_CHAT_CHANNEL_KEY: KEY,
+    FRONT_OFFICE_CHAT_CHANNEL_ID: channel, FRONT_OFFICE_CHAT_CHANNEL_KEY: key,
     ANTHROPIC_API_KEY: 'test-key', FRONT_OFFICE_MODEL: 'test-model',
     GOOGLE_CALENDAR_CLIENT_ID: 'cid', GOOGLE_CALENDAR_CLIENT_SECRET: 'csecret', GOOGLE_CALENDAR_REFRESH_TOKEN: 'rtoken', GOOGLE_CALENDAR_ID: CAL,
   }, live ? { FRONT_OFFICE_CHAT_LIVE: '1' } : {});
@@ -286,12 +286,40 @@ export function dbWorld(rpc: DbSetup['rpc'], script: DbScript = offerThenBook) {
   return { rpcCalls, rpcErrors, hosts, errors, systems, events, llmCalls: () => llmCalls, restore: () => { globalThis.fetch = real; console.error = realError; } };
 }
 
-export async function dbSend(id: string, message: string) {
+export async function dbSend(id: string, message: string, visitor: string = VISITOR) {
   const { POST } = await import('../../app/api/front-office/chat/route.ts');
   return call(POST, '/api/front-office/chat', {
     method: 'POST', cookie: null, headers: { origin: 'http://localhost:3000', 'content-type': 'application/json' },
-    body: JSON.stringify({ visitor: VISITOR, message, id }),
+    body: JSON.stringify({ visitor, message, id }),
   });
+}
+
+/** GET /api/front-office/chat: the history of one visitor on the configured channel. */
+export async function dbHistory(visitor: string = VISITOR) {
+  const { GET } = await import('../../app/api/front-office/chat/route.ts');
+  return call(GET, `/api/front-office/chat?visitor=${encodeURIComponent(visitor)}`, { method: 'GET', cookie: null, headers: { origin: 'http://localhost:3000' } });
+}
+
+/** A second, unrelated business in the SAME database (A-52, X4): its own workspace, web-chat channel (with its own key),
+ * saved settings and Setter mode, and one website visitor with private, recognisable details seeded through the real
+ * fo_* functions. Same owner login as the first business (it only needs a second workspace; isolation is by workspace). */
+export async function dbAddWorkspace(s: DbSetup, o: { name: string; key: string; visitor?: string; message: string; contactName: string; contactEmail: string; answers: Record<string, string>; mode?: Mode }) {
+  const as = async (id: string | null) => {
+    await s.db.exec('reset role');
+    await s.db.query("select set_config('request.jwt.claims',$1,false)", [id ? JSON.stringify({ sub: id, session_id: SESSION }) : '']);
+    await s.db.exec(id ? 'set role authenticated' : 'set role anon');
+  };
+  const one = async <T = unknown>(sql: string, params: unknown[] = []) => (await s.db.query<{ r: T }>(sql, params)).rows[0]?.r as T;
+  const visitor = o.visitor ?? VISITOR;
+  await as(DB_OWNER);
+  const w = await one<string>('select public.create_workspace($1) as r', [o.name]);
+  const channel = await one<string>("select public.fo_create_channel($1,'web-chat','other.example',$2) as r", [w, o.key]);
+  await one('select public.fo_save_agent_settings($1,$2,0) as r', [w, templateSettings('ventra', o.name)]);
+  await one('select public.fo_save_operating_modes($1,$2,$3,0) as r', [w, o.mode ?? 'automatic', 'enquiry_only']);
+  await as(null);
+  const { contact } = await s.rpc('fo_ingest', { channel, channel_key: o.key, sender: visitor, message: o.message, msg_id: 'other-seed-00000001', opt_out: false, opt_in: false }) as { contact: string };
+  await s.rpc('fo_save_details', { channel, channel_key: o.key, contact, new_answers: o.answers, contact_name: o.contactName, contact_email: o.contactEmail, contact_phone: null });
+  return { w, channel, key: o.key, contact, visitor };
 }
 
 // ---------------------------------------------------------------------------------------------------------------
