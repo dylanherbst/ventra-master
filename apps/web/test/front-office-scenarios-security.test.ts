@@ -188,6 +188,7 @@ test('X1 G12 lab Live path, booking and another tool call in one model response:
   assert.equal(t.booking?.decision, 'hold_for_approval');
   assert.equal(s.tables.appointments.length, 0);
   assert.doesNotMatch(t.reply ?? '', /you are booked/i, `the lab reply is "${t.reply}"`);
+  assert.equal(t.reply, 'I have passed your booking request to the team to confirm. You will hear back once it is confirmed.', 'the contact receives exactly the fixed held line');
 });
 
 // ---------------------------------------------------------------------------------------------------------------

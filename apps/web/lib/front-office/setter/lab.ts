@@ -274,7 +274,11 @@ const DETECT: Record<string, RegExp> = {
   decision_maker: /\b(I decide|my partner|business partner|I make the decision|decision maker)\b/i,
 };
 // A-59 (G7): a plain request for a person. Checked before every other rule so it always reaches escalate_human.
-const PERSON = /\b(?:(?:talk|speak|chat)(?:ing)?\s+(?:to|with)\s+(?:(?:a|an|the|your)\s+)?(?:(?:real|actual|live)\s+)?(?:person|human|owner|manager|someone|somebody|anyone)|(?:a\s+)?(?:real|actual|live)\s+(?:person|human)|(?:get|put)\s+(?:me\s+)?(?:a|the)\s+(?:person|human|owner))\b/i;
+// A-75: aligned with the prompt's PERSON_REQUEST_RULE wording (the live Setter has the model decide from that rule; there is no
+// production regex). A request names a person as the thing they want: someone, a human, the owner, a staff or team member, a
+// representative. "People", "the team" or "staff" on their own are ordinary words and do not hand off.
+const WHO = String.raw`(?:(?:a|an|the|your|one\s+of\s+your)\s+)?(?:(?:real|actual|live)\s+)?(?:person|human|owner|manager|someone|somebody|anyone|(?:staff|team)\s+member|representative|rep)`;
+const PERSON = new RegExp(String.raw`\b(?:(?:talk|speak|chat)(?:ing)?\s+(?:to|with)\s+${WHO}|(?:a\s+)?(?:real|actual|live)\s+(?:person|human)|(?:get|put)\s+(?:me\s+)?(?:a|the)\s+(?:person|human|owner)|(?:want|need|like)\s+(?:to\s+(?:talk|speak)\s+(?:to|with)\s+)?(?:a|an)\s+(?:human|person|(?:staff|team)\s+member|representative)|put\s+me\s+through|transfer\s+me|connect\s+me\s+(?:to|with)\s+${WHO})\b`, 'i');
 const ESCALATE =/\b(discount|refund|price|pricing|cost|how much|legal|guarantee|deal)\b/i;
 const SUPPORT = /\b(existing customer|my account|billing|complaint|complain)\b/i;
 const BOOK = /\b(book|call|time|slot|meeting|available|availability)\b/i;

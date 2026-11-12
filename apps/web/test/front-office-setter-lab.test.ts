@@ -175,6 +175,21 @@ test('A-70: more ways to ask for a person hand off; ordinary "someone" messages 
   }
 });
 
+test('A-75: production-style wording hands off; ordinary sentences about people, staff or the team do not', async () => {
+  const yes = ['I want a human', 'I need a human please', 'I need a representative', 'Put me through', 'Please transfer me', 'Connect me to someone', 'connect me with a staff member', 'Can I speak to a team member?', 'can I speak to someone', 'I want to talk to a representative', 'I would like a staff member to call'];
+  for (const message of yes) {
+    const s = await runLabTurn(newLab('automatic'), { message });
+    assert.deepEqual(s.turns[0].tools.map(x => x.name), ['escalate_human'], message);
+    assert.equal(s.turns[0].handedTo, 'human', message);
+  }
+  const no = ["I'll talk to people at the gym", 'I will talk to the team at my gym about it', 'My staff member quit last week', 'I have a team member who trains clients', 'The representative from my old gym was rude', 'I spoke to your staff yesterday', 'Please transfer the lease on my gym to my partner', 'People at the gym love it'];
+  for (const message of no) {
+    const s = await runLabTurn(newLab('automatic'), { message });
+    assert.ok(!s.turns[0].tools.some(x => x.name === 'escalate_human'), `${message}: no hand-off`);
+    assert.equal(s.turns[0].handedTo, null, message);
+  }
+});
+
 test('oversized or tampered state is refused before the pipeline runs', async () => {
   const base = await runLabTurn(newLab('automatic'), { message: 'Hi, I run a gym in Perth.' });
   const tamper = (f: (s: LabState) => void) => { const s = structuredClone(base); f(s); return s; };

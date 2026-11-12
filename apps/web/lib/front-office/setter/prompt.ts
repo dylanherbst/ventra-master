@@ -1,4 +1,5 @@
 // Setter system prompt. The version string is logged with every message it produces (tracker 0.6), so bump it on any change.
+// Current version setter/qualify@3 = the A-59 change (the talk-to-a-person rule, PERSON_REQUEST_RULE). A-75 changed comments only.
 import type { Channel } from '../handoff';
 import { activeOffers, emptyKnowledge, formatPriceAud } from '../settings';
 import type { KnowledgeBase } from '../settings';
