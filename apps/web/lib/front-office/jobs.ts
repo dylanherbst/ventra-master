@@ -175,8 +175,11 @@ function failSafe(s: PendingActionStore): PendingActionStore {
   return { ...s, mode: async product => { try { return await s.mode(product); } catch { return DEFAULT_OPERATING_MODE; } } };
 }
 
-/** Texts go by SMS when the contact has a mobile, otherwise by email when an email sender is given; on the email runner
- * (via 'email') by email whenever the contact has an address (A-48). */
+/** Every job kind (follow-ups, no-show rescues and the 24h/2h reminders) goes by SMS when the contact has a mobile,
+ * otherwise by email when an email sender is given. On the email runner (via 'email') all of them, reminders and rescues
+ * included, go by email whenever the contact has a deliverable address and a sender is configured (A-48); with no email
+ * sender configured the runner falls back to SMS for a contact with a phone; a follow-up then needs an SMS grant, while reminders and rescues are not
+ * consent-gated (jobBlocked only checks follow-ups). */
 /** config: the business's Setter texts, or a loader that is only called when there are jobs to run. */
 /** permissions: the Setter's approval queue and mode (live runner: channelPermissions()); see the note at the top. */
 /** via: what this channel is ('sms', 'web-chat', 'email', 'voice'; runnerChannels() name), for the follow-up consent

@@ -150,7 +150,7 @@ test('A-47 jobs: grant -> follow-up scheduled from website chat -> grant withdra
 });
 
 // A-48: the email runner. Sends are recorded per channel; the SMS and email senders are fakes (nothing leaves).
-const runOn = async (ctx: SetterContext, via: 'sms' | 'web-chat' | 'email') => {
+const runOn = async (ctx: SetterContext, via: 'sms' | 'web-chat' | 'email', withEmailSender = true) => {
   const calls: string[] = []; const texts: string[] = []; const emails: string[] = [];
   const rpc = async (fn: string) => {
     calls.push(fn);
@@ -159,7 +159,7 @@ const runOn = async (ctx: SetterContext, via: 'sms' | 'web-chat' | 'email') => {
     return null;
   };
   const store = createMemoryPendingActionStore({ workspaceId: '55555555-5555-4555-8555-555555555555', modes: () => ({ setter: 'automatic', receptionist: 'enquiry_only' }), owners: [], now: () => JOB_NOW });
-  const out = await runDueJobs({ rpc, auth: { channel: 'ch', key: 'k' }, send: async (to: string) => { texts.push(to); return { sent: false, sid: null }; }, email: async (to: string) => { emails.push(to); return { sent: false, id: null }; }, config: ventraSetterConfig, now: JOB_NOW, permissions: { store, quietHours: { start: 0, end: 0 } }, via });
+  const out = await runDueJobs({ rpc, auth: { channel: 'ch', key: 'k' }, send: async (to: string) => { texts.push(to); return { sent: false, sid: null }; }, email: withEmailSender ? async (to: string) => { emails.push(to); return { sent: false, id: null }; } : undefined, config: ventraSetterConfig, now: JOB_NOW, permissions: { store, quietHours: { start: 0, end: 0 } }, via });
   return { out: out[0], calls, texts, emails };
 };
 
@@ -200,6 +200,20 @@ test('A-48 jobs: nothing looser; another channel still needs an open grant and a
   }
   // No inbound and no grant on the email runner: no consent at all.
   assert.match((await runOn(base({ email: 'sam@example.com' }, false), 'email')).out.note, /No recorded consent: the contact has not messaged the business/);
+});
+
+test('A-50 jobs: the email runner with no email sender falls back to SMS, so a contact with a phone needs an SMS grant', async () => {
+  const lead = (sms: boolean) => base({ email: 'sam@example.com', consent: { sms, email: true } });
+  // No grant: blocked, nothing sent by text or email, nothing logged.
+  const blocked = await runOn(lead(false), 'email', false);
+  assert.equal(blocked.out.outcome, 'cancelled');
+  assert.match(blocked.out.note, /No recorded consent for texts: the contact messaged on email/);
+  assert.equal(blocked.texts.length + blocked.emails.length, 0);
+  assert.ok(!blocked.calls.includes('fo_log_outbound'));
+  // With an SMS grant the code does fall back to a text.
+  const granted = await runOn(lead(true), 'email', false);
+  assert.equal(granted.out.outcome, 'done', granted.out.note);
+  assert.equal(granted.texts.length, 1); assert.equal(granted.emails.length, 0);
 });
 
 test('Meta out-of-window reroute reads contact.consent: SMS with a grant, owner task without one or with an older database', () => {
