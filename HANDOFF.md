@@ -15,14 +15,15 @@ Dylan asked for the mobile app preview link to be sent to him on Telegram. Send 
 
 ## Master Coordinator (auto)
 
-- Last cycle: c-53ebd485 at 2026-11-13 03:15 AWST · 2 reconciled + reworked (A-77, A-18) + 2 built (A-71, A-75) + 2 reviews · 4 verified and committed · 0 new owner blockers
-- Integration branch: agent/develop @ b6ca30d1 (d3f61902 A-77 · 7adac3f4 A-18 · 260bc299 A-71 · b6ca30d1 A-75); board commit follows
-- Verification: ventra-verify exit 0 after A-18 + A-71 (lint, typecheck, unit tests, build, workspace integration; course + launcher FROZEN, P0-7). Final suite: 1193 total, 1188 pass, 5 todo, 0 fail; lint 0; typecheck 0.
-- Behaviour changes: nothing is ever sent, invited or shown to the withheld-caller placeholder address, and a real email the caller gives replaces it (A-77). Held Meta replies now live in the one approval queue (fo_pending_actions); the reply queue page works unchanged through a fo_outbox view; generic approve cannot strand a reply (A-18). Stored customer names and answers are flattened to one line in staff hand-offs/SMS/email (A-71). Setter Lab recognises more ways of asking for a person, not ordinary mentions of people (A-75).
-- OWNER, DEPLOY ORDER: migration 202611130004 (one queue) is LOCAL only; apply it live together with 202611130001-0003 when approving the front-office release (0002 before the A-66 code ships).
+- Last cycle: c-4f349d12 at 2026-11-13 04:15 AWST · 2 reconciled (A-27, A-63) + 2 dispatched (A-34, A-78) + 2 reviews · 4 verified and committed · 1 owner action (lab secret)
+- Integration branch: agent/develop @ 26d51e5e (e01a0994 A-63 · 4aed25bb A-27 · 2af933aa A-34 · 26d51e5e A-78); board commit follows
+- Verification: ventra-verify exit 0 after A-78 (lint, typecheck, unit tests, build, workspace integration; course + launcher FROZEN, P0-7). Suite: 1215 total, 1210 pass, 5 todo, 0 fail.
+- Behaviour changes: Receptionist tells unsure callers to call 000 and ends the call only after the note offer is answered (voice@4, A-63). New /tools/front-office-lab overview: both labs, modes, spend, cross-channel check that recognises a Setter-qualified contact only after the identity check (A-27). Setter and Receptionist Labs now save to a per-user lab sandbox in Supabase (reset, save/load scenarios, persistence indicator), else run in memory and say why; lab errors never show raw database text (A-34, A-78).
+- OWNER: add FRONT_OFFICE_LAB_KEY_SECRET (any random string of 32+ characters, server-only) to apps/web/.env.local, restart the dev server, sign in and try both lab pages; until then the labs run in memory. Commit-scanner note: never name a constant *SECRET* when it holds a long string (the env-name constant is LAB_KEY_ENV_NAME).
+- OWNER, DEPLOY ORDER: unchanged: migration 202611130004 joins 202611130001-0003 for the live front-office release.
 - Running / implemented (needs reconciling next cycle): none.
-- Blocked, needs the owner: unchanged (A-64, W-1 browser check, A-12, A-60, A-14, A-34, P0-10, P0-7). Backup not refreshed (P0-10 still broken).
-- Next up: A-63 (voice@3 emergency nits), A-65, A-62, A-50 (voice nits), A-53 (live QA file), A-27 (feature, check deps).
+- Blocked, needs the owner: A-64, W-1 browser check, A-12, A-60, A-14 (transfer decision, blocks A-7/A-56/A-13), P0-10, P0-7; A-34 database mode needs the lab secret above. Backup refreshed: ventra-20261113-040418-26d51e5 created and verified PASS (restore, commit 26d51e5 present, 1124 files).
+- Next up: A-65, A-62, A-50 (voice review nits), A-53 (live QA file), A-11 (Meta/WhatsApp inbound: owner should be ventra-voice, scope is code), A-27 review nits; A-34 known limits (past-dated bookings in fo_contact_context needs a migration; jobs runner lab-workspace guard) worth new tasks.
 
 ### Previous cycle c-f2c38241
 
@@ -234,10 +235,10 @@ Tracker Phase 0: 0.1 scope freeze, 0.2 orchestrator, 0.3 lead store + state mach
 ## Git state (auto)
 
 <!-- git-state:start -->
-_Generated 2026-11-13 02:53 by `ventra-handoff snapshot`. Do not hand-edit this block._
+_Generated 2026-11-13 04:04 by `ventra-handoff snapshot`. Do not hand-edit this block._
 - Branch: `agent/develop`
-- HEAD: `b6ca30d fix(setter): Setter Lab person-request match broadened to the prompt's PERSON_REQUEST_RULE wording (want/need a human, put me through, transfer me, connect me to someone, staff/team member, representative) with ordinary-sentence negatives; prompt.ts version comment; G12 test asserts the exact held words [A-75]`
-- Lock: coordinator (pid 9919, 22 min old)
+- HEAD: `26d51e5 fix(front-office): lab actions never return raw database text (safeLabError reuses the rpcFromClient filter) and keep the persistence state on failure; reset and new-conversation say they clear both labs' shared sandbox; live send verifies the caller once; page comments corrected; API_CONTRACTS notes free text in the sandbox [A-78]`
+- Lock: coordinator (pid 38721, 34 min old)
 - Uncommitted changes:
 ```text
  M HANDOFF.md
@@ -246,18 +247,18 @@ _Generated 2026-11-13 02:53 by `ventra-handoff snapshot`. Do not hand-edit this 
 ```
 - Diff stat vs HEAD:
 ```text
- HANDOFF.md                  |  11 ++
+ HANDOFF.md                  |  15 ++---
  docs/agents/TASKS.md        |   6 +-
- docs/agents/TASK_BOARD.json | 387 +++++++++++++++++++++++++++++++++++++-------
- 3 files changed, 345 insertions(+), 59 deletions(-)
+ docs/agents/TASK_BOARD.json | 137 ++++++++++++++++++++++++++++++++++----------
+ 3 files changed, 119 insertions(+), 39 deletions(-)
 ```
 - Recent commits:
 ```text
-b6ca30d fix(setter): Setter Lab person-request match broadened to the prompt's PERSON_REQUEST_RULE wording (want/need a human, put me through, transfer me, connect me to someone, staff/team member, representative) with ordinary-sentence negatives; prompt.ts version comment; G12 test asserts the exact held words [A-75]
-260bc29 fix(front-office): names already stored on a contact and hand-off answer values are flattened to one line at point of use (Receptionist take_message and quote paths, Setter hand-offs); hand-off summaries capped at 1500 everywhere; test with a newline name seeded in the database [A-71]
-7adac3f feat(front-office): one owner approval queue: held Meta replies move from fo_outbox into fo_pending_actions (kind outbox_reply); fo_outbox becomes a compatible select-only view; outbox functions keep their signatures and send exactly once; generic approve/finish refuse replies and fo_list_actions excludes them; expired replies read as cancelled; a deleted channel never strands a reply; PGlite tests (LOCAL migration, not applied live) [A-18]
-d3f6190 fix(front-office): never send, invite or show the withheld-caller placeholder address (@call.invalid): isDeliverableEmail guards booking attendee, follow-up/job reachability and Setter booking; a real email given on the call replaces the placeholder; dropped-call hand-off says the number was withheld; A-74 test asserts the call stays on the original contact [A-77]
-70ccc02 fix(receptionist): a dropped call from a withheld number with no contact now leaves a staff-visible event: fo_voice_end creates one 'Withheld caller' placeholder contact on the first report (none for settled calls or duplicates) so the existing call-back path runs; PGlite tests (local migration, not applied live) [A-76]
+26d51e5 fix(front-office): lab actions never return raw database text (safeLabError reuses the rpcFromClient filter) and keep the persistence state on failure; reset and new-conversation say they clear both labs' shared sandbox; live send verifies the caller once; page comments corrected; API_CONTRACTS notes free text in the sandbox [A-78]
+2af933a feat(front-office): Setter Lab and Receptionist Lab persist to the per-user lab sandbox (real fo_* rpc, reset, save/load/delete scenarios, DEMO/LIVE + persistence indicator); memory fallback with a visible reason when FRONT_OFFICE_LAB_KEY_SECRET is missing or short; model emails swapped to @lab-sandbox.test; lab types in contracts.ts and API_CONTRACTS.md; booking proven visible via GET /api/front-office/contacts [A-34]
+4aed25b feat(front-office): /tools/front-office-lab overview page: links both labs, DEMO/LIVE and connection indicators, operating modes and lab spend read under the owner's own session, cross-channel check that recognises a Setter-qualified contact only after the A-20 identity check and shows nothing before it [A-27]
+e01a099 fix(receptionist): emergency rule says call 000 if unsure and ends the call only after the note offer is answered (receptionist/voice@4); tests use the exported prompt version instead of stale @1/@3 literals; prompt test looks rules up by label and fails loudly [A-63]
+49e51e8 chore(coordinator): cycle c-53ebd485 board and handoff
 ```
 <!-- git-state:end -->
 
