@@ -21,21 +21,33 @@ export function isDroppedReason(reason: string): boolean {
 type Ctx = { contact: { id: string; name: string | null; phone: string | null; email: string | null; state: ContactState; answers: Record<string, string> } };
 
 /** Called after fo_voice_end with its result. Only the first end-of-call report for a call (`first === true`, decided
- * atomically in the database) creates the call-back. Returns true when a call-back handoff was recorded. If recording
- * fails, a staff-visible event is logged instead and false is returned (the webhook still answers 200). */
-export async function recordDroppedCall(rpc: Rpc, auth: ChannelAuth, end: { contact: string | null; outcomes: string[] | null; first?: boolean }, call: { id: string; caller: string | null; reason: string; transcript: string }): Promise<boolean> {
+ * atomically in the database) creates the call-back; `first === false` (a duplicate) does nothing. Returns true when a
+ * call-back handoff was recorded. If recording fails, a staff-visible event is logged instead and false is returned (the
+ * webhook still answers 200). If `first` is missing (null/undefined, e.g. migration not applied) no call-back is created
+ * (no duplicates), but an unsettled drop logs a staff-visible event so the caller is not silently lost. */
+export async function recordDroppedCall(rpc: Rpc, auth: ChannelAuth, end: { contact: string | null; outcomes: string[] | null; first?: boolean | null }, call: { id: string; caller: string | null; reason: string; transcript: string }): Promise<boolean> {
   if (!isDroppedReason(call.reason) || !end.contact) return false;
+  if (end.first === false) return false; // a duplicate report: the first one already handled it
   if (end.first !== true) {
-    if (end.first === undefined) console.error('front-office dropped call: fo_voice_end gave no `first` flag (migration 202611130002 not applied?); no call-back created');
+    // No flag at all (null/undefined/anything else): we cannot tell if this is a duplicate, so create no call-back (no
+    // duplicates) but make sure staff can see that a caller may have been lost.
+    console.error('front-office dropped call: fo_voice_end gave no `first` flag (migration 202611130002 not applied?); no call-back created');
+    // A call that was already settled (booked, message, ...) needs no call-back, so no alarm either (same rule as createCallback).
+    if (end.outcomes?.some(o => SETTLED.has(o))) return false;
+    await logDispatch(rpc, auth, end.contact, `Dropped call ${call.reason}: the system could not tell if a call-back was already made, so none was created. Please check the call log and call this person back if needed.`);
     return false;
   }
   try { return await createCallback(rpc, auth, end.contact, end.outcomes ?? [], call); }
   catch (e) {
     console.error('front-office dropped-call handoff failed:', e instanceof Error ? e.message : 'unknown');
     // Staff must still see that a caller was lost: an activity event on the contact (fo_events, kind dispatch).
-    await rpc('fo_log_dispatch', { channel: auth.channel, channel_key: auth.key, contact: end.contact, agent_name: 'receptionist', reason: `Dropped call ${call.reason}: the call-back could not be saved. Please check the call log and call this person back.` }).catch(() => undefined);
+    await logDispatch(rpc, auth, end.contact, `Dropped call ${call.reason}: the call-back could not be saved. Please check the call log and call this person back.`);
     return false;
   }
+}
+
+async function logDispatch(rpc: Rpc, auth: ChannelAuth, contact: string, reason: string): Promise<void> {
+  await rpc('fo_log_dispatch', { channel: auth.channel, channel_key: auth.key, contact, agent_name: 'receptionist', reason }).catch(() => undefined);
 }
 
 async function createCallback(rpc: Rpc, auth: ChannelAuth, contact: string, outcomes: string[], call: { id: string; caller: string | null; reason: string; transcript: string }): Promise<boolean> {

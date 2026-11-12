@@ -60,6 +60,33 @@ test('G5 dropped call: a repeated end-of-call report creates no second handoff',
   await report(s, 'customer-ended-call');
   await report(s, 'customer-ended-call');
   assert.equal(s.log.ends, 2); assert.equal(s.db.handoffs.length, 1);
+  assert.equal(s.log.dispatches.length, 0, 'a duplicate is not an error: no staff event');
+  assert.equal(s.log.sent, 0);
+});
+
+test('A-73: sequential duplicate end-of-call report (second returns first=false) creates no second call-back and no event', async () => {
+  const s = voiceStore();
+  const firsts: unknown[] = [];
+  const rpc = async (fn: string, a: Record<string, unknown>) => { const r = await s.rpc(fn, a); if (fn === 'fo_voice_end') firsts.push((r as { first: unknown }).first); return r; };
+  await report({ ...s, rpc }, 'customer-ended-call');
+  assert.equal(s.db.handoffs.length, 1);
+  await report({ ...s, rpc }, 'customer-ended-call');
+  assert.deepEqual(firsts, [true, false]);
+  assert.equal(s.db.handoffs.length, 1);
+  assert.equal(s.log.dispatches.length, 0);
+  assert.equal(s.log.sent, 0);
+});
+
+test('A-73: fo_contact_context throws -> a staff-visible dispatch event, no call-back, webhook still 200', async () => {
+  const s = voiceStore();
+  const rpc = async (fn: string, a: Record<string, unknown>) => { if (fn === 'fo_contact_context') throw new Error('context down'); return s.rpc(fn, a); };
+  const orig = console.error; const seen: string[] = []; console.error = (...m: unknown[]) => { seen.push(m.join(' ')); };
+  try { await report({ ...s, rpc }, 'customer-ended-call'); } finally { console.error = orig; }
+  assert.equal(s.db.handoffs.length, 0);
+  assert.equal(s.log.dispatches.length, 1);
+  assert.equal(s.log.dispatches[0], 'receptionist: Dropped call customer-ended-call: the call-back could not be saved. Please check the call log and call this person back.');
+  assert.ok(seen.some(m => /dropped-call handoff failed: context down/.test(m)));
+  assert.equal(s.log.sent, 0);
 });
 
 test('G5 dropped call: completed calls (booked, message, transfer, normal ending) create none', async () => {
@@ -90,6 +117,40 @@ test('A-58 follow-up: no `first` flag from the database -> no call-back (and it 
   assert.ok(seen.some(m => /no `first` flag/.test(m)));
 });
 
+test('A-73: missing / null `first` flag -> no call-back, but a staff-visible dispatch event (one per report)', async () => {
+  for (const mode of ['undefined', 'null', 'missing'] as const) {
+    const s = voiceStore();
+    const rpc = async (fn: string, a: Record<string, unknown>) => {
+      const r = await s.rpc(fn, a);
+      if (fn !== 'fo_voice_end') return r;
+      const body = { ...(r as Record<string, unknown>) };
+      if (mode === 'missing') delete body.first; else body.first = mode === 'null' ? null : undefined;
+      return body;
+    };
+    const orig = console.error; console.error = () => undefined;
+    try { await report({ ...s, rpc }, 'customer-ended-call'); } finally { console.error = orig; }
+    assert.equal(s.db.handoffs.length, 0, mode);
+    assert.equal(s.log.dispatches.length, 1, mode);
+    assert.match(s.log.dispatches[0], /^receptionist: Dropped call customer-ended-call: the system could not tell if a call-back was already made, so none was created/, mode);
+    assert.equal(s.log.sent, 0, mode);
+  }
+});
+
+test('A-73: missing `first` flag but the call was settled (booked) -> no event and no call-back', async () => {
+  const s = voiceStore(['booked']);
+  const rpc = async (fn: string, a: Record<string, unknown>) => { const r = await s.rpc(fn, a); return fn === 'fo_voice_end' ? { ...(r as object), first: undefined } : r; };
+  const orig = console.error; console.error = () => undefined;
+  try { await report({ ...s, rpc }, 'customer-ended-call'); } finally { console.error = orig; }
+  assert.equal(s.db.handoffs.length, 0); assert.equal(s.log.dispatches.length, 0); assert.equal(s.log.sent, 0);
+});
+
+test('A-73: a non-drop reason with a missing `first` flag logs no event (nothing was lost)', async () => {
+  const s = voiceStore();
+  const rpc = async (fn: string, a: Record<string, unknown>) => { const r = await s.rpc(fn, a); return fn === 'fo_voice_end' ? { ...(r as object), first: null } : r; };
+  await report({ ...s, rpc }, 'assistant-ended-call');
+  assert.equal(s.db.handoffs.length, 0); assert.equal(s.log.dispatches.length, 0);
+});
+
 test('A-58 follow-up: failed handoff -> a staff-visible event is recorded and the webhook still answers 200', async () => {
   const s = voiceStore([], { failHandoff: true });
   const orig = console.error; console.error = () => undefined;
@@ -116,6 +177,7 @@ test('A-58 follow-up: withheld number and no email on file -> no handoff can be 
   try { await report(s, 'customer-ended-call', null); } finally { console.error = orig; }
   assert.equal(s.db.handoffs.length, 0);
   assert.equal(s.log.dispatches.length, 1);
+  assert.equal(s.log.dispatches[0], 'receptionist: Dropped call customer-ended-call: the call-back could not be saved. Please check the call log and call this person back.');
   assert.equal(s.log.sent, 0);
 });
 
@@ -132,15 +194,23 @@ test('A-58 follow-up: only the explicit drop reasons count (exceeded-max-duratio
 test('A-58 follow-up: the Receptionist Lab simulator produces the same call-back, once', async () => {
   const { simulateCall, fixtures } = await import('../lib/front-office/receptionist/simulate.ts');
   let found = 0;
+  // Exactly one fixture is an unsettled hang-up ("book-too-early"); every other fixture leaves no call-back.
+  const expectedCallbacks: Record<string, number> = { faq: 0, 'dont-know': 0, 'new-caller': 0, book: 0, 'book-too-early': 1, reschedule: 0, cancel: 0, transfer: 0, urgent: 0 };
+  assert.deepEqual(fixtures.map(f => f.id).sort(), Object.keys(expectedCallbacks).sort(), 'fixture list changed: update the expected counts');
   for (const f of fixtures) {
     const r = await simulateCall(f);
     const callbacks = r.tables.handoffs.filter(h => /call back \(dropped call\)/.test(String((h as { intent?: string }).intent)));
-    // Normal endings never leave one; a hang-up leaves at most one (the call is then marked 'message', so a repeat adds none).
-    if (r.endOfCall.endedReason !== 'customer-ended-call') assert.equal(callbacks.length, 0, f.id);
-    else assert.ok(callbacks.length <= 1, f.id);
-    if (callbacks.length) { found++; assert.equal((callbacks[0] as { owner: string }).owner, 'human'); assert.ok(r.endOfCall.outcomes.includes('message'), f.id); }
+    assert.equal(callbacks.length, expectedCallbacks[f.id], f.id);
+    if (callbacks.length) {
+      found++;
+      const h = callbacks[0] as { owner: string; channel: string; nextAction: string; summary: string };
+      assert.equal(h.owner, 'human'); assert.equal(h.channel, 'voice'); assert.equal(h.nextAction, 'Call the caller back');
+      assert.match(h.summary, /^Dropped call from /); assert.match(h.summary, /Stopped: customer-ended-call/);
+      assert.equal(r.tables.handoffs.length, 1, f.id);
+      assert.ok(r.endOfCall.outcomes.includes('message'), f.id);
+    }
   }
-  assert.ok(found >= 1, 'at least one fixture is a dropped call');
+  assert.equal(found, 1, 'exactly one fixture is a dropped call');
 });
 
 test('G5 dropped call: an error ending reason -> one call-back handoff', async () => {
