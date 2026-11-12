@@ -37,25 +37,36 @@ export type Capture = {
 
 /** Runs a scenario body, timing it and recording what it saw. pass is true only when every assertion in the body held;
  * a failing body is still recorded (pass false) and then rethrown so the test fails. Records are plain JSON. When the
- * test-only env FRONT_OFFICE_QA_RECORD_DIR is set, each record is also written there as <id>.json. */
+ * test-only env FRONT_OFFICE_QA_RECORD_DIR is set, each record is also written there as <id>-<operatingMode>-<case>.json.
+ * `case` is optional (A-62): when omitted, it is the 1-based count of earlier runs of the same id and mode, so two cases
+ * of one scenario never overwrite each other's file. A failure to write the file never hides the body's own error. */
 export function createRecorder() {
   const records: ScenarioRecord[] = [];
-  async function scenario(meta: { id: string; operatingMode: OperatingMode | 'n/a'; expected: string }, body: (c: Capture) => Promise<void>): Promise<ScenarioRecord> {
+  const runs = new Map<string, number>();
+  async function scenario(meta: { id: string; operatingMode: OperatingMode | 'n/a'; expected: string; case?: string }, body: (c: Capture) => Promise<void>): Promise<ScenarioRecord> {
+    const runKey = `${meta.id}-${meta.operatingMode}`, run = (runs.get(runKey) ?? 0) + 1;
+    runs.set(runKey, run);
+    const caseName = (meta.case ?? String(run)).replace(/[^A-Za-z0-9_.-]/g, '_');
     const r: ScenarioRecord = { id: meta.id, mode: 'demo', operatingMode: meta.operatingMode, inputs: [], outputs: [], toolCalls: [], dbAfter: null, latencyMs: 0, costAud: 0, errors: [], expected: meta.expected, actual: '', pass: false };
     const c: Capture = {
       input: (...x) => { r.inputs.push(...x); }, output: (...x) => { r.outputs.push(...x); }, tools: (...t) => { r.toolCalls.push(...t); },
       db: (x) => { r.dbAfter = x; }, actual: (s) => { r.actual = s; }, error: (s) => { r.errors.push(s); },
     };
     const t0 = performance.now();
+    let bodyError: unknown, bodyFailed = false;
     try { await body(c); r.pass = true; }
-    catch (e) { r.errors.push(e instanceof Error ? e.message : String(e)); throw e; }
-    finally {
-      r.latencyMs = Math.round(performance.now() - t0);
+    catch (e) { bodyFailed = true; bodyError = e; r.errors.push(e instanceof Error ? e.message : String(e)); }
+    r.latencyMs = Math.round(performance.now() - t0);
+    let writeError: unknown, writeFailed = false;
+    try {
       const plain = JSON.parse(JSON.stringify(r)) as ScenarioRecord;
       records.push(plain);
       const dir = process.env.FRONT_OFFICE_QA_RECORD_DIR;
-      if (dir) { mkdirSync(dir, { recursive: true }); writeFileSync(path.join(dir, `${plain.id}-${plain.operatingMode}.json`), JSON.stringify(plain, null, 2)); }
-    }
+      if (dir) { mkdirSync(dir, { recursive: true }); writeFileSync(path.join(dir, `${plain.id}-${plain.operatingMode}-${caseName}.json`), JSON.stringify(plain, null, 2)); }
+    } catch (e) { writeFailed = true; writeError = e; }
+    // A recording problem must not replace the scenario's own assertion error; it only fails a scenario that passed.
+    if (bodyFailed) throw bodyError;
+    if (writeFailed) throw writeError;
     return r;
   }
   return { records, scenario };

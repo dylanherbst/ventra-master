@@ -3,6 +3,11 @@
 // writes one JSON record through the recorder in helpers/front-office-scenarios.ts and asserts outcomes (state, rows,
 // tool calls, permission decisions), not wording. Known code gaps (section 6) are pinned as today's safe baseline plus a
 // test.todo naming the gap.
+//
+// What these scenarios do and do not prove (A-62): the model is scripted, so any reply TEXT in a scenario is written by
+// the test itself. Assertions on that text (no price or digit, no pitch, not claiming to be human, "booked" wording) only
+// prove the code-side guards around it (permission decisions, tool refusals, stored rows, fixed fallback replies, what the
+// prompt carries). They are NOT coverage of what a real model would say. Such lines are marked "scripted text" below.
 import test, { before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import './helpers/route-harness.ts';
@@ -74,7 +79,7 @@ test('S1 new lead (H-LAB, automatic): one question back, at most qualifying, no 
 // ---------------------------------------------------------------------------------------------------------------
 test('S2 pricing (H-LAB + H-AGENT, all three modes): escalated to a person, no number or currency, nothing held', async () => {
   for (const mode of MODES) {
-    await rec.scenario({ id: 'S2', operatingMode: mode, expected: 'escalate_human; human handoff; no number/currency; 0 pending; transfer performs in every mode' }, async (c) => {
+    await rec.scenario({ id: 'S2', case: mode, operatingMode: mode, expected: 'escalate_human; human handoff; no number/currency; 0 pending; transfer performs in every mode' }, async (c) => {
       const message = 'How much does it cost?';
       c.input(message);
       const s = await runLabTurn(newLab(mode), { message });
@@ -84,6 +89,7 @@ test('S2 pricing (H-LAB + H-AGENT, all three modes): escalated to a person, no n
       assert.deepEqual(t.tools.map(x => x.name), ['escalate_human']);
       assert.equal(t.handedTo, 'human');
       assert.deepEqual(s.tables.handoffs.map(x => x.owner), ['human']);
+      // Scripted text (not coverage of a real model): the lab reply is written by the scripted stand-in.
       assert.doesNotMatch(t.reply ?? '', PRICE_OR_DIGIT, 'no price invented');
       assert.equal(s.pending.length, 0); assert.equal(s.tables.appointments.length, 0);
       assert.equal(decide(mode, 'transfer').decision, 'perform', 'TODO(A-14): transfer always performs today');
@@ -96,7 +102,7 @@ test('S2 pricing (H-LAB + H-AGENT, all three modes): escalated to a person, no n
       c.output({ agent: turn.reply }); c.tools(...labTools(s), ...m.calls());
       assert.equal(turn.actions.find(x => x.action === 'transfer')?.decision, 'perform');
       assert.equal(turn.handedTo, 'human'); assert.equal(a.db.handoffs[0].owner, 'human');
-      assert.doesNotMatch(turn.reply ?? '', PRICE_OR_DIGIT);
+      assert.doesNotMatch(turn.reply ?? '', PRICE_OR_DIGIT); // scripted text: the reply is written by this test
       assert.equal(a.pending.items.length, 0); assert.equal(a.db.appointment, null);
       c.db({ lab: labDb(s), agent: a.db });
       c.actual(`lab tools [${t.tools.map(x => x.name)}], agent transfer ${turn.actions.find(x => x.action === 'transfer')?.decision}`);
@@ -136,8 +142,8 @@ test('S4 unqualified (H-AGENT, automatic): disqualified, no times offered, no fo
     { message: 'Who is this? Wrong number', reply: 'Sorry for the mix-up. We will not message again.' },
     { message: 'Just curious, I do not have a business, I am a student.', reply: 'Thanks for letting me know. This is built for businesses, so it would not suit you right now. All the best with your studies.' },
   ];
-  for (const k of cases) {
-    await rec.scenario({ id: 'S4', operatingMode: 'automatic', expected: 'set_stage(disqualified); no offer_times; no jobs; polite, no pitch' }, async (c) => {
+  for (const [i, k] of cases.entries()) {
+    await rec.scenario({ id: 'S4', case: `message${i + 1}`, operatingMode: 'automatic', expected: 'set_stage(disqualified); no offer_times; no jobs; polite, no pitch' }, async (c) => {
       c.input(k.message);
       const a = agentSetup('automatic', lead('new', [{ direction: 'inbound', body: k.message }]));
       const m = scripted([[tool('set_stage', { stage: 'disqualified', reason: 'Not a fit' })], [say(k.reply)]]);
@@ -147,6 +153,7 @@ test('S4 unqualified (H-AGENT, automatic): disqualified, no times offered, no fo
       assert.ok(!turn.tools.includes('offer_times') && !turn.tools.includes('book_time'));
       assert.equal(a.db.jobs.length, 0, 'no follow-ups or reminders');
       assert.equal(a.db.handoffs.length, 0); assert.equal(a.pending.items.length, 0); assert.equal(a.db.appointment, null);
+      // Scripted text: the reply is written by this test, so these two only prove a reply is sent and stored, not its tone.
       assert.doesNotMatch(turn.reply ?? '', /\b(book|offer|price|deal)\b|\$/i, 'no pitch');
       assert.ok(turn.reply, 'still answered politely');
       c.actual(`state ${turn.state}, jobs ${a.db.jobs.length}`);
@@ -169,14 +176,12 @@ test('S5 booking, automatic (H-LAB): one appointment and event, booked, sales ha
     assert.ok(s.tables.jobs.some(j => j.kind.startsWith('reminder') && j.status === 'pending'), 'reminders scheduled');
     assert.ok(!s.tables.jobs.some(j => j.kind === 'follow-up' && j.status === 'pending'), 'no follow-up after a booking');
     assert.equal(s.pending.length, 0);
-    assert.match(t.reply ?? '', BOOKED_WORDING, 'the confirmation is the reply');
-    // The same pick again: the contact is booked, so the router hands it to Sales and nothing new is booked. Since A-54
-    // (G1) the Setter answers with the booking it already has, using no booking tools.
+    assert.match(t.reply ?? '', BOOKED_WORDING, 'the confirmation is the reply'); // scripted text: the lab stand-in writes the confirmation
+    // The same pick again: the contact is booked, so the router hands it to Sales and nothing new is booked. What the
+    // Setter then says to a booked contact (the G1 reply) is pinned in S9 (H-DB), not here.
     s = await runLabTurn(s, { message: 'The last one please.' });
     assert.equal(s.tables.appointments.length, 1, 'still one appointment'); assert.equal(s.calendar.length, 1, 'still one event');
     assert.match(s.turns[2].route, /^sales:/);
-    assert.ok(s.turns[2].reply?.includes(formatSlot(Date.parse(s.tables.appointments[0].starts), LAB_CONFIG.availability.timeZone)), `the booking is restated: ${s.turns[2].reply}`);
-    assert.deepEqual(s.turns[2].tools, [], 'no booking tools on the replay');
     labGlobals(s);
     c.output(...s.turns.map(x => x.reply)); c.tools(...labTools(s)); c.db(labDb(s));
     c.actual(`appointments ${s.tables.appointments.length}, events ${s.calendar.length}`);
@@ -275,7 +280,7 @@ function objectionFollower() {
 }
 test('S6 objection (H-AGENT + knowledge, automatic): the owner rule answers it; escalates only when the rule says so; no invented discount', async () => {
   for (const k of [{ message: "Honestly that's too expensive for me", escalate: false }, { message: 'I need to think about it', escalate: true }]) {
-    await rec.scenario({ id: 'S6', operatingMode: 'automatic', expected: `objection rule reply; escalate ${k.escalate}; no booking; no invented discount` }, async (c) => {
+    await rec.scenario({ id: 'S6', case: k.escalate ? 'escalate' : 'answer', operatingMode: 'automatic', expected: `objection rule reply; escalate ${k.escalate}; no booking; no invented discount` }, async (c) => {
       c.input(k.message);
       const a = agentSetup('automatic', lead('qualifying', [{ direction: 'inbound', body: k.message }]));
       const systems: string[] = [];
@@ -288,6 +293,7 @@ test('S6 objection (H-AGENT + knowledge, automatic): the owner rule answers it; 
       assert.equal(turn.handedTo, k.escalate ? 'human' : null);
       assert.equal(a.db.handoffs.length, k.escalate ? 1 : 0);
       assert.equal(turn.booked, false); assert.equal(a.db.appointment, null);
+      // Scripted text: the follower repeats the owner's rule line, so this proves the rule reaches the prompt, not model behaviour.
       assert.doesNotMatch(turn.reply ?? '', /discount|% off|half price|free/i);
       for (const n of (turn.reply ?? '').match(/\d+/g) ?? []) assert.ok(systems[0].includes(n), `number ${n} is on file`);
       c.actual(`reply from rule ${rule.id}, escalated ${turn.tools.includes('escalate_human')}`);
@@ -299,7 +305,7 @@ test('S6 objection (H-AGENT + knowledge, automatic): the owner rule answers it; 
 test('S7 wants a human (H-AGENT, all three modes; H-LAB deal trigger): handed to a person, AI then stays quiet, never claims to be human', async () => {
   const CLAIMS_HUMAN = /\bI(?:'m| am) (?:a )?(?:human|real person|real)\b/i;
   for (const mode of MODES) {
-    await rec.scenario({ id: 'S7', operatingMode: mode, expected: 'escalate_human; fo_handoffs owner human; next inbound gets no AI reply; never claims to be human' }, async (c) => {
+    await rec.scenario({ id: 'S7', case: mode, operatingMode: mode, expected: 'escalate_human; fo_handoffs owner human; next inbound gets no AI reply; never claims to be human' }, async (c) => {
       const message = 'Can I talk to a real person?';
       c.input(message, 'Hello? Anyone there?');
       const a = agentSetup(mode, lead('qualifying', [{ direction: 'inbound', body: message }]));
@@ -307,7 +313,7 @@ test('S7 wants a human (H-AGENT, all three modes; H-LAB deal trigger): handed to
       const turn = await runSetterTurn(CID, a.deps(m.llm));
       assert.equal(turn.actions.find(x => x.action === 'transfer')?.decision, 'perform');
       assert.equal(turn.handedTo, 'human'); assert.equal(a.db.handoffs.length, 1); assert.equal(a.db.handoffs[0].owner, 'human');
-      assert.doesNotMatch(turn.reply ?? '', CLAIMS_HUMAN);
+      assert.doesNotMatch(turn.reply ?? '', CLAIMS_HUMAN); // scripted text: the reply is written by this test
       a.db.messages.push({ direction: 'inbound', body: 'Hello? Anyone there?', agent: null, at: '' });
       const outBefore = a.db.outbound.length;
       const next = scripted([[say('Hi again!')]]);
@@ -318,7 +324,7 @@ test('S7 wants a human (H-AGENT, all three modes; H-LAB deal trigger): handed to
       const s = await runLabTurn(newLab(mode), { message: 'Can I talk to someone about a deal?' });
       assert.deepEqual(s.turns[0].tools.map(x => x.name), ['escalate_human']);
       assert.ok(s.tables.handoffs.some(x => x.owner === 'human'));
-      assert.doesNotMatch(s.turns[0].reply ?? '', CLAIMS_HUMAN);
+      assert.doesNotMatch(s.turns[0].reply ?? '', CLAIMS_HUMAN); // scripted text (lab stand-in)
       labGlobals(s);
       c.output(turn.reply, t2.reply, s.turns[0].reply); c.tools(...m.calls(), ...labTools(s)); c.db({ agent: a.db, lab: labDb(s) });
       c.actual(`handoff ${a.db.handoffs[0].owner}, second turn reply ${t2.reply}`);
@@ -328,7 +334,7 @@ test('S7 wants a human (H-AGENT, all three modes; H-LAB deal trigger): handed to
 test.todo('S7 G7: the Setter prompt has no plain "talk to a person" rule and the lab script has no "human" trigger (setter/prompt.ts:71-72, setter/lab.ts:273)');
 test('S7 lab fidelity (H-LAB, all three modes, A-61): after a hand-off to a person the lab AI stays quiet like production', async () => {
   for (const mode of MODES) {
-    await rec.scenario({ id: 'S7-lab', operatingMode: mode, expected: 'lab: escalate_human; next inbound stored, no model call, no AI reply, no outbound; turn says a person is looking after this contact' }, async (c) => {
+    await rec.scenario({ id: 'S7-lab', case: mode, operatingMode: mode, expected: 'lab: escalate_human; next inbound stored, no model call, no AI reply, no outbound; turn says a person is looking after this contact' }, async (c) => {
       c.input('Can I talk to someone about a deal?', 'Hello? Anyone there?');
       const s1 = await runLabTurn(newLab(mode), { message: 'Can I talk to someone about a deal?' });
       assert.equal(s1.turns[0].handedTo, 'human');
@@ -412,7 +418,7 @@ test('S9 returning customer (H-DB, automatic): a qualified contact is not re-ask
       const db = await h.dbSnapshot(s);
       assert.equal(db.contact[0].state, 'qualified'); assert.equal(db.appointments.length, 0); assert.equal(db.pending.length, 0);
       assertOutboundTagged(db.messages.filter(m => m.direction === 'outbound'));
-      assertNoFalseBooking([res.body.reply as string], db.appointments);
+      assertNoFalseBooking([res.body.reply as string], db.appointments); // scripted text: the reply is written by this test
       c.output(res.body); c.db({ qualified: db });
     } finally { w.restore(); restore(); await s.db.close(); }
 
@@ -539,7 +545,7 @@ test('S11 booking conflict, owner approval (H-AGENT): a held booking whose slot 
 });
 
 // ---------------------------------------------------------------------------------------------------------------
-test('S12 API failure (H-AGENT + H-LAB, automatic): model error leaves no state change and no secret; calendar failure never says booked', async () => {
+test('S12 API failure (H-AGENT + H-LAB, automatic): model error leaves no state change and no secret; calendar failure never says booked (S12b covers the chat route)', async () => {
   await rec.scenario({ id: 'S12', operatingMode: 'automatic', expected: 'model throws: fixed fallback reply + human handoff, no appointment/state change, inbound stored, no secret; calendar throws: never "You\'re booked"' }, async (c) => {
     // Model throws in the direct turn (A-55, G2 closed): the fixed fallback reply, a hand-off to a person, nothing else.
     const a = agentSetup('automatic');
@@ -577,14 +583,16 @@ test('S12 API failure (H-AGENT + H-LAB, automatic): model error leaves no state 
     assert.equal(turn.booked, false); assert.equal(b.db.appointment, null); assert.notEqual(b.db.contact.state, 'booked');
     const bookCall = m.calls().find(x => x.name === 'book_time');
     assert.ok(bookCall?.isError || /Not booked/.test(bookCall?.result ?? ''), `book_time failed visibly: ${bookCall?.result}`);
-    assertNoFalseBooking([turn.reply], []);
+    assertNoFalseBooking([turn.reply], []); // scripted text: the reply is written by this test; the real proof is the unchanged rows above
     c.output(t.error, turn.reply); c.tools(...labTools(s), ...m.calls()); c.db({ lab: labDb(s), agent: b.db });
     c.actual(`model error: ${t.error}; calendar error: ${bookCall?.result}`);
   });
 });
-test('S12 G2 (H-DB, all three modes): a model/API failure through the real chat route gets the fixed fallback reply and a human handoff, not a 503; nothing booked; no secret; the next message is left to the person', async () => {
+// S12b is its own scenario (A-62): the model-throws case through the real chat route in all three modes. The reply here is
+// the code's fixed SETTER_FALLBACK_REPLY, not scripted text.
+test('S12b G2 (H-DB, all three modes): a model/API failure through the real chat route gets the fixed fallback reply and a human handoff, not a 503; nothing booked; no secret; the next message is left to the person', async () => {
   for (const mode of MODES) {
-    await rec.scenario({ id: 'S12', operatingMode: mode, expected: 'chat 200 with SETTER_FALLBACK_REPLY; inbound stored; 1 outbound tagged setter/fallback@1; human handoff; state qualified; 0 appointments/pending; no key or provider body in response or logs; next message: no AI reply' }, async (c) => {
+    await rec.scenario({ id: 'S12b', case: mode, operatingMode: mode, expected: 'chat 200 with SETTER_FALLBACK_REPLY; inbound stored; 1 outbound tagged setter/fallback@1; human handoff; state qualified; 0 appointments/pending; no key or provider body in response or logs; next message: no AI reply' }, async (c) => {
       const SECRET = 'fake-route-key-SECRET-do-not-leak';
       const s = await h.dbSetup(mode);
       const restore = h.dbEnv(s.channel, true);
@@ -641,6 +649,7 @@ test('S12 G2 (H-DB, all three modes): a model/API failure through the real chat 
 after(() => {
   const ids = new Set(rec.records.map(r => r.id));
   for (let i = 1; i <= 12; i++) assert.ok(ids.has(`S${i}`), `record for S${i}`);
+  assert.ok(ids.has('S12b'), 'record for S12b');
   for (const r of rec.records) {
     assert.equal(r.costAud, 0); assert.equal(r.mode, 'demo');
     assert.deepEqual(JSON.parse(JSON.stringify(r)), r, 'records are plain JSON');
