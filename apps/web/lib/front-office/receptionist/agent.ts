@@ -11,6 +11,7 @@ import type { Agent } from '../handoff';
 import { scheduleReminders } from '../jobs';
 import type { LlmMessage, StreamLlm, ToolResultBlock, ToolSpec, ToolUseBlock } from '../llm';
 import type { ChannelAuth, Rpc } from '../orchestrator';
+import { deliverableEmail, isDeliverableEmail } from '../contracts';
 import type { OperatingMode } from '../contracts';
 import { decide } from '../permissions';
 import { availabilityFor, knowledgeAnswer } from '../settings';
@@ -160,7 +161,7 @@ export async function receptionistSession(d: Omit<ReceptionistDeps, 'llm' | 'con
   async function handoff(owner: Agent, intent: string, summary: string, nextAction: string) {
     const c = ctx as Ctx | null;
     if (!c) return;
-    const h = checkedHandoff({ contact: { id: c.contact.id, name: plainText(c.contact.name, 160) || null, phone: c.contact.phone, email: c.contact.email, state: c.contact.state }, channel: 'voice', intent: intent || 'call back', answers: c.contact.answers, summary: summary || 'See the call.', nextAction, from: 'receptionist', owner });
+    const h = checkedHandoff({ contact: { id: c.contact.id, name: plainText(c.contact.name, 160) || null, phone: c.contact.phone, email: c.contact.phone ? deliverableEmail(c.contact.email) : c.contact.email, state: c.contact.state }, channel: 'voice', intent: intent || 'call back', answers: c.contact.answers, summary: summary || 'See the call.', nextAction, from: 'receptionist', owner });
     await d.rpc('fo_record_handoff', { ...a, contact: c.contact.id, handoff: h });
   }
   /** Second factor before a booking is moved or cancelled (identity.ts): the caller number alone is never enough.
@@ -321,7 +322,7 @@ export async function receptionistSession(d: Omit<ReceptionistDeps, 'llm' | 'con
         // A repeat: a second request_quote on this call, or the contact already has this same request on file.
         const onFile = c?.contact.answers[QUOTE_ANSWER_KEYS.need];
         if (!quoteState && onFile && onFile.toLowerCase() === need.toLowerCase()) {
-          quoteState = { handedOff: true, notified: !!(s.staffPhone || s.staffEmail), phone: c?.contact.phone ?? null, email: c?.contact.email ?? null, updateSent: false };
+          quoteState = { handedOff: true, notified: !!(s.staffPhone || s.staffEmail), phone: c?.contact.phone ?? null, email: deliverableEmail(c?.contact.email), updateSent: false };
         }
         const repeat = quoteState !== null;
         const fields: Record<string, string> = { [QUOTE_ANSWER_KEYS.need]: need };
@@ -332,10 +333,10 @@ export async function receptionistSession(d: Omit<ReceptionistDeps, 'llm' | 'con
           const r = await d.rpc('fo_save_details', { ...a, contact: c.contact.id, new_answers: fields, contact_name: nameToSave(name), contact_email: okEmail ? email : null, contact_phone: null }) as { answers?: Record<string, string> } | null;
           c.contact.answers = r?.answers ?? { ...c.contact.answers, ...fields };
           if (nameToSave(name)) c.contact.name = name;
-          if (okEmail && !c.contact.email) c.contact.email = email;
+          if (okEmail && !isDeliverableEmail(c.contact.email)) c.contact.email = email;
         }
         const who = name || c?.contact.name || 'a caller';
-        const phoneNow = c?.contact.phone ?? d.call.caller ?? null, emailNow = okEmail ? email : c?.contact.email ?? null;
+        const phoneNow = c?.contact.phone ?? d.call.caller ?? null, emailNow = okEmail ? email : deliverableEmail(c?.contact.email);
         const from = phoneNow ?? 'number withheld';
         const details = [`needs ${need}`, where && `where: ${where}`, when && `when: ${when}`, budget && `budget: ${budget}`, emailNow && `email: ${emailNow}`].filter(Boolean).join('; ');
         const writeHandoff = async () => { if (c) { await handoff('human', 'quote request', `Quote request from ${who} on ${from}: ${details}.`, 'Prepare a quote and send it to the caller'); return true; } return false; };

@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto';
 import type { CalendarProvider } from './calendar/google';
 import { formatSlot, openSlots, pickOffers } from './calendar/slots';
 import type { Availability, Interval } from './calendar/slots';
+import { deliverableEmail } from './contracts';
 import type { ChannelAuth, Rpc } from './orchestrator';
 import type { SmsSender } from './sms-send';
 
@@ -49,11 +50,12 @@ export async function bookSlot(i: BookInput): Promise<BookResult> {
   const stillOpen = openSlots(i.availability, busy, i.now).some(s => s.start === i.start);
   const ours = !stillOpen && await i.calendar.hasEvent(eventId);
   if (!stillOpen && !ours) throw new SlotTaken();
-  const who = i.contact.name ?? i.contact.phone ?? i.contact.email ?? 'Lead';
+  const email = deliverableEmail(i.contact.email); // a placeholder address never gets a calendar invite
+  const who = i.contact.name ?? i.contact.phone ?? email ?? 'Lead';
   if (!ours) await i.calendar.createEvent({
     id: eventId, summary: `${i.meetingTitle}: ${who}`, start: i.start, end: i.start + dur, timeZone: i.availability.timeZone,
-    description: `Booked by the VENTRA Setter. Contact: ${[i.contact.phone, i.contact.email].filter(Boolean).join(', ')}`,
-    attendeeEmail: i.contact.email,
+    description: `Booked by the VENTRA Setter. Contact: ${[i.contact.phone, email].filter(Boolean).join(', ')}`,
+    attendeeEmail: email,
   });
   const booked = await i.rpc('fo_book', { ...auth, contact: i.contact.id, starts: new Date(i.start).toISOString(), ends: new Date(i.start + dur).toISOString(), calendar_provider: 'google', event_id: eventId }) as Record<string, unknown>;
   if (booked.duplicate === true) return { appointment: String(booked.appointment), duplicate: true, eventId, confirmation: '', sent: false };

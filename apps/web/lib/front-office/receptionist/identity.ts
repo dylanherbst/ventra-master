@@ -8,9 +8,9 @@ export type IdentityCheck = 'ok' | 'missing' | 'wrong';
 const clean = (v: unknown, max: number) => typeof v === 'string' ? v.trim().slice(0, max) : '';
 const norm = (v: string) => v.normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z\s'-]/g, ' ').replace(/['-]/g, '').split(/\s+/).filter(Boolean);
 
-/** Note: norm() keeps only Latin letters, so a non-Latin name never matches and that caller verifies by day and time only.
- * Name given vs name on the booking: ignores case, spacing and accents. Equal, or the same first name (a surname the
- * caller leaves out is fine; two different surnames are not). Nothing on file never matches. */
+/** Name given vs name on the booking: ignores case, spacing and accents. Equal, or the same first name (a surname the
+ * caller leaves out is fine; two different surnames are not). Nothing on file never matches.
+ * Note: norm() keeps only Latin letters, so a non-Latin name never matches and that caller verifies by day and time only. */
 export function nameMatches(given: string, onFile: string | null | undefined): boolean {
   const g = norm(given), f = norm(onFile ?? '');
   if (!g.length || !f.length || g[0].length < 2) return false;

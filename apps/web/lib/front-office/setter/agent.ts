@@ -30,6 +30,7 @@ import { bookSlot, offerTimes, SlotTaken } from '../booking';
 import type { Offer } from '../booking';
 import type { CalendarProvider } from '../calendar/google';
 import { formatSlot } from '../calendar/slots';
+import { deliverableEmail, isDeliverableEmail } from '../contracts';
 import type { OperatingMode, PendingActionKind, PendingActionPayload, PermissionDecision } from '../contracts';
 import { readPhone } from '../crm';
 import { checkedHandoff } from '../handoff';
@@ -159,7 +160,7 @@ export async function runSetterTurn(contactId: string, d: SetterDeps): Promise<S
   // A person owns this conversation: the AI does not reply (or start follow-ups) until it is handed back.
   // Only with the permission check; without it the turn runs as before A-8.
   if (store && withPerson(ctx.handoffs)) return result(null);
-  const who = plainText(ctx.contact.name, 160) || ctx.contact.phone || ctx.contact.email || 'this lead';
+  const who = plainText(ctx.contact.name, 160) || ctx.contact.phone || deliverableEmail(ctx.contact.email) || 'this lead';
   const tz = d.config.availability.timeZone;
   const apptStart = ctx.appointment ? Date.parse(ctx.appointment.starts) : NaN;
   /** "<meeting> on <time> (<time zone>), <where>": from the stored appointment only, never from the model. */
@@ -167,7 +168,7 @@ export async function runSetterTurn(contactId: string, d: SetterDeps): Promise<S
 
   const contactLine = [
     `Contact stage: ${state}.`,
-    `Name: ${plainText(ctx.contact.name, 160) || 'unknown'}. Email: ${ctx.contact.email ?? 'unknown'}.`,
+    `Name: ${plainText(ctx.contact.name, 160) || 'unknown'}. Email: ${deliverableEmail(ctx.contact.email) ?? 'unknown'}.`,
     `Answers so far: ${Object.keys(ctx.contact.answers).length ? JSON.stringify(ctx.contact.answers) : 'none'}.`,
     ctx.appointment ? `Already booked: ${formatSlot(Date.parse(ctx.appointment.starts), d.config.availability.timeZone)}.` : '',
     ctx.handoffs.length ? `Earlier handoffs: ${ctx.handoffs.map(h => `${h.from} to ${h.owner}: ${h.intent}`).join('; ')}.` : '',
@@ -299,7 +300,7 @@ export async function runSetterTurn(contactId: string, d: SetterDeps): Promise<S
       case 'book_time': {
         const start = Date.parse(str(input.start, 40));
         if (!d.calendar) return 'The calendar is not connected.';
-        if (!ctx.contact.phone && !ctx.contact.email) return 'Ask for their mobile or email first, and save it, so the confirmation reaches them.';
+        if (!ctx.contact.phone && !isDeliverableEmail(ctx.contact.email)) return 'Ask for their mobile or email first, and save it, so the confirmation reaches them.';
         if (!offers.length) offers = await offerTimes(d.calendar, d.config.availability, d.now, 12);
         const offer = offers.find(o => o.start === start);
         if (!offer) return 'That is not one of the offered times. Call offer_times and use a start value from it.';
@@ -418,7 +419,7 @@ export async function runSetterTurn(contactId: string, d: SetterDeps): Promise<S
   // The follow-up ladder: not after a booking, a hand-off, or a booking waiting for the owner.
   if (!store) {
     // Without the permission check: the start before A-8, unchanged (now + gapBefore(1), no new checks).
-    if (text && !booked && !handedTo && (ctx.contact.phone || ctx.contact.email) && !['booked', 'disqualified', 'customer'].includes(state)) await startFollowUps(d.rpc, d.auth, contactId, d.now);
+    if (text && !booked && !handedTo && (ctx.contact.phone || isDeliverableEmail(ctx.contact.email)) && !['booked', 'disqualified', 'customer'].includes(state)) await startFollowUps(d.rpc, d.auth, contactId, d.now);
   } else if (text && !booked && !handedTo && !bookingHeld && !['booked', 'disqualified', 'customer'].includes(state)) await followUp();
   if (!text) text = null;
   return result(text);

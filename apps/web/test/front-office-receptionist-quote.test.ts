@@ -29,12 +29,13 @@ const PRICE = /[$€£]|\bAUD\b|\bdollars?\b|\d/i;
 
 /** One caller turn against the simulated database: the call row (and contact, if the number is known) exists first,
  * as fo_voice_turn makes it on a real call. Every tool result passed back to the model is recorded. */
-async function quoteCall(opts: { mode?: OperatingMode; caller?: string | null; settings?: AgentSettings; contact?: SimSeed['contact']; steps: (results: string[]) => ScriptStep[] }) {
+async function quoteCall(opts: { mode?: OperatingMode; caller?: string | null; settings?: AgentSettings; contact?: SimSeed['contact']; contactEmail?: string; steps: (results: string[]) => ScriptStep[] }) {
   const settings = opts.settings ?? demoSettings();
   const caller = opts.caller === undefined ? CALLER : opts.caller;
   const db = simulationStore(settings, { caller, contact: opts.contact });
   const callId = 'call_quote0001';
   const turn = await db.rpc('fo_voice_turn', { ...a, call_id: callId, caller, turn: 1, message: 'How much would it cost to run a team bootcamp?' }) as { contact: string | null };
+  if (opts.contactEmail) { const row = db.tables.fo_contacts.find(x => x.id === turn.contact); if (row) row.email = opts.contactEmail; }
   const results: string[] = [];
   const cal = simulatedCalendar(), senders = recordingSenders();
   const steps = opts.steps(results).map((s): ScriptStep => typeof s === 'function' ? r => { results.push(...r.map(b => b.content)); return s(r); } : s);
@@ -243,4 +244,24 @@ test('caller text is one clean line in staff texts, emails, the handoff and the 
   assert.doesNotMatch(h.summary, CONTROL); assert.ok(h.summary.includes('needs Bootcamp for eight people please'));
   assert.equal(r.senders.out.length, 2);
   for (const o of r.senders.out) { assert.doesNotMatch(o.body, CONTROL); assert.ok(o.body.includes('quote request from Sam Lee')); }
+});
+
+// A-77 rework: a contact holding the withheld-caller placeholder address takes the real address the caller gives.
+test('quote request: a real email replaces the withheld-caller placeholder on the record and in the staff text', async () => {
+  const PLACEHOLDER = 'withheld-0123456789abcdef0123456789abcdef@call.invalid';
+  const { db, senders, contactId } = await quoteCall({ contactEmail: PLACEHOLDER, steps: standardSteps });
+  const c = db.tables.fo_contacts.find(x => x.id === contactId);
+  assert.equal(c?.email, 'sam@example.com', 'saved over the placeholder');
+  const all = JSON.stringify([senders.out, db.tables.handoffs]);
+  assert.match(all, /sam@example\.com/);
+  assert.doesNotMatch(all, /call\.invalid/);
+});
+
+test('quote request: with no real email given, the placeholder never reaches staff text or the handoff', async () => {
+  const PLACEHOLDER = 'withheld-0123456789abcdef0123456789abcdef@call.invalid';
+  const { senders, db } = await quoteCall({ contactEmail: PLACEHOLDER, steps: () => [
+    [tool('request_quote', { need: 'Bootcamp for eight', name: 'Sam Lee' })],
+    () => [say('Thanks, the team will be in touch.')],
+  ] });
+  assert.doesNotMatch(JSON.stringify([senders.out, db.tables.handoffs]), /call\.invalid/);
 });

@@ -181,6 +181,25 @@ test('A-58 follow-up: withheld number and no email on file -> no handoff can be 
   assert.equal(s.log.sent, 0);
 });
 
+test('A-77: dropped call from a withheld number (placeholder contact) -> hand-off says the number was withheld, no placeholder name or email shown, nothing sent', async () => {
+  const s = voiceStore([], { caller: null });
+  s.db.contact.name = 'Withheld caller'; s.db.contact.answers = {}; s.db.contact.email = 'withheld-0123456789abcdef@call.invalid';
+  await report(s, 'customer-ended-call', null);
+  assert.equal(s.db.handoffs.length, 1);
+  const h = s.db.handoffs[0] as { summary: string; contact: { name: string | null } };
+  assert.match(h.summary, /^Dropped call from a withheld number \(no number to call back on\)\. Captured: nothing captured\./);
+  assert.doesNotMatch(JSON.stringify(h.summary), /Withheld caller|call\.invalid/);
+  assert.equal(h.contact.name, null);
+  assert.equal(s.log.sent, 0);
+});
+
+test('A-77: a real caller who is merely named "Withheld caller" but has a phone is still shown as captured', async () => {
+  const s = voiceStore();
+  s.db.contact.name = 'Withheld caller';
+  await report(s, 'customer-ended-call');
+  assert.match((s.db.handoffs[0] as { summary: string }).summary, /name Withheld caller/);
+});
+
 test('A-58 follow-up: only the explicit drop reasons count (exceeded-max-duration yes; unknown no)', async () => {
   const { isDroppedReason, DROPPED_ENDED_REASONS } = await import('../lib/front-office/receptionist/dropped.ts');
   assert.ok(DROPPED_ENDED_REASONS.includes('exceeded-max-duration'));

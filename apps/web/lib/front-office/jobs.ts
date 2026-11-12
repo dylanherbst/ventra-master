@@ -15,7 +15,7 @@
 // Approving a held job item: use createJobsExecutor(createSetterExecutor(...)) so the item becomes 'performed'.
 import { timingSafeEqual } from 'node:crypto';
 import { formatSlot } from './calendar/slots';
-import { DEFAULT_OPERATING_MODE, hasConsent } from './contracts';
+import { DEFAULT_OPERATING_MODE, deliverableEmail, hasConsent, isDeliverableEmail } from './contracts';
 import type { ContactConsent, PendingActionPayload } from './contracts';
 import type { ChannelAuth, Rpc } from './orchestrator';
 import type { Channel } from './handoff';
@@ -166,7 +166,7 @@ export function metaRoute(w: SocialWindow, contact: Ctx['contact'], now: number,
   if (w.optedOut || contact.optedOut) return { via: 'owner', reason: 'The contact opted out.' };
   if (w.recipient && inReplyWindow(w.lastInbound, now)) return { via: 'meta', recipient: w.recipient };
   if (contact.phone && hasConsent(contact.consent, 'sms')) return { via: 'sms' };
-  if (contact.email && canEmail && hasConsent(contact.consent, 'email')) return { via: 'email' };
+  if (isDeliverableEmail(contact.email) && canEmail && hasConsent(contact.consent, 'email')) return { via: 'email' };
   return { via: 'owner', reason: w.recipient ? 'Meta’s 24-hour reply window has closed and there is no SMS or email consent.' : 'No Instagram or Messenger id for this contact.' };
 }
 
@@ -198,7 +198,7 @@ export async function runDueJobs(input: { rpc: Rpc; auth: ChannelAuth; send: Sms
     try {
       const ctx = await i.rpc('fo_contact_context', { ...a, contact: job.contact }) as Ctx;
       let text: string | null = null, prompt = FOLLOW_UP_PROMPT, next: { step: number; gap: number; kind: Job['kind'] } | null = null;
-      const reachable = !!i.meta || !!ctx.contact.phone || (!!ctx.contact.email && !!i.email);
+      const reachable = !!i.meta || !!ctx.contact.phone || (isDeliverableEmail(ctx.contact.email) && !!i.email);
       if (ctx.contact.optedOut || !reachable) { outcome = 'cancelled'; note = 'Opted out or no way to reach them'; }
       else if (job.kind === 'follow-up') {
         if (done.has(ctx.contact.state)) { outcome = 'cancelled'; note = `Contact is ${ctx.contact.state}`; }
@@ -236,7 +236,7 @@ export async function runDueJobs(input: { rpc: Rpc; auth: ChannelAuth; send: Sms
       // Off Meta: by text when the contact has a mobile, otherwise by email. On the email runner (A-48) a contact with an
       // email address is answered by email even when they also left a phone number: that is the channel they used, so
       // the same-channel rule applies; a text to them would be another channel and need an SMS grant.
-      const direct: 'sms' | 'email' = ctx.contact.phone && !(i.via === 'email' && ctx.contact.email && i.email) ? 'sms' : 'email';
+      const direct: 'sms' | 'email' = ctx.contact.phone && !(i.via === 'email' && isDeliverableEmail(ctx.contact.email) && i.email) ? 'sms' : 'email';
       if (text && store) {
         // Every job that sends goes through the same permission check and quiet hours (follow-ups, reminders, rescues).
         const channel = route?.via === 'meta' ? i.meta!.kind : route?.via === 'email' ? 'email' : route?.via === 'sms' ? 'sms' : direct;
@@ -287,7 +287,7 @@ export async function runDueJobs(input: { rpc: Rpc; auth: ChannelAuth; send: Sms
     if (blocked) return { note: `${label}: ${blocked}` };
     const start = job.appointment && ctx.appointment ? Date.parse(ctx.appointment.starts) : null;
     const late = (t: number) => start !== null && t >= start;
-    const who = ctx.contact.name ?? ctx.contact.phone ?? ctx.contact.email ?? 'this lead';
+    const who = ctx.contact.name ?? ctx.contact.phone ?? deliverableEmail(ctx.contact.email) ?? 'this lead';
     const by = channel === 'sms' ? 'text' : channel === 'email' ? 'email' : channel === 'instagram' ? 'Instagram DM' : 'Messenger';
     const body = text.slice(0, 1000), inbound = lastInbound(ctx);
     const payload: PendingActionPayload = job.kind === 'follow-up'

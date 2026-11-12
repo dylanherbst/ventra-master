@@ -279,6 +279,20 @@ test('a failed check locks the whole call: switching to another contact by phone
   unchanged(t); handedToStaff(t);
   assert.equal(t.senders.out.length, sent, 'no extra text or email');
   assert.equal(t.db.tables.fo_contacts.length, 1, 'no second contact was created on the locked call');
+  const original = t.db.tables.fo_contacts[0].id;
+  assert.ok(t.db.tables.fo_calls.every(k => !k.contact_id || k.contact_id === original), 'the call stays linked to the original contact');
+  assert.ok(t.db.tables.handoffs.every(h => (h as { contact: { id: string } }).contact.id === original), 'the hand-off is on the original contact');
+});
+
+test('A-77: with no failed check, naming a different number mid-call still switches the call to that contact', async () => {
+  const t = setup();
+  const s = await t.session();
+  await run(s, 'qualify', { phone: '+61422220088', answers: {}, name: 'Pat Other' });
+  assert.equal(t.db.tables.fo_contacts.length, 2, 'a second contact was created for the other number');
+  const other = t.db.tables.fo_contacts.find(c => c.phone === '+61422220088');
+  assert.ok(other, 'the new contact has the number the caller gave');
+  assert.equal(t.db.tables.fo_calls.find(k => k.provider_call_id === 'call_identity_0001')?.contact_id, other.id, 'the call is now linked to the new contact');
+  assert.equal(t.db.tables.handoffs.length, 0, 'no failed check, so no hand-off');
 });
 
 test('the hand-off is marked done only once it was written: a failing hand-off is retried on the next wrong guess', async () => {

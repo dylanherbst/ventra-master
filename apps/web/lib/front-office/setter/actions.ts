@@ -24,7 +24,7 @@
 import { bookSlot, confirmationText, SlotTaken } from '../booking';
 import type { CalendarProvider } from '../calendar/google';
 import { formatSlot } from '../calendar/slots';
-import { DEFAULT_OPERATING_MODE, hasConsent } from '../contracts';
+import { DEFAULT_OPERATING_MODE, hasConsent, isDeliverableEmail } from '../contracts';
 import type { ContactConsent, PendingActionPayload, PermissionDecision } from '../contracts';
 import { checkedHandoff } from '../handoff';
 import type { Agent, Channel } from '../handoff';
@@ -126,7 +126,7 @@ export function checkFollowUp(ctx: SetterContext, via?: Channel): FollowUpCheck 
   if (c.optedOut) return { ok: false, why: 'The contact opted out.' };
   if (NO_FOLLOW_UP.includes(c.state)) return { ok: false, why: `The contact is ${c.state}.` };
   if (withPerson(ctx.handoffs)) return { ok: false, why: 'A person is looking after this contact.' };
-  const reach = (ch: 'sms' | 'email') => ch === 'sms' ? !!c.phone : !!c.email;
+  const reach = (ch: 'sms' | 'email') => ch === 'sms' ? !!c.phone : isDeliverableEmail(c.email);
   const own = via === 'sms' || via === 'email' ? via : null;
   // NOTE: fo_contact_context returns only the latest 40 messages, so a long thread of only outbound messages could hide
   // the contact's inbound message; that fails safe (no same-channel follow-up). Explicit consent is not affected.
@@ -138,7 +138,7 @@ export function checkFollowUp(ctx: SetterContext, via?: Channel): FollowUpCheck 
     if (reach(ch) && hasConsent(c.consent, ch)) return { ok: true, channel: ch, consent: `The contact gave recorded consent to be contacted by ${ch === 'sms' ? 'text' : 'email'}.` };
   }
   if (!first) return { ok: false, why: 'No recorded consent: the contact has not messaged the business.' };
-  if (!c.phone && !c.email) return { ok: false, why: 'No mobile or email on record. Follow-ups never go into website chat, Instagram or Messenger.' };
+  if (!c.phone && !isDeliverableEmail(c.email)) return { ok: false, why: 'No mobile or email on record. Follow-ups never go into website chat, Instagram or Messenger.' };
   return { ok: false, why: `No recorded consent for ${c.phone ? 'texts' : 'email'}: the contact messaged on ${via ?? 'a channel that is not known'} and has not agreed to be contacted another way.` };
 }
 
@@ -166,7 +166,7 @@ export function outsideQuietHours(t: number, timeZone: string, q: QuietHours = D
 const iso = (t: number) => new Date(t).toISOString();
 const auth = (x: SetterActionDeps) => ({ channel: x.auth.channel, channel_key: x.auth.key });
 const readContext = async (x: SetterActionDeps, contact: string) => await x.rpc('fo_contact_context', { ...auth(x), contact }) as SetterContext;
-const channelOf = (x: SetterActionDeps, ctx: SetterContext): Channel => x.channel ?? (ctx.contact.phone ? 'sms' : ctx.contact.email ? 'email' : 'web-chat');
+const channelOf = (x: SetterActionDeps, ctx: SetterContext): Channel => x.channel ?? (ctx.contact.phone ? 'sms' : isDeliverableEmail(ctx.contact.email) ? 'email' : 'web-chat');
 const noSend: SmsSender = async () => ({ sent: false, sid: null });
 
 /** Moves the lead and records the change. Passes through qualifying when needed (new -> qualifying -> qualified). */
@@ -203,7 +203,7 @@ export async function performBook(x: SetterActionDeps, contactId: string, start:
   // A person took over since: they stay in charge. Booking now would also record a 'sales' handoff that ends theirs.
   if (withPerson(ctx.handoffs)) return no('A person is looking after this contact now, so nothing was booked.');
   if (c.state === 'booked' || ctx.appointment) return no('The contact already has a booking, so nothing else was booked.');
-  if (!c.phone && !c.email) return no('There is no mobile or email to confirm the booking to, so nothing was booked.');
+  if (!c.phone && !isDeliverableEmail(c.email)) return no('There is no mobile or email to confirm the booking to, so nothing was booked.');
   if (!Number.isFinite(start) || start <= x.now) return no('That time has already passed, so nothing was booked.');
   let state: ContactState = c.state;
   try {

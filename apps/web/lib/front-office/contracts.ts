@@ -125,6 +125,15 @@ export type Message = {
  * grant for that channel. Older databases do not return it: missing means no consent on either channel. A grant never
  * overrides an opt-out; callers still refuse opted-out contacts first. */
 export type ContactConsent = { sms: boolean; email: boolean };
+/** An email that mail can really reach. Placeholder addresses (the `.invalid` TLD, e.g. the withheld-caller contact's
+ * withheld-...@call.invalid) are never deliverable: nothing is ever sent or invited to one. */
+export function isDeliverableEmail(email: unknown): email is string {
+  if (typeof email !== 'string') return false;
+  const e = email.trim().toLowerCase();
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e) && !/\.invalid$/.test(e);
+}
+/** The email if it is deliverable, otherwise null. */
+export const deliverableEmail = (email: unknown): string | null => isDeliverableEmail(email) ? email : null;
 /** Explicit consent for one channel from a raw contact.consent value. Only the boolean true counts. */
 export function hasConsent(consent: unknown, channel: 'sms' | 'email'): boolean {
   return !!consent && typeof consent === 'object' && (consent as Record<string, unknown>)[channel] === true;

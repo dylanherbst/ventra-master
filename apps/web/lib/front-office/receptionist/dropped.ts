@@ -1,5 +1,6 @@
 // G5: a call that drops mid-way (the caller hung up, or the line or pipeline failed) before anything was settled leaves
 // one call-back handoff for staff: caller number, what was captured, and where the call stopped. Nothing is sent.
+import { isDeliverableEmail } from '../contracts';
 import { checkedHandoff } from '../handoff';
 import type { ChannelAuth, Rpc } from '../orchestrator';
 import type { ContactState } from '../state';
@@ -57,11 +58,15 @@ async function createCallback(rpc: Rpc, auth: ChannelAuth, contact: string, outc
   if (!ctx) return false;
   const c = ctx.contact;
   const from = c.phone ?? call.caller ?? 'number withheld';
-  const captured = [c.name ? `name ${c.name}` : '', ...Object.entries(c.answers ?? {}).map(([k, v]) => `${k}: ${v}`)].filter(Boolean).join('; ') || 'nothing captured';
+  // The withheld-number placeholder contact (name 'Withheld caller', email ...@call.invalid) is not something the caller
+  // told us: say the number was withheld instead of presenting it as captured.
+  const placeholder = !c.phone && !isDeliverableEmail(c.email) && /^withheld caller$/i.test((c.name ?? '').trim());
+  const named = c.name && !placeholder;
+  const captured = [named ? `name ${c.name}` : '', ...Object.entries(c.answers ?? {}).map(([k, v]) => `${k}: ${v}`)].filter(Boolean).join('; ') || 'nothing captured';
   const lastAi = call.transcript.split('\n').map(l => l.trim()).filter(l => /^(AI|Assistant|Bot):/i.test(l)).at(-1)?.replace(/^\w+:\s*/, '') ?? '';
   const stopped = `${call.reason}${outcomes.length ? ` after ${outcomes.join(', ')}` : ''}${lastAi ? `; last thing the AI said: "${lastAi.slice(0, 200)}"` : ''}`;
-  const h = checkedHandoff({ contact: { id: c.id, name: c.name, phone: c.phone, email: c.email, state: c.state }, channel: 'voice', intent: 'call back (dropped call)',
-    answers: c.answers ?? {}, summary: `Dropped call from ${from}. Captured: ${captured}. Stopped: ${stopped}.`.slice(0, 1500), nextAction: 'Call the caller back', from: 'receptionist', owner: 'human' });
+  const h = checkedHandoff({ contact: { id: c.id, name: placeholder ? null : c.name, phone: c.phone, email: c.email, state: c.state }, channel: 'voice', intent: 'call back (dropped call)',
+    answers: c.answers ?? {}, summary: `Dropped call from ${placeholder ? 'a withheld number (no number to call back on)' : from}. Captured: ${captured}. Stopped: ${stopped}.`.slice(0, 1500), nextAction: 'Call the caller back', from: 'receptionist', owner: 'human' });
   await rpc('fo_record_handoff', { ...a, contact: c.id, handoff: h });
   await rpc('fo_voice_outcome', { ...a, call_id: call.id, outcome: 'message' }).catch(() => undefined);
   return true;
