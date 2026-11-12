@@ -396,7 +396,7 @@ function gatedModel(base: Llm, s: LabState, db: Ctx, contactId: string, tools: L
           });
           const p: BookingProposal = { start: new Date(offer.start).toISOString(), label, decision: g.decision, mode: g.permission.mode, reason: g.permission.reason, say: g.permission.say, pendingId: g.decision === 'hold_for_approval' ? g.item.id : null, booked: null };
           onProposal(p);
-          if (g.decision === 'hold_for_approval') { db.writes.push({ rpc: 'gate', detail: `owner approval queue insert: ${g.item.summary}` }); out.push(say(g.permission.say)); continue; }
+          if (g.decision === 'hold_for_approval') { db.writes.push({ rpc: 'gate', detail: `owner approval queue insert: ${g.item.summary}` }); out.push(say(g.permission.say)); forced = g.permission.say; continue; } // forced: like production forcedReply, a later model text cannot replace the held words (G12)
           if (g.decision === 'refuse') {
             // enquiry_only: the AI takes a message for a person instead of booking.
             out.push(track(tool('escalate_human', { intent: 'book a call', summary: `Wants the ${LAB_CONFIG.meetingTitle} on ${label}. Enquiry only mode: please arrange it by hand.` }) as ToolUseBlock));

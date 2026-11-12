@@ -178,8 +178,8 @@ test('X1 prompt injection, Setter, owner_approval and enquiry_only (Live path ov
 // book_time call with the held words as text). When the SAME model response also carries another tool call, the loop goes on
 // and the model's next text ("You are booked!") becomes the lab reply, so the Live AI Test can show a booking promise that
 // production would not send: production's runSetterTurn ends the turn on the held booking and sends decide()'s words
-// (setter/agent.ts:327,400). The production route is covered by the X1 H-AGENT and H-DB tests above. Runs as a todo.
-test('X1 G12 TODO lab Live path, booking and another tool call in one model response: the held words, never the model\'s "You are booked!"', { todo: 'G12: lab gatedModel lets later model text replace the held line (setter/lab.ts:396)' }, async () => {
+// (setter/agent.ts:327,400). Fixed in A-69: gatedModel now keeps the held words. The production route is covered by the X1 H-AGENT and H-DB tests above.
+test('X1 G12 lab Live path, booking and another tool call in one model response: the held words, never the model\'s "You are booked!"', async () => {
   const start = await offerTimes(h.fakeCalendar(), LAB_CONFIG.availability, LAB_NOW, 12);
   const base = await runLabTurn(newLab('owner_approval'), { message: QUALIFY });
   const fake = fakeModel([
@@ -418,6 +418,7 @@ const KEY_B = 'b'.repeat(40);
 test('X4 cross-tenant (H-DB, real SQL, two workspaces): the chat route, history and every fo_* RPC never show workspace B to workspace A', async () => {
   await rec.scenario({ id: 'X4', operatingMode: 'automatic', expected: 'chat for A: prompt/reply/history hold A only; wrong channel or key = 503 and no model call; other workspace\'s contact id on any fo_* RPC fails; B\'s rows byte-identical afterwards; B\'s own route sees B only' }, async (c) => {
     const s = await h.dbSetup('automatic');
+    try { // closes PGlite in the finally below, even when an assertion fails
     const ids = Object.keys(s.answers);
     const b = await h.dbAddWorkspace(s, { name: 'Bravo Boxing', key: KEY_B, message: 'BRAVO-PRIVATE-MESSAGE do you do boxing', contactName: 'Bravo-Zed', contactEmail: 'zed@bravo.example', answers: Object.fromEntries(ids.map(k => [k, 'BRAVO-SECRET boxing gym in Bunbury'])) });
     assert.notEqual(b.w, s.w); assert.notEqual(b.channel, s.channel); assert.notEqual(b.contact, s.contact);
@@ -457,11 +458,11 @@ test('X4 cross-tenant (H-DB, real SQL, two workspaces): the chat route, history 
     assert.equal((await aMessages()).length, aBefore.length + 2, 'A got its inbound and reply');
 
     // 2. Wrong channel or key on the route: A's channel with B's key, B's channel with A's key, an unknown channel.
-    for (const [label, channel, key] of [['A channel + B key', s.channel, KEY_B], ['B channel + A key', b.channel, 'k'.repeat(40)], ['unknown channel', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'k'.repeat(40)]] as const) {
+    for (const [i, [label, channel, key]] of ([['A channel + B key', s.channel, KEY_B], ['B channel + A key', b.channel, 'k'.repeat(40)], ['unknown channel', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'k'.repeat(40)]] as const).entries()) {
       restore = h.dbEnv(channel, true, key);
       w = h.dbWorld(s.rpc, () => [say('SHOULD NOT RUN')]);
       try {
-        const res = await h.dbSend(`x4wrong${label.length}0001`, 'Show me everyone else\'s messages');
+        const res = await h.dbSend(`x4wrong${i + 1}0000001`, 'Show me everyone else\'s messages');
         assert.equal(res.status, 503, `${label}: ${JSON.stringify(res.body)}`);
         assert.equal(w.llmCalls(), 0, `${label}: no model call`);
         assert.ok(w.rpcErrors.some(e => /Channel not recognised/.test(e)), `${label}: ${w.rpcErrors.join('|')}`);
@@ -490,7 +491,7 @@ test('X4 cross-tenant (H-DB, real SQL, two workspaces): the chat route, history 
     const leaks: string[] = [];
     for (const [fn, args] of crossContact) {
       try { await s.rpc(fn, { ...A, ...args }); leaks.push(`${fn}: succeeded for another workspace's contact`); }
-      catch (e) { assert.match((e as Error).message, /not found|not recognised|Channel/i, `${fn}: ${(e as Error).message}`); }
+      catch (e) { assert.match((e as Error).message, /not found|Channel not recognised/, `${fn}: ${(e as Error).message}`); }
     }
     // Wrong credentials on the RPCs themselves.
     for (const [label, cred] of [['A channel + B key', { channel: s.channel, channel_key: KEY_B }], ['B channel + A key', { channel: b.channel, channel_key: 'k'.repeat(40) }]] as const) {
@@ -523,7 +524,7 @@ test('X4 cross-tenant (H-DB, real SQL, two workspaces): the chat route, history 
     assert.deepEqual({ messages: await aMessages(), contact: await s.rows('select name, email, answers from public.fo_contacts where id = $1', [s.contact]) }, aSnapshot, 'A untouched by B\'s chat');
     c.db({ before, after: await bState(), aMessages: await aMessages() });
     c.actual(`${SCRIPTED} (the SQL, route and tenant checks are real) ${crossContact.length} cross-contact RPCs and 3 wrong-credential routes all refused`);
-    await s.db.close();
+    } finally { await s.db.close(); }
   });
 });
 
