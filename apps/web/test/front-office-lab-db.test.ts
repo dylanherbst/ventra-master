@@ -26,7 +26,7 @@ const HYGIENE_MIGRATION = '202611110003_lab_workspace_hygiene.sql';
 /** Tables the A-35 deletion checks must cover at least (the full list is read from the database itself). */
 const EXPECTED_WORKSPACE_TABLES = ['memberships', 'business_profiles', 'offers', 'draft_imports', 'launcher_drafts', 'course_drafts', 'orders',
   'fo_lab_sandboxes', 'fo_lab_scenarios', 'fo_channels', 'fo_connections', 'fo_contacts', 'fo_messages', 'fo_events', 'fo_appointments', 'fo_jobs',
-  'fo_calls', 'fo_handoffs', 'fo_outbox', 'fo_pending_actions', 'fo_agent_settings'];
+  'fo_calls', 'fo_handoffs', 'fo_pending_actions', 'fo_agent_settings'];
 const LAB_ONLY = /only holds front office lab data/;
 
 async function setup() {
@@ -236,13 +236,17 @@ test('reset clears only the sandbox; named scenarios save and load the lab state
     const n = (t: string) => one<number>(`select count(*)::int as r from public.${t} where workspace_id = $1`, [biz]);
     const out = {
       contacts: await n('fo_contacts'), messages: await n('fo_messages'), events: await n('fo_events'), appointments: await n('fo_appointments'),
-      jobs: await n('fo_jobs'), calls: await n('fo_calls'), handoffs: await n('fo_handoffs'), outbox: await n('fo_outbox'), pendingActions: await n('fo_pending_actions'),
+      jobs: await n('fo_jobs'), calls: await n('fo_calls'), handoffs: await n('fo_handoffs'), outbox: await n('fo_outbox'),
+      // A-18: replies now live in fo_pending_actions (fo_outbox is a view over them); this counts the other held actions.
+      pendingActions: await one<number>("select count(*)::int as r from public.fo_pending_actions where workspace_id = $1 and kind <> 'outbox_reply'", [biz]),
+      allQueued: await n('fo_pending_actions'),
     };
     await as(owner, so);
     return out;
   };
   const before = await bizCounts();
   assert.deepEqual([before.contacts, before.messages, before.appointments, before.jobs, before.calls, before.handoffs, before.outbox, before.pendingActions], [1, 1, 1, 1, 1, 1, 1, 1]);
+  assert.equal(before.allQueued, 2, 'the held reply and the held booking share the one queue');
   assert.ok(before.events >= 4);
 
   await as(owner, so);
@@ -463,9 +467,12 @@ test('hygiene (A-35): non-front-office tables refuse lab workspaces; deleting a 
   await as(null);
   await one('select public.fo_request_action($1,$2,$3,$4,$5,$6,$7,$8,$9) as r', [sb.channels.sms.id, key, 'setter', booked.contact, null,
     JSON.stringify({ kind: 'book', start: '2026-11-13T01:00:00.000Z', end: '2026-11-13T01:30:00.000Z', timeZone: 'Australia/Perth' }), 'Book Sam', 'lab:book:00000002', 60]);
+  // A held reply (A-18: it lives in fo_pending_actions) must go with the sandbox too.
+  await one('select public.fo_queue_outbound($1,$2,$3,$4,$5) as r', [sb.channels.sms.id, key, booked.contact, 'See you Friday', 'setter-v1']);
   await as(owner, so);
   await lab.saveLabScenario(rpc, w, { product: 'receptionist', name: 'Full', state: {}, expectedRevision: 0 });
   const before = await leftovers(env, w);
+  assert.equal(await one<number>("select count(*)::int as r from public.fo_pending_actions where workspace_id = $1 and kind = 'outbox_reply'", [w]), 1, 'the sandbox held a reply');
   for (const t of ['workspaces', 'memberships', 'fo_lab_sandboxes', 'fo_lab_scenarios', 'fo_channels', 'fo_contacts', 'fo_messages', 'fo_events', 'fo_appointments', 'fo_jobs', 'fo_agent_settings', 'fo_pending_actions']) {
     assert.ok(before[t], `the sandbox held ${t} rows before deletion`);
   }
@@ -473,6 +480,7 @@ test('hygiene (A-35): non-front-office tables refuse lab workspaces; deleting a 
   await db.exec('reset role');
   await db.query('delete from public.workspaces where id = $1', [w]);
   assert.deepEqual(await leftovers(env, w), {}, 'every workspace table is empty for the deleted sandbox');
+  assert.equal(await one<number>('select count(*)::int as r from public.fo_outbox where workspace_id = $1', [w]), 0, 'no reply row is left');
   assert.deepEqual(await leftovers(env, biz), bizBefore, 'the business keeps every row');
   // A business workspace that still holds a profile, drafts or orders stays undeletable, as before.
   await assert.rejects(db.query('delete from public.workspaces where id = $1', [biz]), /foreign key/);
