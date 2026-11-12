@@ -136,6 +136,9 @@ export async function receptionistSession(d: Omit<ReceptionistDeps, 'llm' | 'con
   /** The caller as a contact: from the call, or from a number they gave. */
   async function ensureContact(phoneArg: unknown, name?: string): Promise<string | null> {
     const phone = cleanPhone(phoneArg);
+    // After a failed identity check the call stays on the contact it failed for: no switching to another number, so the
+    // lock (and its call marker, read from that contact) cannot be dodged by naming a different contact mid-call.
+    if (ctx && (locked || failedEarlier())) return contactId;
     if (phone && E164.test(phone) && d.call.id && (!ctx || ctx.contact.phone !== phone)) {
       // The name is saved only after we know whether this contact has a booking (nameToSave): fo_voice_contact would
       // otherwise name a contact that has no name on file yet, even one holding someone else's booking.

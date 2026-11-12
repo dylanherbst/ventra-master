@@ -263,6 +263,24 @@ test('the lock survives a new session on the same call: a second guess is refuse
   assert.match(await run(other, 'cancel', { reason: 'x', verify_name: 'Casey' }), /^Cancelled/);
 });
 
+test('a failed check locks the whole call: switching to another contact by phone is refused, with no second hand-off', async () => {
+  const t = setup();
+  const first = await t.session();
+  assert.match(await run(first, 'cancel', { reason: 'x', verify_name: 'Taylor' }), /^Not done, and nothing was changed/);
+  const sent = t.senders.out.length;
+  // Same session, then a fresh session on the same call id: both try another contact.
+  for (const s of [first, await t.session()]) {
+    await run(s, 'qualify', { phone: '+61422220088', answers: {}, name: 'Casey Lane' });
+    const r = await run(s, 'cancel', { reason: 'x', verify_name: 'Casey' });
+    assert.match(r, /^Not done, and nothing was changed/);
+    assert.doesNotMatch(r, PRIVATE);
+    await run(s, 'reschedule', { start: STARTS, verify_time: '2026-11-11T10:00' });
+  }
+  unchanged(t); handedToStaff(t);
+  assert.equal(t.senders.out.length, sent, 'no extra text or email');
+  assert.equal(t.db.tables.fo_contacts.length, 1, 'no second contact was created on the locked call');
+});
+
 test('the hand-off is marked done only once it was written: a failing hand-off is retried on the next wrong guess', async () => {
   const t = setup(); let fail = true;
   const rpc = async (fn: string, a: Record<string, unknown>) => { if (fn === 'fo_record_handoff' && fail) throw new Error('db down'); return t.db.rpc(fn, a); };
