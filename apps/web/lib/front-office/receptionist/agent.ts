@@ -18,6 +18,7 @@ import type { AgentSettings } from '../settings';
 import { canTransition, isContactState } from '../state';
 import type { ContactState } from '../state';
 import type { SmsSender } from '../sms-send';
+import { plainText } from '../text';
 import { RECEPTIONIST_PROMPT_VERSION, receptionistSystemPrompt } from './prompt';
 
 export type VoiceOut = { type: 'text'; text: string } | { type: 'transfer'; number: string } | { type: 'end' };
@@ -104,9 +105,6 @@ export function callTranscript(turns: CallerTurn[]): LlmMessage[] {
 }
 
 const str = (v: unknown, max: number) => typeof v === 'string' ? v.trim().slice(0, max) : '';
-/** Caller text for staff messages and handoffs: whitespace and control characters collapsed to one space. */
-// eslint-disable-next-line no-control-regex
-const plainText = (v: unknown, max: number) => typeof v === 'string' ? v.replace(/[\s\u0000-\u001f\u007f]+/g, ' ').trim().slice(0, max) : '';
 const cleanPhone = (v: unknown) => str(v, 24).replace(/[\s()-]/g, '').replace(/^0(?=[2-478]\d{8}$)/, '+61');
 const E164 = /^\+[1-9][0-9]{6,14}$/;
 
@@ -146,7 +144,7 @@ export async function receptionistSession(d: Omit<ReceptionistDeps, 'llm' | 'con
   async function handoff(owner: Agent, intent: string, summary: string, nextAction: string) {
     const c = ctx as Ctx | null;
     if (!c) return;
-    const h = checkedHandoff({ contact: { id: c.contact.id, name: c.contact.name, phone: c.contact.phone, email: c.contact.email, state: c.contact.state }, channel: 'voice', intent: intent || 'call back', answers: c.contact.answers, summary: summary || 'See the call.', nextAction, from: 'receptionist', owner });
+    const h = checkedHandoff({ contact: { id: c.contact.id, name: plainText(c.contact.name, 160) || null, phone: c.contact.phone, email: c.contact.email, state: c.contact.state }, channel: 'voice', intent: intent || 'call back', answers: c.contact.answers, summary: summary || 'See the call.', nextAction, from: 'receptionist', owner });
     await d.rpc('fo_record_handoff', { ...a, contact: c.contact.id, handoff: h });
   }
   const missingAnswers = () => s.questions.filter(q => q.required && !(ctx as Ctx | null)?.contact.answers[q.id]).map(q => q.id);
@@ -161,15 +159,15 @@ export async function receptionistSession(d: Omit<ReceptionistDeps, 'llm' | 'con
         return r.result;
       }
       case 'qualify': {
-        await ensureContact(input.phone, str(input.name, 160) || undefined);
+        await ensureContact(input.phone, plainText(input.name, 160) || undefined);
         if (!ctx) return 'I need their mobile number first, so the team can reach them. Ask for it and pass it as phone.';
         const c = ctx as Ctx;
         const ids = new Set(s.questions.map(q => q.id)), answers: Record<string, string> = {};
         for (const [k, v] of Object.entries((input.answers ?? {}) as Record<string, unknown>)) if (ids.has(k) && typeof v === 'string' && v.trim()) answers[k] = v.trim().slice(0, 1000);
         const email = str(input.email, 254), okEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-        const r = await d.rpc('fo_save_details', { ...a, contact: c.contact.id, new_answers: answers, contact_name: str(input.name, 160) || null, contact_email: okEmail ? email : null, contact_phone: null }) as { answers?: Record<string, string> } | null;
+        const r = await d.rpc('fo_save_details', { ...a, contact: c.contact.id, new_answers: answers, contact_name: plainText(input.name, 160) || null, contact_email: okEmail ? email : null, contact_phone: null }) as { answers?: Record<string, string> } | null;
         c.contact.answers = r?.answers ?? { ...c.contact.answers, ...answers };
-        if (str(input.name, 160)) c.contact.name = str(input.name, 160);
+        if (plainText(input.name, 160)) c.contact.name = plainText(input.name, 160);
         const missing = missingAnswers();
         if (!missing.length && ['new', 'contacted', 'qualifying', 'nurture', 'disqualified'].includes(c.contact.state)) { await moveTo('qualified', 'Answered the qualifying questions on a call'); await outcome('qualified'); }
         else if (missing.length && ['new', 'contacted', 'nurture'].includes(c.contact.state)) await moveTo('qualifying', 'Qualifying on a call');
@@ -225,16 +223,16 @@ export async function receptionistSession(d: Omit<ReceptionistDeps, 'llm' | 'con
       case 'cancel': {
         const c = ctx as Ctx | null;
         if (!c?.appointment) return 'I cannot find a booking for this caller.';
-        await cancelBooking({ calendar: d.calendar, rpc: d.rpc, auth: d.auth, send: d.send, contact: c.contact, appointment: c.appointment, reason: str(input.reason, 400) || 'Cancelled on a call', businessName: s.businessName, timeZone: tz });
+        await cancelBooking({ calendar: d.calendar, rpc: d.rpc, auth: d.auth, send: d.send, contact: c.contact, appointment: c.appointment, reason: plainText(input.reason, 400) || 'Cancelled on a call', businessName: s.businessName, timeZone: tz });
         c.appointment = null; c.contact.state = 'qualified';
         await outcome('cancelled');
         return 'Cancelled. A text confirming it is on its way. Offer to book another time.';
       }
       case 'take_message': {
-        const name = str(input.name, 160);
+        const name = plainText(input.name, 160);
         await ensureContact(input.phone, name || undefined);
         const c = ctx as Ctx | null;
-        const msg = str(input.message, 1500) || 'Please call back.';
+        const msg = plainText(input.message, 1500) || 'Please call back.';
         const from = c?.contact.phone ?? d.call.caller ?? 'number withheld';
         const urgent = input.urgent === true;
         await handoff('human', urgent ? 'urgent call back' : 'call back', `Phone message${urgent ? ' (urgent)' : ''} from ${name || c?.contact.name || 'a caller'} on ${from}: ${msg}`, 'Call the caller back');
@@ -315,7 +313,7 @@ export async function receptionistSession(d: Omit<ReceptionistDeps, 'llm' | 'con
       }
       case 'transfer': {
         if (!s.transferNumber) return 'No one is available to take calls right now. Offer to take a message instead.';
-        await handoff('human', 'call transferred', `Transferred to the team: ${str(input.reason, 400) || 'caller asked for a person'}.`, 'Take the transferred call');
+        await handoff('human', 'call transferred', `Transferred to the team: ${plainText(input.reason, 400) || 'caller asked for a person'}.`, 'Take the transferred call');
         await outcome('transfer');
         transferTo = s.transferNumber; action = 'transfer';
         return 'Transferring now. Say one short sentence, like "Putting you through now."';

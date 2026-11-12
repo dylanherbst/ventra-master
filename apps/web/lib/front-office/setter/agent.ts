@@ -47,6 +47,7 @@ import { checkFollowUp, failSafeStore, performBook, performFollowUp, withPerson 
 import type { BookOutcome, SetterActionDeps, SetterActionRecord, SetterContext, SetterPermissions, StatusTransition } from './actions';
 import { fillTemplate } from './config';
 import type { SetterConfig } from './config';
+import { plainText } from '../text';
 import { SETTER_PROMPT_VERSION, SETTER_RETURNING_PROMPT_VERSION, setterReturningPrompt, setterSystemPrompt } from './prompt';
 
 type Context = SetterContext;
@@ -158,7 +159,7 @@ export async function runSetterTurn(contactId: string, d: SetterDeps): Promise<S
   // A person owns this conversation: the AI does not reply (or start follow-ups) until it is handed back.
   // Only with the permission check; without it the turn runs as before A-8.
   if (store && withPerson(ctx.handoffs)) return result(null);
-  const who = ctx.contact.name ?? ctx.contact.phone ?? ctx.contact.email ?? 'this lead';
+  const who = plainText(ctx.contact.name, 160) || ctx.contact.phone || ctx.contact.email || 'this lead';
   const tz = d.config.availability.timeZone;
   const apptStart = ctx.appointment ? Date.parse(ctx.appointment.starts) : NaN;
   /** "<meeting> on <time> (<time zone>), <where>": from the stored appointment only, never from the model. */
@@ -166,7 +167,7 @@ export async function runSetterTurn(contactId: string, d: SetterDeps): Promise<S
 
   const contactLine = [
     `Contact stage: ${state}.`,
-    `Name: ${ctx.contact.name ?? 'unknown'}. Email: ${ctx.contact.email ?? 'unknown'}.`,
+    `Name: ${plainText(ctx.contact.name, 160) || 'unknown'}. Email: ${ctx.contact.email ?? 'unknown'}.`,
     `Answers so far: ${Object.keys(ctx.contact.answers).length ? JSON.stringify(ctx.contact.answers) : 'none'}.`,
     ctx.appointment ? `Already booked: ${formatSlot(Date.parse(ctx.appointment.starts), d.config.availability.timeZone)}.` : '',
     ctx.handoffs.length ? `Earlier handoffs: ${ctx.handoffs.map(h => `${h.from} to ${h.owner}: ${h.intent}`).join('; ')}.` : '',
@@ -188,8 +189,8 @@ export async function runSetterTurn(contactId: string, d: SetterDeps): Promise<S
   }
   async function handoff(owner: Agent, intent: string, summary: string, nextAction: string) {
     const h: Handoff = checkedHandoff({
-      contact: { id: contactId, name: ctx.contact.name, phone: ctx.contact.phone, email: ctx.contact.email, state },
-      channel, intent: intent || 'follow up', answers: ctx.contact.answers, summary: summary || 'See the conversation.', nextAction, from: 'setter', owner,
+      contact: { id: contactId, name: plainText(ctx.contact.name, 160) || null, phone: ctx.contact.phone, email: ctx.contact.email, state },
+      channel, intent: plainText(intent, 200) || 'follow up', answers: ctx.contact.answers, summary: plainText(summary, 1500) || 'See the conversation.', nextAction, from: 'setter', owner,
     });
     await d.rpc('fo_record_handoff', { ...a, contact: contactId, handoff: h });
     handedTo = owner;
@@ -221,7 +222,8 @@ export async function runSetterTurn(contactId: string, d: SetterDeps): Promise<S
     return { decision: g.decision, say: g.permission.say, ok: rec.ok, decided };
   }
   /** Taking a message for the team: always allowed (decide('take_message')); recorded as a handoff to a person. */
-  async function takeMessage(intent: string, summary: string) {
+  async function takeMessage(intentIn: string, summaryIn: string) {
+    const intent = plainText(intentIn, 200), summary = plainText(summaryIn, 1500);
     const rec: SetterActionRecord = { action: 'take_message', decision: 'perform', reason: '', pendingActionId: null, summary: `Message for the team about ${who}: ${intent}`.slice(0, 300), payload: null, ok: null, note: null };
     actions.push(rec);
     const perform = async () => { await handoff('human', intent, summary, 'A person gets back to the contact (message taken)'); return { ok: true, note: 'Message taken for the team.' }; };
@@ -231,7 +233,8 @@ export async function runSetterTurn(contactId: string, d: SetterDeps): Promise<S
     if (g.decision === 'perform') { rec.ok = g.result.ok; rec.note = g.result.note ?? null; }
   }
   /** Hands the lead to a person (a 'transfer'). Returns what to tell the contact when it did not happen right away. */
-  async function toPerson(intent: string, summary: string, nextAction: string): Promise<string | null> {
+  async function toPerson(intentIn: string, summaryIn: string, nextAction: string): Promise<string | null> {
+    const intent = plainText(intentIn, 200), summary = plainText(summaryIn, 1500);
     // TODO(A-14): whether a hand-off to a person is allowed in every mode is an open owner decision. This relies on
     // decide('transfer') as it is today (always 'perform'); the hold and refuse branches below follow whatever it answers.
     const g = await act('transfer', { kind: 'transfer', reason: `${intent || 'follow up'}: ${summary}`.slice(0, 400) }, `Hand ${who} to a person: ${intent || 'follow up'}`, `setter:transfer:${contactId}:${d.now}:${actions.length}`, async () => {
@@ -261,10 +264,10 @@ export async function runSetterTurn(contactId: string, d: SetterDeps): Promise<S
         const reading = rawPhone ? readPhone(rawPhone) : null;
         const okEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email), okPhone = reading?.ok === true;
         const phone = reading?.ok ? reading.phone : '';
-        const r = await d.rpc('fo_save_details', { ...a, contact: contactId, new_answers: answers, contact_name: str(input.name, 160) || null, contact_email: okEmail ? email : null, contact_phone: okPhone ? phone : null }) as { answers: Record<string, string>; skipped: string[] } | null;
+        const r = await d.rpc('fo_save_details', { ...a, contact: contactId, new_answers: answers, contact_name: plainText(input.name, 160) || null, contact_email: okEmail ? email : null, contact_phone: okPhone ? phone : null }) as { answers: Record<string, string>; skipped: string[] } | null;
         ctx.contact.answers = r?.answers ?? { ...ctx.contact.answers, ...answers };
         const skipped = r?.skipped ?? [];
-        if (str(input.name, 160)) ctx.contact.name = str(input.name, 160);
+        if (plainText(input.name, 160)) ctx.contact.name = plainText(input.name, 160);
         if (okEmail && !skipped.includes('email')) ctx.contact.email = email.toLowerCase();
         if (okPhone && !skipped.includes('phone')) ctx.contact.phone = phone;
         const note = (reading && !reading.ok ? ` The mobile was not saved: ${reading.reason} Ask again.` : '') + (skipped.length ? ` Not saved (already on another record): ${skipped.join(', ')}. A person will check.` : '');
@@ -278,7 +281,7 @@ export async function runSetterTurn(contactId: string, d: SetterDeps): Promise<S
           const missing = d.config.questions.filter(q => q.required && !ctx.contact.answers[q.id]).map(q => q.id);
           if (missing.length) return `Not yet: save these answers first: ${missing.join(', ')}.`;
         }
-        await moveTo(stage, str(input.reason, 500) || stage);
+        await moveTo(stage, plainText(input.reason, 500) || stage);
         return `Stage is now ${state}.`;
       }
       case 'offer_times': {
