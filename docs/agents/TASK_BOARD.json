@@ -1,12 +1,12 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-12T20:30:45.654Z",
+  "updatedAt": "2026-11-12T20:55:00Z",
   "integrationBranch": "agent/develop",
   "lastRun": {
-    "id": "c-a3429447",
-    "startedAt": "2026-11-12T20:05:11Z",
-    "endedAt": "2026-11-12T20:30:45.654Z",
-    "summary": "4 voice tasks done and committed: A-65 (cc44355a), A-62 (252a3d4b), A-50 (045e4e9c), A-53 (599b2522); each reviewed PASS and ventra-verify PASSED. New: A-79 owner decision (email-runner reminders/consent), A-80 queued (A-53 nits). Website W-1 still blocked (localhost:3020 needs approval)."
+    "id": "c-ceead848",
+    "startedAt": "2026-11-12T20:35:12Z",
+    "endedAt": "2026-11-12T20:55:00Z",
+    "summary": "A-80 done (7159570b): A-53 review nits in the live QA suite; QA caught an X5 weakening that was fixed before commit; ventra-verify PASSED. Small cycle because of the 1.64 USD spending cap. Website W-1 still blocked (localhost:3020 needs approval)."
   },
   "tasks": [
     {
@@ -6189,7 +6189,7 @@
       "phase": null,
       "module": "shared",
       "owner": "ventra-voice",
-      "state": "queued",
+      "state": "done",
       "priority": 4,
       "dependsOn": [],
       "scope": [
@@ -6202,17 +6202,24 @@
       "plan": "A-53 review",
       "branch": "agent/develop",
       "worktree": null,
-      "startedAt": null,
-      "finishedAt": null,
-      "lastRunId": "c-a3429447",
+      "startedAt": "2026-11-12T20:40:00Z",
+      "finishedAt": "2026-11-12T20:55:00Z",
+      "lastRunId": "c-ceead848",
       "runIds": [
-        "c-a3429447"
+        "c-a3429447",
+        "c-ceead848"
       ],
-      "commits": [],
-      "evidence": [],
+      "commits": [
+        "7159570b"
+      ],
+      "evidence": [
+        "All 4 nits fixed by ventra-voice; ventra-qa (diff review) found X5 accepted numbers from the caller's own lines, coordinator removed caller lines from X5 extras",
+        "ventra-verify PASSED twice (lint, typecheck, unit-tests incl. this file all skipped without FRONT_OFFICE_QA_LIVE, build, workspace-integration); course/launcher integration FROZEN",
+        "ventra-qa could not run the single-file node test (permission prompt); covered by the unit-tests glob test/*.test.ts"
+      ],
       "blocker": null,
       "notes": "Also consider: lab-usage MODEL_PRICES lacks Claude 5.x ids (lib/front-office/lab-usage.ts, separate task if changed).",
-      "updatedAt": "2026-11-12T20:30:45.654Z"
+      "updatedAt": "2026-11-12T20:55:00Z"
     }
   ]
 }

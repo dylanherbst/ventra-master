@@ -22,7 +22,8 @@ Dylan asked for the mobile app preview link to be sent to him on Telegram. Send 
 - OWNER: A-79 decide email-runner reminders/rescues (email first even with a mobile; SMS fallback not consent-checked as transactional; recommendation keep). Optional: run the live QA file yourself (chargeable).
 - Running / implemented (needs reconciling next cycle): none.
 - Blocked, needs the owner: A-79, A-64, A-14 (blocks A-7/A-56/A-13), A-60, A-12, P0-10, P0-7, W-1 browser check (localhost:3020 still needs approval; blocks all W- tasks), M-1/M-2/M-4 review; lab secret FRONT_OFFICE_LAB_KEY_SECRET (see previous cycle).
-- Next up: A-80 (A-53 nits), A-11 (WhatsApp inbound remains, Meta exists; owner should be ventra-voice), lab-usage price table lacks Claude 5.x ids (new task), M-3 Reels when budget allows.
+- Cycle c-ceead848: A-80 done (7159570b), ventra-verify PASSED. Note: single-file `node --test` needs a permission prompt for subagents; the full unit-tests glob covers it.
+- Next up: A-11 (WhatsApp inbound remains, Meta exists; owner should be ventra-voice), lab-usage price table lacks Claude 5.x ids (new task), M-3 Reels when budget allows.
 
 ### Previous cycle c-4f349d12
 
