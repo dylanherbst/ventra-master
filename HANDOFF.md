@@ -15,6 +15,17 @@ Dylan asked for the mobile app preview link to be sent to him on Telegram. Send 
 
 ## Master Coordinator (auto)
 
+- Last cycle: c-0ba93875 at 2026-11-13 01:45 AWST · 6 built/reworked (A-67, A-68, A-59, A-69, A-72, A-66) + 7 reviews · 6 verified and committed · 0 new owner blockers (2 migrations to apply live)
+- Integration branch: agent/develop @ 26894959 (4fcb7f40 A-68 · 87cd18b2 A-59 · 4677e933 A-67 · 3d59f446 A-69 · a5203666 A-72 · 26894959 A-66); board commit follows
+- Verification: npm --prefix apps/web test 1142 total, 1137 pass, 5 todo, 0 fail (1129/1122/7 todo at start); lint 0; typecheck 0; ventra-verify exit 0 (course + launcher FROZEN, P0-7).
+- Behaviour changes: customer names, messages and reasons are flattened to one line before reaching staff hand-offs/SMS/email (A-67); the database only stores answers to the business's own questions (A-68); "can I talk to a person" hands off and the AI never claims to be human (A-59); a dropped call creates exactly one call-back (A-66/A-72).
+- OWNER, DEPLOY ORDER: migrations 202611130001 (save-details guard) and 202611130002 (voice end first flag) are local only. Apply 202611130002 to the live project BEFORE the A-66 code ships, or dropped-call call-backs stop.
+- Running / implemented (needs reconciling next cycle): none.
+- Blocked, needs the owner: unchanged (A-64, W-1 browser check, A-12, A-60, A-14, A-34, P0-10, P0-7).
+- Next up: A-71 (stored dirty names, G12 exact assert), A-70 (Setter prompt version bump), A-73 (A-66 nits), A-63, A-65, A-62, A-50, A-20.
+
+### Previous cycle c-8409421c
+
 - Last cycle: c-8409421c at 2026-11-12 03:06 AWST · 1 dispatched (A-58, ventra-voice) · 0 verified/committed · 0 new owner blockers (spend cap reached before review)
 - Integration branch: agent/develop @ 6a63a3e; board commit follows
 - Running / implemented (needs reconciling next cycle): A-58 implemented, uncommitted: apps/web/lib/front-office/receptionist/dropped.ts (new), apps/web/lib/front-office/vapi-route.ts (+7/-1), apps/web/test/front-office-receptionist-dropped.test.ts (new). Coordinator checked: 4/4 new tests pass, typecheck clean. Needs ventra-review (Vapi webhook) + full test/lint, then commit.
@@ -201,78 +212,30 @@ Tracker Phase 0: 0.1 scope freeze, 0.2 orchestrator, 0.3 lead store + state mach
 ## Git state (auto)
 
 <!-- git-state:start -->
-_Generated 2026-11-12 03:10 by `ventra-handoff snapshot`. Do not hand-edit this block._
+_Generated 2026-11-13 01:25 by `ventra-handoff snapshot`. Do not hand-edit this block._
 - Branch: `agent/develop`
-- HEAD: `6a63a3e chore(coordinator): cycle c-b5e908f2 board and handoff`
-- Lock: coordinator (pid 43613, 3 min old)
+- HEAD: `2689495 fix(receptionist): dropped-call call-back only on the first end-of-call report (fo_voice_end first flag), visible dispatch event when the hand-off fails, Lab and simulator use the same recordDroppedCall, explicit endedReason allow-list incl. exceeded-max-duration [A-66]`
+- Lock: coordinator (pid 62285, 45 min old)
 - Uncommitted changes:
 ```text
- M .claude/agents/ventra-backend.md
- M .claude/agents/ventra-feature.md
- M .claude/agents/ventra-frontend.md
- M .claude/agents/ventra-qa.md
- M .claude/agents/ventra-setup.md
- M AGENTS.md
- M CLAUDE.md
  M HANDOFF.md
- M apps/web/app/design-system/glass/ventra-glass.css
- D apps/web/app/glass-showcase/card-demo.tsx
- D apps/web/app/glass-showcase/liquid-glass-card.tsx
- M apps/web/app/glass-showcase/page.tsx
- D apps/web/app/lab/lab.css
- D apps/web/app/lab/page.tsx
- M apps/web/lib/front-office/vapi-route.ts
- M apps/web/package-lock.json
- M apps/web/package.json
  M docs/agents/TASKS.md
  M docs/agents/TASK_BOARD.json
- D docs/design/LIQUID_GLASS_SPEC.md
- D docs/design/reference/dylan-home-dashboard.png
- D docs/design/reference/dylan-liquid-glass-kit.png
- D docs/design/reference/home-approved.png
- D docs/design/reference/kit-approved.png
- D docs/design/ventra-ui/components.d.ts
- D docs/design/ventra-ui/components.js
- D docs/design/ventra-ui/glass.css
- D docs/design/ventra-ui/tokens.css
- D docs/design/ventra-ui/tokens.json
- M package.json
- M scripts/agents/install.sh
- M scripts/agents/ventra-backup
- M scripts/agents/ventra-verify
-?? .claude-sync/
-?? .claude/agents/ventra-marketing.md
-?? .claude/agents/ventra-store.md
-?? .claude/agents/ventra-voice.md
-?? .claude/agents/ventra-web-design.md
-?? .codex/agents/ventra-marketing.toml
-?? .codex/agents/ventra-store.toml
 ```
 - Diff stat vs HEAD:
 ```text
- docs/design/LIQUID_GLASS_SPEC.md                  | 188 ------
- docs/design/reference/dylan-home-dashboard.png    | Bin 627700 -> 0 bytes
- docs/design/reference/dylan-liquid-glass-kit.png  | Bin 630505 -> 0 bytes
- docs/design/reference/home-approved.png           | Bin 2071965 -> 0 bytes
- docs/design/reference/kit-approved.png            | Bin 1385351 -> 0 bytes
- docs/design/ventra-ui/components.d.ts             |  27 -
- docs/design/ventra-ui/components.js               | 225 -------
- docs/design/ventra-ui/glass.css                   | 249 --------
- docs/design/ventra-ui/tokens.css                  |  15 -
- docs/design/ventra-ui/tokens.json                 | 692 ----------------------
- package.json                                      |   7 +-
- scripts/agents/install.sh                         |   2 +-
- scripts/agents/ventra-backup                      |   3 +
- scripts/agents/ventra-verify                      |  11 +-
- 33 files changed, 78 insertions(+), 1668 deletions(-)
+ HANDOFF.md                  |   11 +
+ docs/agents/TASKS.md        |    8 +
+ docs/agents/TASK_BOARD.json | 2256 ++++++++++++++++++++++++++++++++++++-------
+ 3 files changed, 1920 insertions(+), 355 deletions(-)
 ```
 - Recent commits:
 ```text
-6a63a3e chore(coordinator): cycle c-b5e908f2 board and handoff
-fa0e99a test(receptionist): QA scenario suite R1-R13 + X5 in Demo mode (scripted model, no network, nothing sent); R6 000 rule now a passing check (G4 fixed by A-57); R9/R10 audio, G3 operating modes and G5 dropped-call call-back as labelled todos [A-51]
-2d3ff9c chore(coordinator): cycle c-4735b672 board and handoff
-7ddb32f fix(setter-lab): after a hand-off to a person the Setter Lab goes quiet like the live routes (same withPerson check on the lab's handoff records; message stored, no model call, no reply, route shows why); A-49 lab-fidelity todo now a passing test in all three modes [A-61]
-890222e feat(setter): returning booked contacts on web chat and the Setter Lab get a reply with their stored booking (time, zone, where; built in code) via setter/returning-booked@1; only handoff tools allowed (server-enforced); move/cancel and any hand-off end on fixed lines; model text claiming a booking change is never sent; no upcoming booking -> code-recorded hand-off; SMS/email/Meta unchanged; S9 G1 todo now passing [A-54]
+2689495 fix(receptionist): dropped-call call-back only on the first end-of-call report (fo_voice_end first flag), visible dispatch event when the hand-off fails, Lab and simulator use the same recordDroppedCall, explicit endedReason allow-list incl. exceeded-max-duration [A-66]
+a520366 feat(receptionist): fo_voice_end returns an atomic first flag so duplicate end-of-call reports can create only one call-back; duplicates no longer overwrite the stored call (new local migration, not applied live) [A-72]
+3d59f44 fix(setter): Setter Lab keeps the decide() words when a held booking comes with another tool call (matches production); G12 scenario now a passing check; X4 test closes PGlite in finally, narrower error regex, stable ids [A-69]
+4677e93 fix(front-office): one plainText helper; Setter and Receptionist flatten caller names, hand-off intents/summaries, transfer/cancel/move reasons and take_message text before they reach staff hand-offs, SMS, email or prompts; G9, G10, G11 scenario todos now passing checks [A-67]
+87cd18b feat(setter): plain request for a person hands off to the team and the AI never claims to be human; Setter Lab scripted model triggers the hand-off [A-59]
 ```
 <!-- git-state:end -->
 
