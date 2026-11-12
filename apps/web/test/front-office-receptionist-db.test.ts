@@ -6,6 +6,7 @@ import { PGlite } from '@electric-sql/pglite';
 import './helpers/route-harness.ts';
 
 const { templateSettings } = await import('../lib/front-office/settings.ts');
+const { RECEPTIONIST_PROMPT_VERSION } = await import('../lib/front-office/receptionist/prompt.ts');
 
 const KEY = 'k'.repeat(40), VOICE = '+61800000001', CALLER = '+61411111111';
 const migrations = ['202610160001_s01.sql', '202611060001_front_office.sql', '202611060002_front_office_appointments.sql', '202611060003_front_office_setter.sql', '202611060004_front_office_chat_email.sql', '202611060005_front_office_meta.sql', '202611080001_front_office_receptionist.sql'];
@@ -77,7 +78,7 @@ test('calls: caller becomes a contact once, turns are idempotent, replies logged
     const again = await one<Record<string, unknown>>(turn, [voice, KEY, 'call_0001abcd', CALLER, 1, 'Hi, what time do you open?']);
     assert.equal(again.duplicate, true, 'Vapi retries do not double-log'); assert.equal(again.contact, t1.contact);
     await one(turn, [voice, KEY, 'call_0001abcd', CALLER, 2, 'And parking?']);
-    assert.ok(await one('select public.fo_voice_reply($1,$2,$3,$4,$5) as r', [voice, KEY, 'call_0001abcd', 'We open at 6.', 'receptionist/voice@1']));
+    assert.ok(await one('select public.fo_voice_reply($1,$2,$3,$4,$5) as r', [voice, KEY, 'call_0001abcd', 'We open at 6.', RECEPTIONIST_PROMPT_VERSION]));
     await assert.rejects(db.query('select public.fo_voice_reply($1,$2,$3,$4,$5)', [voice, KEY, 'call_0001abcd', 'x', '']), /Prompt version/);
     await one('select public.fo_voice_outcome($1,$2,$3,$4) as r', [voice, KEY, 'call_0001abcd', 'faq']);
     await one('select public.fo_voice_outcome($1,$2,$3,$4) as r', [voice, KEY, 'call_0001abcd', 'faq']);
@@ -87,7 +88,7 @@ test('calls: caller becomes a contact once, turns are idempotent, replies logged
     await db.exec('reset role');
     const msgs = (await db.query<{ direction: string; agent: string | null; prompt_version: string | null }>('select direction, agent, prompt_version from public.fo_messages order by created_at')).rows;
     assert.deepEqual(msgs.map(m => m.direction), ['inbound', 'inbound', 'outbound']);
-    assert.equal(msgs[2].agent, 'receptionist'); assert.equal(msgs[2].prompt_version, 'receptionist/voice@1');
+    assert.equal(msgs[2].agent, 'receptionist'); assert.equal(msgs[2].prompt_version, RECEPTIONIST_PROMPT_VERSION);
     const call = (await db.query<{ ended_reason: string; summary: string; transcript: string }>('select * from public.fo_calls')).rows[0];
     assert.equal(call.ended_reason, 'customer-ended-call'); assert.equal(call.summary, 'Asked about hours.');
     const kinds = (await db.query<{ kind: string }>('select kind from public.fo_events order by id')).rows.map(r => r.kind);
@@ -104,7 +105,7 @@ test('calls: withheld number has no contact until the caller gives a mobile; mis
     await as(null);
     const t = await one<Record<string, unknown>>('select public.fo_voice_turn($1,$2,$3,$4,$5,$6) as r', [voice, KEY, 'call_withheld1', null, 1, 'Hi']);
     assert.equal(t.contact, null);
-    assert.equal(await one('select public.fo_voice_reply($1,$2,$3,$4,$5) as r', [voice, KEY, 'call_withheld1', 'Hello', 'receptionist/voice@1']), null, 'nothing to log against');
+    assert.equal(await one('select public.fo_voice_reply($1,$2,$3,$4,$5) as r', [voice, KEY, 'call_withheld1', 'Hello', RECEPTIONIST_PROMPT_VERSION]), null, 'nothing to log against');
     await assert.rejects(db.query('select public.fo_voice_contact($1,$2,$3,$4,$5)', [voice, KEY, 'call_withheld1', '0412', 'Sam']), /not valid/);
     const c = await one<string>('select public.fo_voice_contact($1,$2,$3,$4,$5) as r', [voice, KEY, 'call_withheld1', CALLER, 'Sam']);
     const again = await one<Record<string, unknown>>('select public.fo_voice_turn($1,$2,$3,$4,$5,$6) as r', [voice, KEY, 'call_withheld1', null, 2, 'Thanks']);

@@ -8,6 +8,7 @@ import './helpers/route-harness.ts';
 
 const { simulateCall, fixtureById, fixtures, demoSettings, simulationStore, SIM_AUTH } = await import('../lib/front-office/receptionist/simulate.ts');
 const { checkedAgentSettings } = await import('../lib/front-office/settings.ts');
+const { RECEPTIONIST_PROMPT_VERSION } = await import('../lib/front-office/receptionist/prompt.ts');
 type SimResult = import('../lib/front-office/receptionist/simulate.ts').SimResult;
 
 // No network in this file: any fetch fails the run.
@@ -54,7 +55,7 @@ test('FAQ: answered only from the business’s own FAQ; spoken reply logged with
   assert.match(String(faq.result), /5 am to 9 pm on weekdays/);
   assert.equal(r.turns[1].said, 'We are open 5 am to 9 pm on weekdays and 7 am to 1 pm on weekends.');
   assert.deepEqual(call(r).outcomes, ['faq']);
-  assert.ok(r.tables.fo_messages.some(m => m.direction === 'outbound' && m.prompt_version === 'receptionist/voice@3' && /5 am/.test(m.body)));
+  assert.ok(r.tables.fo_messages.some(m => m.direction === 'outbound' && m.prompt_version === RECEPTIONIST_PROMPT_VERSION && /5 am/.test(m.body)));
   assert.ok(r.tables.fo_messages.some(m => m.direction === 'inbound' && m.provider_id === 'vapi:call_sim_faq:1'));
   assert.deepEqual(actions(r), [{ name: 'endCall', args: {} }]);
   assert.equal(r.endOfCall.endedReason, 'assistant-ended-call');
