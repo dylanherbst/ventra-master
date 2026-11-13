@@ -15,6 +15,24 @@ Dylan asked for the mobile app preview link to be sent to him on Telegram. Send 
 
 ## Master Coordinator (auto)
 
+- Last cycle: c-960d5bfe at 2026-11-14 01:40 AWST · 4 dispatched (AMP-013, AMP-021, AMP-040, AMP-022, all Sonnet) + 4 reviews + 4 rework rounds · 4 verified locally, 0 committed · 0 new blockers
+- Integration branch: agent/develop @ a4a22e0 (board commit follows). AMP repo: ~/Developer/AIMONEYPRINTER aimp/foundation @ 2085c70 + UNCOMMITTED verified work (now 10 tasks). Coordinator checks: lint 0, typecheck 0, npm test 1285 / 1279 pass / 0 fail / 1 skipped (qpdf not installed) / 5 todo.
+- Commit these when AMP-005-D clears (after the c-a7fe8df1 and c-aa359f36 lists below, one commit per task):
+  - AMP-013: apps/web/lib/aimp/selection/ apps/web/app/tools/opportunity-select/ apps/web/test/aimp-selection-select.test.ts
+  - AMP-021: apps/web/lib/aimp/factory/ apps/web/app/tools/product-factory/ apps/web/test/aimp-factory-pdf.test.ts apps/web/test/aimp-factory-zip.test.ts apps/web/test/aimp-factory-request.test.ts
+  - AMP-040: apps/web/lib/aimp/sellers/ apps/web/app/tools/seller-readiness/ apps/web/test/aimp-sellers-readiness.test.ts
+  - AMP-022: apps/web/lib/aimp/products/ apps/web/app/tools/product-review/ apps/web/test/aimp-products-lifecycle.test.ts (imports factory: commit after AMP-021)
+  - Do NOT commit apps/web/test/.tmp/ (test output; add `apps/web/test/.tmp/` to the AMP repo .gitignore).
+- Independent check: coordinator rendered a 48-page wedding planner PDF from the factory and opened it in macOS Quartz (sips); cover renders cleanly with the DEMO footer. Other pages not viewed. No browser checks of the four /tools pages (local HTTP needs approval).
+- Follow-ups: merchant_accounts needs details_submitted, disabled_reason, past_due, capability statuses, last_event_created (AMP-040); Stripe webhook signature check before applyAccountUpdated (AMP-043-D); storefront purchaseState should use checkoutGate (AMP-041); approved product bytes are re-rendered, not stored (AMP-024); selection needs a DB select_business_once RPC + jobs table (AMP-060); live LLM adapter does not exist yet.
+- Owner decisions (non-blocking): regenerate limit 5 per product; buyer file = ZIP (A4 + Letter PDFs + README); default demo price A$12 in selection preview.
+- Running / implemented (needs reconciling next cycle): none.
+- Blocked, needs the owner: AMP-005-D (add ~/Developer/AIMONEYPRINTER as an allowed directory for coordinator cycles; 10 verified tasks waiting), AMP-043-D Stripe test keys, AMP-052-D Pinterest app.
+- Leftover temp files from this cycle (safe to delete, not committed): docs/agents/.cycle-c960*.{mjs,json,jq,ts,pdf,png}. Foreign uncommitted changes left alone: README.md, COORDINATOR.md, STATUS.md, scripts/agents/ventra-coord, ventra-coordinator, ventra-master, scripts/agents/.cycle-*.jq.
+- Next up: commit the ten tasks; then AMP-020 (branding, unblocked by AMP-013), AMP-024 (private master files, unblocked by AMP-022), AMP-060 (job orchestration), AMP-023 after AMP-020.
+
+### Previous cycle c-a7fe8df1
+
 - Last cycle: c-a7fe8df1 at 2026-11-14 01:15 AWST · 4 dispatched (AMP-004, AMP-011, AMP-012, AMP-010, all Sonnet) + 3 reviews + 4 rework rounds · 4 verified locally, 0 committed · 0 new blockers
 - Integration branch: agent/develop @ 8cff670 (board commit follows). AMP repo: ~/Developer/AIMONEYPRINTER aimp/foundation @ 2085c70 + UNCOMMITTED verified work. Coordinator checks: lint 0, typecheck 0, npm test 1212 / 1207 pass / 5 todo / 0 fail.
 - Commit these when AMP-005-D clears (one commit per task; AMP-003 and AMP-030 file lists below under c-aa359f36):
@@ -277,10 +295,10 @@ Tracker Phase 0: 0.1 scope freeze, 0.2 orchestrator, 0.3 lead store + state mach
 ## Git state (auto)
 
 <!-- git-state:start -->
-_Generated 2026-11-14 00:59 by `ventra-handoff snapshot`. Do not hand-edit this block._
+_Generated 2026-11-14 01:32 by `ventra-handoff snapshot`. Do not hand-edit this block._
 - Branch: `agent/develop`
-- HEAD: `8cff670 chore(coordinator): cycle c-aa359f36 board and handoff; AiMoneyPrinter only: AMP-001/001-D done, AMP-003/030 verified (uncommitted in AMP repo, AMP-005-D), VENTRA queued tasks deferred, AMP audit added`
-- Lock: coordinator (pid 57730, 24 min old)
+- HEAD: `a4a22e0 chore(coordinator): cycle c-a7fe8df1 board and handoff; AMP-004, AMP-011, AMP-012, AMP-010 verified locally (Sonnet, reviewed, 1212 tests 0 fail), held uncommitted in the AMP repo by AMP-005-D`
+- Lock: coordinator (pid 70153, 27 min old)
 - Uncommitted changes:
 ```text
  M HANDOFF.md
@@ -292,29 +310,37 @@ _Generated 2026-11-14 00:59 by `ventra-handoff snapshot`. Do not hand-edit this 
  M scripts/agents/ventra-coord
  M scripts/agents/ventra-coordinator
  M scripts/agents/ventra-master
+?? docs/agents/.cycle-c960-1.json
+?? docs/agents/.cycle-c960-2.json
+?? docs/agents/.cycle-c960-3.json
+?? docs/agents/.cycle-c960-p1.png
+?? docs/agents/.cycle-c960-pdf.ts
+?? docs/agents/.cycle-c960-sample.pdf
+?? docs/agents/.cycle-c960.jq
+?? docs/agents/.cycle-c960.mjs
 ?? scripts/agents/.cycle-aimp.jq
 ?? scripts/agents/.cycle-defer.jq
 ```
 - Diff stat vs HEAD:
 ```text
- HANDOFF.md                        |  16 +++
+ HANDOFF.md                        |  18 ++++
  README.md                         |   2 +
- docs/agents/AIMP_BOARD.json       | 260 +++++++++++++++++++++++++++++---------
- docs/agents/COORDINATOR.md        |  46 ++++++-
+ docs/agents/AIMP_BOARD.json       | 211 ++++++++++++++++++++++++++++++--------
+ docs/agents/COORDINATOR.md        |  46 ++++++++-
  docs/agents/STATUS.md             |   2 +
- docs/agents/TASKS.md              |   6 +-
- scripts/agents/ventra-coord       |   6 +
- scripts/agents/ventra-coordinator |  33 +++--
+ docs/agents/TASKS.md              |   4 +
+ scripts/agents/ventra-coord       |   6 ++
+ scripts/agents/ventra-coordinator |  33 +++---
  scripts/agents/ventra-master      |   3 +-
- 9 files changed, 299 insertions(+), 75 deletions(-)
+ 9 files changed, 270 insertions(+), 55 deletions(-)
 ```
 - Recent commits:
 ```text
+a4a22e0 chore(coordinator): cycle c-a7fe8df1 board and handoff; AMP-004, AMP-011, AMP-012, AMP-010 verified locally (Sonnet, reviewed, 1212 tests 0 fail), held uncommitted in the AMP repo by AMP-005-D
 8cff670 chore(coordinator): cycle c-aa359f36 board and handoff; AiMoneyPrinter only: AMP-001/001-D done, AMP-003/030 verified (uncommitted in AMP repo, AMP-005-D), VENTRA queued tasks deferred, AMP audit added
 1962c7e chore(coordinator): cycle c-ceead848 board and handoff
 7159570 test(front-office): A-53 review nits in the live QA suite: numbers in replies may also come from tool results and the caller's text (not in X5, where reading back an injected number must fail); usage.priceKnown from priceFor(model).known with a note that unpriced models are costed at the top rate; X5 records input only after the break check; IS_AI needs AI/bot or an AI/virtual/digital assistant phrase, CLAIMS_HUMAN accepts curly apostrophes and 'I am not a bot' [A-80]
 bdf70c0 chore(coordinator): cycle c-a3429447 board and handoff
-599b252 test(front-office): live AI QA scenarios S2, S3, S5, S7, X1, R1, R5, R6, X5 through the real labs and model adapter; skipped unless FRONT_OFFICE_QA_LIVE=1 (no key read, no network otherwise), fetch confined to the model host, call and AUD cap enforced before each call via meteredLlm, fallback replies cannot hide a cap hit [A-53]
 ```
 <!-- git-state:end -->
 

@@ -2,7 +2,7 @@
   "version": 1,
   "project": "aimp",
   "app": "aimoneyprinter",
-  "updatedAt": "2026-11-13T17:15:00Z",
+  "updatedAt": "2026-11-13T17:32:06Z",
   "integrationBranch": "aimp/foundation",
   "worktree": "~/Developer/AIMONEYPRINTER",
   "codingModel": "sonnet",
@@ -54,10 +54,10 @@
     }
   ],
   "lastRun": {
-    "id": "c-a7fe8df1",
-    "startedAt": "2026-11-13T16:34:56Z",
-    "endedAt": "2026-11-13T17:16:00Z",
-    "summary": "AMP-004, AMP-011, AMP-012, AMP-010 verified locally (Sonnet, reviewed, 1212 tests 0 fail); all uncommitted because AMP-005-D still blocks commits in the AiMoneyPrinter repo."
+    "id": "c-960d5bfe",
+    "startedAt": "2026-11-13T17:04:57Z",
+    "endedAt": "2026-11-13T17:32:06Z",
+    "summary": "4 dispatched (AMP-013, AMP-021, AMP-040, AMP-022, all Sonnet), 4 reviews, 4 reworks; 4 verified locally (lint 0, typecheck 0, 1285/1279 pass/0 fail); 0 committed: AMP-005-D still blocks commits in ~/Developer/AIMONEYPRINTER (10 verified tasks held)."
   },
   "tasks": [
     {
@@ -278,10 +278,11 @@
       "worktree": "~/Developer/AIMONEYPRINTER",
       "startedAt": "2026-11-13T16:40:00Z",
       "finishedAt": null,
-      "lastRunId": "c-a7fe8df1",
+      "lastRunId": "c-960d5bfe",
       "runIds": [
         "c-aa359f36",
-        "c-a7fe8df1"
+        "c-a7fe8df1",
+        "c-960d5bfe"
       ],
       "commits": [],
       "evidence": [
@@ -296,6 +297,12 @@
           "kind": "note",
           "level": "Local",
           "detail": "Re-checked in cycle c-a7fe8df1: cd into ~/Developer/AIMONEYPRINTER and VENTRA_REPO=... ventra-git status both still need approval. Still blocked; now 6 verified tasks held uncommitted (AMP-003, 030, 004, 011, 012, 010)."
+        },
+        {
+          "at": "2026-11-13T17:06:15Z",
+          "level": "Local",
+          "kind": "note",
+          "detail": "Re-checked in cycle c-960d5bfe: VENTRA_REPO=~/Developer/AIMONEYPRINTER ventra-git status still requires approval. Still blocked; 6 verified tasks held uncommitted."
         }
       ],
       "blocker": {
@@ -311,7 +318,8 @@
       },
       "notes": "Never worked around: no settings or guard edits by the coordinator.",
       "legacy": [],
-      "model": null
+      "model": null,
+      "updatedAt": "2026-11-13T17:06:15Z"
     },
     {
       "id": "AMP-004",
@@ -574,13 +582,17 @@
       "module": "aimp",
       "tier": "P0",
       "owner": "ventra-web-design",
-      "state": "queued",
+      "state": "verified",
       "priority": 1,
       "dependsOn": [
         "AMP-012",
         "AMP-010"
       ],
-      "scope": [],
+      "scope": [
+        "apps/web/lib/aimp/selection/**",
+        "apps/web/app/tools/opportunity-select/**",
+        "apps/web/test/aimp-selection-*.test.ts"
+      ],
       "acceptance": [
         "One selected idea creates one durable business record and kicks off its build once."
       ],
@@ -588,18 +600,43 @@
       "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
       "branch": "aimp/foundation",
       "worktree": "~/Developer/AIMONEYPRINTER",
-      "startedAt": null,
-      "finishedAt": null,
-      "lastRunId": null,
-      "runIds": [],
+      "startedAt": "2026-11-13T17:06:15Z",
+      "finishedAt": "2026-11-13T17:21:41Z",
+      "lastRunId": "c-960d5bfe",
+      "runIds": [
+        "c-960d5bfe"
+      ],
       "commits": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "at": "2026-11-13T17:06:15Z",
+          "level": "Local",
+          "kind": "note",
+          "model": "sonnet",
+          "detail": "Dispatched to ventra-web-design (sonnet): idea preview + idempotent selection creating one business record via lib/aimp/data; test page /tools/opportunity-select."
+        },
+        {
+          "at": "2026-11-13T17:21:41Z",
+          "level": "Local",
+          "kind": "review",
+          "model": "sonnet",
+          "detail": "ventra-review: request changes (idea-id collision, cross-tab idempotency in browser store, lost-update edits, unscoped list, unvalidated stored records, repeat-selection ordering, circular mock). One rework round by ventra-web-design (sonnet) fixed all: hashed idea id, storage re-read per op, merge inside atomic update + expectedRevision, list(workspaceId), record shape check; 19 tests in aimp-selection-select.test.ts."
+        },
+        {
+          "at": "2026-11-13T17:21:41Z",
+          "level": "Local",
+          "kind": "test",
+          "model": "sonnet",
+          "detail": "Coordinator ran in ~/Developer/AIMONEYPRINTER after all reworks: lint exit 0, typecheck exit 0, npm test 1269 tests, 1263 pass, 0 fail, 1 skipped (qpdf not installed, AMP-021), 5 todo (baseline 1212/1207). Not browser-checked. Files: lib/aimp/selection/{preview,select,memory-store,adapter,index}.ts, app/tools/opportunity-select/{page,select-demo}.tsx, test/aimp-selection-select.test.ts. UNCOMMITTED: AMP-005-D."
+        }
+      ],
       "blocker": null,
       "notes": "",
       "legacy": [
         "aimp-2.4"
       ],
-      "model": null
+      "model": "sonnet",
+      "updatedAt": "2026-11-13T17:21:41Z"
     },
     {
       "id": "AMP-020",
@@ -641,13 +678,17 @@
       "module": "aimp",
       "tier": "P0",
       "owner": "ventra-feature",
-      "state": "queued",
+      "state": "verified",
       "priority": 1,
       "dependsOn": [
         "AMP-011",
         "AMP-004"
       ],
-      "scope": [],
+      "scope": [
+        "apps/web/lib/aimp/factory/**",
+        "apps/web/app/tools/product-factory/**",
+        "apps/web/test/aimp-factory-*.test.ts"
+      ],
       "acceptance": [
         "A buyer-ready file opens correctly, with usable pages and the content advertised in the listing."
       ],
@@ -655,18 +696,50 @@
       "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
       "branch": "aimp/foundation",
       "worktree": "~/Developer/AIMONEYPRINTER",
-      "startedAt": null,
-      "finishedAt": null,
-      "lastRunId": null,
-      "runIds": [],
+      "startedAt": "2026-11-13T17:06:15Z",
+      "finishedAt": "2026-11-13T17:21:41Z",
+      "lastRunId": "c-960d5bfe",
+      "runIds": [
+        "c-960d5bfe"
+      ],
       "commits": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "at": "2026-11-13T17:06:15Z",
+          "level": "Local",
+          "kind": "note",
+          "model": "sonnet",
+          "detail": "Dispatched to ventra-feature (sonnet): structured spec to a real PDF/ZIP via reusable templates, no new dependencies; test page /tools/product-factory."
+        },
+        {
+          "at": "2026-11-13T17:21:41Z",
+          "level": "Local",
+          "kind": "review",
+          "model": "sonnet",
+          "detail": "ventra-review: approve with nits; PDF/ZIP writers and route judged correct. Rework round by ventra-feature (sonnet) fixed duplicate pages (distinct month/checklist/prompt content), bounded live AI output (exact counts, length caps, overflow guards), independent per-page claim test, request/route tests (422 vs 500, headers), ellipsis/title-case/surrogate fixes. Not re-reviewed."
+        },
+        {
+          "at": "2026-11-13T17:21:41Z",
+          "level": "Local",
+          "kind": "browser",
+          "model": "sonnet",
+          "detail": "Coordinator rendered a wedding-planning planner (demo provider) to A4 PDF: 48 pages, claims 12 monthly / 26 weekly / etc.; macOS Quartz (sips) opened it and rendered the cover cleanly with DEMO footer; duplicate audience line seen before rework is gone. Only page 1 viewed."
+        },
+        {
+          "at": "2026-11-13T17:21:41Z",
+          "level": "Local",
+          "kind": "test",
+          "model": "sonnet",
+          "detail": "Same coordinator run as AMP-013: lint 0, typecheck 0, 1269/1263 pass/0 fail/1 skipped (qpdf missing)/5 todo. Files: lib/aimp/factory/{pdf,zip,spec,generate,templates,render,request,index}.ts, app/tools/product-factory/{page.tsx,download/route.ts}, test/aimp-factory-{pdf,zip,request}.test.ts. Note: apps/web/test/.tmp/ is written by tests and not gitignored. UNCOMMITTED: AMP-005-D."
+        }
+      ],
       "blocker": null,
       "notes": "",
       "legacy": [
         "aimp-3.1"
       ],
-      "model": null
+      "model": "sonnet",
+      "updatedAt": "2026-11-13T17:21:41Z"
     },
     {
       "id": "AMP-022",
@@ -675,12 +748,16 @@
       "module": "aimp",
       "tier": "P0",
       "owner": "ventra-feature",
-      "state": "queued",
+      "state": "verified",
       "priority": 1,
       "dependsOn": [
         "AMP-021"
       ],
-      "scope": [],
+      "scope": [
+        "apps/web/lib/aimp/products/**",
+        "apps/web/app/tools/product-review/**",
+        "apps/web/test/aimp-products-*.test.ts"
+      ],
       "acceptance": [
         "Failed files stay in review. The merchant can preview the exact version buyers will receive."
       ],
@@ -688,19 +765,44 @@
       "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
       "branch": "aimp/foundation",
       "worktree": "~/Developer/AIMONEYPRINTER",
-      "startedAt": null,
-      "finishedAt": null,
-      "lastRunId": null,
-      "runIds": [],
+      "startedAt": "2026-11-13T17:21:41Z",
+      "finishedAt": "2026-11-13T17:32:06Z",
+      "lastRunId": "c-960d5bfe",
+      "runIds": [
+        "c-960d5bfe"
+      ],
       "commits": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "at": "2026-11-13T17:21:41Z",
+          "level": "Local",
+          "kind": "note",
+          "model": "sonnet",
+          "detail": "Dispatched to ventra-feature (sonnet): validation, preview, approval, regeneration and versioning on top of lib/aimp/factory (read-only); test page /tools/product-review."
+        },
+        {
+          "at": "2026-11-13T17:32:06Z",
+          "level": "Local",
+          "kind": "review",
+          "model": "sonnet",
+          "detail": "ventra-review: approve with nits (no path releases a failed or mismatched version). Rework by ventra-feature (sonnet): atomic store.approveVersion (one approved per product), store-level approval invariant, createVersion rejects duplicate id/number and enforces limit, file route 404 for not_found + x-version-status + session comment, not_in_review for drafts. 16 tests in aimp-products-lifecycle.test.ts. Not re-reviewed."
+        },
+        {
+          "at": "2026-11-13T17:32:06Z",
+          "level": "Local",
+          "kind": "test",
+          "model": "sonnet",
+          "detail": "Coordinator ran in ~/Developer/AIMONEYPRINTER after rework: lint exit 0, typecheck exit 0, npm test 1285 tests, 1279 pass, 0 fail, 1 skipped (qpdf missing), 5 todo. Not browser-checked. Files: lib/aimp/products/{types,store,qa,service,index}.ts, app/tools/product-review/{page.tsx,actions.ts,demo.ts,file/route.ts}, test/aimp-products-lifecycle.test.ts. Follow-ups: approved bytes are re-rendered not stored (fold into AMP-024 private master files); no Supabase store yet; buyer file is the ZIP (A4+Letter+README), regenerate limit 5 (owner to confirm). UNCOMMITTED: AMP-005-D."
+        }
+      ],
       "blocker": null,
       "notes": "",
       "legacy": [
         "aimp-3.2",
         "aimp-3.3"
       ],
-      "model": null
+      "model": "sonnet",
+      "updatedAt": "2026-11-13T17:32:06Z"
     },
     {
       "id": "AMP-023",
@@ -965,13 +1067,17 @@
       "module": "aimp",
       "tier": "P0",
       "owner": "ventra-backend",
-      "state": "queued",
+      "state": "verified",
       "priority": 1,
       "dependsOn": [
         "AMP-003",
         "AMP-004"
       ],
-      "scope": [],
+      "scope": [
+        "apps/web/lib/aimp/sellers/**",
+        "apps/web/app/tools/seller-readiness/**",
+        "apps/web/test/aimp-sellers-*.test.ts"
+      ],
       "acceptance": [
         "Checkout stays disabled until that seller can accept payments. Disconnected and incomplete accounts show the next action."
       ],
@@ -979,18 +1085,43 @@
       "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
       "branch": "aimp/foundation",
       "worktree": "~/Developer/AIMONEYPRINTER",
-      "startedAt": null,
-      "finishedAt": null,
-      "lastRunId": null,
-      "runIds": [],
+      "startedAt": "2026-11-13T17:06:15Z",
+      "finishedAt": "2026-11-13T17:21:41Z",
+      "lastRunId": "c-960d5bfe",
+      "runIds": [
+        "c-960d5bfe"
+      ],
       "commits": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "at": "2026-11-13T17:06:15Z",
+          "level": "Local",
+          "kind": "note",
+          "model": "sonnet",
+          "detail": "Dispatched to ventra-backend (sonnet): Stripe Connect seller readiness on fixtures (no keys, AMP-043-D), checkout gate; test page /tools/seller-readiness."
+        },
+        {
+          "at": "2026-11-13T17:21:41Z",
+          "level": "Local",
+          "kind": "review",
+          "model": "sonnet",
+          "detail": "ventra-review: request changes (gate failed open on unknown provider status, stale-event bypass on non-finite created, register() unvalidated, stale stripe-id mapping). Rework by ventra-backend (sonnet) fixed all; coordinator read gate.ts (allow-list live/test/fixture, try/catch to seller_not_ready) and store.ts (integer created required, validSnapshot on register, old mapping deleted). 14 tests in aimp-sellers-readiness.test.ts."
+        },
+        {
+          "at": "2026-11-13T17:21:41Z",
+          "level": "Local",
+          "kind": "test",
+          "model": "sonnet",
+          "detail": "Same coordinator run: lint 0, typecheck 0, 1269/1263 pass/0 fail. Files: lib/aimp/sellers/{types,readiness,store,connect,gate,money,fixtures,index}.ts, app/tools/seller-readiness/page.tsx, test/aimp-sellers-readiness.test.ts. Fixtures only; no Stripe calls. Follow-ups: merchant_accounts needs details_submitted, disabled_reason, past_due, capability statuses, last_event_created; webhook signature verification required (AMP-043-D); storefront purchaseState should call checkoutGate. UNCOMMITTED: AMP-005-D."
+        }
+      ],
       "blocker": null,
       "notes": "Build against fixtures/mocked Stripe until AMP-043-D.",
       "legacy": [
         "aimp-6.2"
       ],
-      "model": null
+      "model": "sonnet",
+      "updatedAt": "2026-11-13T17:21:41Z"
     },
     {
       "id": "AMP-041",
