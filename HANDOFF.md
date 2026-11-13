@@ -15,17 +15,19 @@ Dylan asked for the mobile app preview link to be sent to him on Telegram. Send 
 
 ## Master Coordinator (auto)
 
-- Last cycle: c-79d5e30f at 2026-11-14 03:25 AWST · 2 dispatched (AMP-041, AMP-034, both Sonnet) + 1 review (approve) · 2 verified locally, 0 committed · 0 new owner blockers
-- Integration branch: agent/develop @ a94d531 (board commit follows). AMP repo: ~/Developer/AIMONEYPRINTER aimp/foundation @ 2085c70 + UNCOMMITTED verified work (now 18 tasks). Coordinator checks: lint 0, typecheck 0, npm test 1508 / 1502 pass / 0 fail / 1 skipped / 5 todo.
-- AMP-005-D re-checked: `cd ~/Developer/AIMONEYPRINTER` is refused (only VENTRA-FEATURES allowed). Not worked around.
+- Last cycle: c-0e5a5416 at 2026-11-14 03:35 AWST · 1 dispatched (AMP-045, Sonnet) + 1 review (PASS) · 1 verified locally, 0 committed · 0 new owner blockers (small cycle: $2.14 cap)
+- Integration branch: agent/develop @ eb68f76 (board commit follows). AMP repo: ~/Developer/AIMONEYPRINTER aimp/foundation + UNCOMMITTED verified work (now 19 tasks). Coordinator checks: lint 0, typecheck 0, npm test 1513 / 1507 pass / 0 fail / 1 skipped / 5 todo.
+- AMP-005-D re-checked: `git -C ~/Developer/AIMONEYPRINTER status` is readable, but `cd` into the repo (needed for ventra-git commit) is still refused. Not worked around.
 - Commit these when AMP-005-D clears (after the lists below, one commit per task):
+  - AMP-045: apps/web/lib/aimp/providers/types.ts apps/web/lib/aimp/providers/fixtures.ts apps/web/lib/aimp/jobs/handlers.ts apps/web/test/aimp-providers-idempotency.test.ts apps/web/test/aimp-jobs-handlers.test.ts (after AMP-060, which created jobs/ and providers/)
+- AMP-045 follow-ups: checkout/service.ts, files/service.ts, factory/generate.ts still call providers without a key; keyed() would cache a rejected promise if a future make() is async; live adapters must forward the key as the vendor idempotency header.
   - AMP-034: apps/web/lib/aimp/storefront/schema.ts apps/web/lib/aimp/site-versions/store.ts apps/web/test/aimp-site-versions-rework.test.ts (after AMP-030, AMP-031, AMP-032, which share these files)
   - AMP-041: apps/web/lib/aimp/orders/ apps/web/lib/aimp/checkout/ apps/web/app/api/aimp/checkout/ apps/web/app/api/aimp/webhooks/ apps/web/app/tools/aimp-checkout/ apps/web/test/aimp-checkout-service.test.ts apps/web/test/aimp-orders-paid.test.ts (after AMP-023, AMP-024, AMP-040)
 - AMP-041 follow-ups: orders + payment_events migration (unique (workspace_id, listing_id, idempotency_key), unique checkout_session_id, event_id PK, conditional pending→paid update); store directory is a demo table (resolve from published site version later); review lows: failed order not retryable with same key, replay does not compare buyerEmail, in-memory growth, body cap counts chars. AMP-042 can use checkout.onOrderPaid / isDeliverable / createOrderBook.
 - Running / implemented (needs reconciling next cycle): none.
-- Blocked, needs the owner: AMP-005-D (add ~/Developer/AIMONEYPRINTER as an allowed directory for coordinator cycles; 18 verified tasks waiting), AMP-043-D Stripe test keys, AMP-052-D Pinterest app.
-- Leftover temp files (safe to delete, not committed): docs/agents/.cycle-c79d*.{mjs,json,jq} plus older .cycle-* files.
-- Next up: commit the 18 tasks; then AMP-042 (fulfilment, now unblocked by AMP-041), AMP-050, AMP-053, AMP-045, AMP-061, AMP-062.
+- Blocked, needs the owner: AMP-005-D (add ~/Developer/AIMONEYPRINTER as an allowed directory for coordinator cycles; 19 verified tasks waiting), AMP-043-D Stripe test keys, AMP-052-D Pinterest app.
+- Leftover temp files (safe to delete, not committed): docs/agents/.cycle-c0e5.mjs, .cycle-c79d*.{mjs,json,jq} plus older .cycle-* files.
+- Next up: commit the 19 tasks; then AMP-042 (fulfilment, unblocked by AMP-041), AMP-050, AMP-053, AMP-061, AMP-062.
 
 ### Previous cycle c-712dc75a
 
@@ -340,10 +342,10 @@ Tracker Phase 0: 0.1 scope freeze, 0.2 orchestrator, 0.3 lead store + state mach
 ## Git state (auto)
 
 <!-- git-state:start -->
-_Generated 2026-11-14 02:52 by `ventra-handoff snapshot`. Do not hand-edit this block._
+_Generated 2026-11-14 03:16 by `ventra-handoff snapshot`. Do not hand-edit this block._
 - Branch: `agent/develop`
-- HEAD: `a94d531 chore(coordinator): cycle c-712dc75a board and handoff; AMP-023, AMP-032, AMP-060 verified locally (Sonnet, reviewed, reworked, 1487 tests 0 fail), held uncommitted in the AMP repo by AMP-005-D; follow-ups AMP-034, AMP-045`
-- Lock: coordinator (pid 20686, 10 min old)
+- HEAD: `eb68f76 chore(coordinator): cycle c-79d5e30f board and handoff; AMP-041 checkout/orders and AMP-034 slug rule verified locally (Sonnet, reviewed, 1508 tests 0 fail), held uncommitted in the AMP repo by AMP-005-D`
+- Lock: coordinator (pid 34970, 4 min old)
 - Uncommitted changes:
 ```text
  M HANDOFF.md
@@ -355,6 +357,7 @@ _Generated 2026-11-14 02:52 by `ventra-handoff snapshot`. Do not hand-edit this 
  M scripts/agents/ventra-coord
  M scripts/agents/ventra-coordinator
  M scripts/agents/ventra-master
+?? docs/agents/.cycle-c0e5.mjs
 ?? docs/agents/.cycle-c712-1.json
 ?? docs/agents/.cycle-c712-2.json
 ?? docs/agents/.cycle-c712-3.json
@@ -386,24 +389,24 @@ _Generated 2026-11-14 02:52 by `ventra-handoff snapshot`. Do not hand-edit this 
 ```
 - Diff stat vs HEAD:
 ```text
- HANDOFF.md                        |  14 +++++
- README.md                         |   2 +
- docs/agents/AIMP_BOARD.json       | 126 ++++++++++++++++++++++++++++++--------
- docs/agents/COORDINATOR.md        |  46 +++++++++++++-
- docs/agents/STATUS.md             |   2 +
- docs/agents/TASKS.md              |   3 +-
- scripts/agents/ventra-coord       |   6 ++
- scripts/agents/ventra-coordinator |  33 ++++++----
- scripts/agents/ventra-master      |   3 +-
- 9 files changed, 192 insertions(+), 43 deletions(-)
+ HANDOFF.md                        | 14 ++++----
+ README.md                         |  2 ++
+ docs/agents/AIMP_BOARD.json       | 72 +++++++++++++++++++++++++++++++--------
+ docs/agents/COORDINATOR.md        | 46 ++++++++++++++++++++++++-
+ docs/agents/STATUS.md             |  2 ++
+ docs/agents/TASKS.md              |  2 +-
+ scripts/agents/ventra-coord       |  6 ++++
+ scripts/agents/ventra-coordinator | 33 +++++++++++-------
+ scripts/agents/ventra-master      |  3 +-
+ 9 files changed, 144 insertions(+), 36 deletions(-)
 ```
 - Recent commits:
 ```text
+eb68f76 chore(coordinator): cycle c-79d5e30f board and handoff; AMP-041 checkout/orders and AMP-034 slug rule verified locally (Sonnet, reviewed, 1508 tests 0 fail), held uncommitted in the AMP repo by AMP-005-D
 a94d531 chore(coordinator): cycle c-712dc75a board and handoff; AMP-023, AMP-032, AMP-060 verified locally (Sonnet, reviewed, reworked, 1487 tests 0 fail), held uncommitted in the AMP repo by AMP-005-D; follow-ups AMP-034, AMP-045
 d03c51c chore(coordinator): cycle c-f428b679 board and handoff; AMP-020, AMP-024, AMP-031 verified locally (Sonnet, reviewed, reworked, 1376 tests 0 fail), held uncommitted in the AMP repo by AMP-005-D
 8e55095 chore(coordinator): cycle c-960d5bfe board and handoff; AMP-013, AMP-021, AMP-040, AMP-022 verified locally (Sonnet, reviewed, 1285 tests 0 fail), held uncommitted in the AMP repo by AMP-005-D
 a4a22e0 chore(coordinator): cycle c-a7fe8df1 board and handoff; AMP-004, AMP-011, AMP-012, AMP-010 verified locally (Sonnet, reviewed, 1212 tests 0 fail), held uncommitted in the AMP repo by AMP-005-D
-8cff670 chore(coordinator): cycle c-aa359f36 board and handoff; AiMoneyPrinter only: AMP-001/001-D done, AMP-003/030 verified (uncommitted in AMP repo, AMP-005-D), VENTRA queued tasks deferred, AMP audit added
 ```
 <!-- git-state:end -->
 

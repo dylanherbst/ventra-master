@@ -2,7 +2,7 @@
   "version": 1,
   "project": "aimp",
   "app": "aimoneyprinter",
-  "updatedAt": "2026-11-13T19:25:00Z",
+  "updatedAt": "2026-11-13T19:16:33.316Z",
   "integrationBranch": "aimp/foundation",
   "worktree": "~/Developer/AIMONEYPRINTER",
   "codingModel": "sonnet",
@@ -54,10 +54,10 @@
     }
   ],
   "lastRun": {
-    "id": "c-79d5e30f",
-    "startedAt": "2026-11-13T18:41:57Z",
-    "endedAt": "2026-11-13T19:25:00Z",
-    "summary": "AMP-041 and AMP-034 verified locally (Sonnet; AMP-041 reviewed APPROVE); 1508 tests 0 fail; held uncommitted in the AMP repo by AMP-005-D"
+    "id": "c-0e5a5416",
+    "startedAt": "2026-11-13T19:11:57Z",
+    "endedAt": "2026-11-13T19:16:33.316Z",
+    "summary": "AMP-045 provider idempotency keys verified locally (Sonnet, reviewed PASS, 1513 tests 0 fail); held uncommitted by AMP-005-D."
   },
   "tasks": [
     {
@@ -2586,7 +2586,7 @@
       "owner": "ventra-web-design"
     },
     {
-      "state": "queued",
+      "state": "verified",
       "priority": 1,
       "dependsOn": [
         "AMP-060"
@@ -2602,20 +2602,64 @@
       ],
       "branch": "aimp/foundation",
       "worktree": "/Users/dylan/Developer/AIMONEYPRINTER",
-      "startedAt": null,
-      "finishedAt": null,
-      "lastRunId": "c-712dc75a",
+      "startedAt": "2026-11-13T19:20:00Z",
+      "finishedAt": "2026-11-13T19:16:33.316Z",
+      "lastRunId": "c-0e5a5416",
       "runIds": [
-        "c-712dc75a"
+        "c-712dc75a",
+        "c-0e5a5416"
       ],
       "commits": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "at": "2026-11-13T19:16:33.316Z",
+          "kind": "diff",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "ventra-backend (Sonnet) changed providers/types.ts (IdempotencyOptions, optional idempotencyKey on llm.generate, payments.createCheckoutSession/completeSession, email.send, storage.put, social.queuePost, domains.provision), providers/fixtures.ts (keyed() dedupe helper per adapter), jobs/handlers.ts (passes step key to llm/storage/email/social); new test/aimp-providers-idempotency.test.ts; test/aimp-jobs-handlers.test.ts one assertion 2->1 email (reviewed: legitimate, still asserts duplicateKeys) plus crash-before-checkpoint test. Files untracked in AMP repo, read directly."
+        },
+        {
+          "at": "2026-11-13T19:16:33.316Z",
+          "kind": "test",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "coordinator ran npm --prefix ~/Developer/AIMONEYPRINTER/apps/web test: exit 0, 1513 tests, 1507 pass, 0 fail, 1 skipped, 5 todo (was 1508 tests last cycle; +5 new)."
+        },
+        {
+          "at": "2026-11-13T19:16:33.316Z",
+          "kind": "typecheck",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "coordinator ran npm --prefix ~/Developer/AIMONEYPRINTER/apps/web run typecheck: exit 0."
+        },
+        {
+          "at": "2026-11-13T19:16:33.316Z",
+          "kind": "lint",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "coordinator ran npm --prefix ~/Developer/AIMONEYPRINTER/apps/web run lint (--max-warnings 0): exit 0."
+        },
+        {
+          "at": "2026-11-13T19:16:33.316Z",
+          "kind": "review",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "ventra-review (Sonnet): PASS, no defects. Notes: keyed() would cache a rejected promise if a future make() is async (add comment then); real vendor adapters may want to reject key reuse with different input."
+        },
+        {
+          "at": "2026-11-13T19:16:33.316Z",
+          "kind": "note",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "Held uncommitted in the AMP repo by AMP-005-D (commit files: apps/web/lib/aimp/providers/types.ts, apps/web/lib/aimp/providers/fixtures.ts, apps/web/lib/aimp/jobs/handlers.ts, apps/web/test/aimp-providers-idempotency.test.ts, apps/web/test/aimp-jobs-handlers.test.ts). Follow-up: checkout/service.ts, files/service.ts, factory/generate.ts still call providers without a key."
+        }
+      ],
       "blocker": null,
-      "notes": "From AMP-060 review (c-712dc75a): runner is at-least-once with stable keys; exactly-once needs providers to dedupe by key.",
-      "model": null,
+      "notes": "From AMP-060 review (c-712dc75a): runner is at-least-once with stable keys; exactly-once needs providers to dedupe by key. c-0e5a5416: verified locally; follow-up for non-job call sites (checkout, files, factory) to pass keys.",
+      "model": "sonnet",
       "verifyLevel": "local",
       "createdAt": "2026-11-13T18:45:00Z",
-      "updatedAt": "2026-11-13T18:45:00Z",
+      "updatedAt": "2026-11-13T19:16:33.316Z",
       "id": "AMP-045",
       "title": "Provider idempotency keys: every side-effecting provider adapter (llm generate, email send, social queuePost, storage) accepts and forwards an idempotency key; jobs handlers pass the per-step key",
       "owner": "ventra-backend"
