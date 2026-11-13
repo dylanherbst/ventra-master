@@ -65,3 +65,18 @@ the AI, books an appointment, and a real test booking + call record exist.
 
 **Report:** the next cycle summary covers the brief's "Required report" list (reused code, assignments, research,
 implemented, interactive tests, lab URLs, routes/contracts, commits, blockers, keys/approvals, next tasks).
+
+### 2026-11-13 20:55 AWST — VENTRA archived; AiMoneyPrinter only (status: handled c-aa359f36)
+
+Owner decision: **VENTRA is archived. Work only on Workstream E (AiMoneyPrinter).**
+- Workstreams A (Setter/Receptionist), B (owner UI), C (marketing) and D (website & store) are paused. Do not dispatch
+  any A-, W-, M- or other VENTRA task. Move every queued/running VENTRA task on `TASK_BOARD.json` and
+  `WEBSITE_BOARD.json` to `deferred` with note "VENTRA archived 2026-11-13" (keep ids, commits and evidence).
+- All task slots and the whole daily budget go to `AIMP_BOARD.json`. Keep every AMP coding job on Sonnet.
+- **AMP-001-D is resolved:** `~/Developer/AIMONEYPRINTER` is now its own git repository (normal `.git` directory,
+  branch `aimp/foundation`, commit 8ce30e5 "AiMoneyPrinter becomes its own repository" contains all work that was
+  held uncommitted, including AMP-003/012/030). It is no longer a VENTRA-CLEAN worktree. Mark AMP-001-D done, let
+  git/ventra-git run there again, and commit AMP work inside that repo (`ventra-git` from that directory;
+  `VENTRA_REPO=~/Developer/AIMONEYPRINTER ventra-verify` for checks). It has no remote yet (GitHub token pending).
+- Do not edit `~/Developer/VENTRA-CLEAN` or its worktree list. Full VENTRA backup:
+  `~/Backups/ventra/ventra-archive-2026-11-13.bundle`.

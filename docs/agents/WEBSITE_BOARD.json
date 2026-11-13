@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-10T17:28:06.836Z",
+  "updatedAt": "2026-11-13T16:15:00Z",
   "project": "website",
   "integrationBranch": "frontend/website-ui",
   "worktree": "~/Developer/VENTRA-WEBSITE",
@@ -141,7 +141,7 @@
       "phase": 4,
       "module": "website",
       "owner": "ventra-web-design",
-      "state": "queued",
+      "state": "deferred", "deferredNote": "VENTRA archived 2026-11-13 (c-aa359f36)",
       "priority": 1,
       "dependsOn": [
         "W-1"
@@ -173,7 +173,7 @@
       "phase": 4,
       "module": "website",
       "owner": "ventra-web-design",
-      "state": "queued",
+      "state": "deferred", "deferredNote": "VENTRA archived 2026-11-13 (c-aa359f36)",
       "priority": 2,
       "dependsOn": [
         "W-1"
@@ -202,7 +202,7 @@
       "phase": 4,
       "module": "website",
       "owner": "ventra-web-design",
-      "state": "queued",
+      "state": "deferred", "deferredNote": "VENTRA archived 2026-11-13 (c-aa359f36)",
       "priority": 2,
       "dependsOn": [
         "W-1"
@@ -231,7 +231,7 @@
       "phase": 4,
       "module": "website",
       "owner": "ventra-web-design",
-      "state": "queued",
+      "state": "deferred", "deferredNote": "VENTRA archived 2026-11-13 (c-aa359f36)",
       "priority": 2,
       "dependsOn": [
         "W-1"
@@ -260,7 +260,7 @@
       "phase": 4,
       "module": "website",
       "owner": "ventra-web-design",
-      "state": "queued",
+      "state": "deferred", "deferredNote": "VENTRA archived 2026-11-13 (c-aa359f36)",
       "priority": 2,
       "dependsOn": [
         "W-1"
@@ -289,7 +289,7 @@
       "phase": 4,
       "module": "website",
       "owner": "ventra-web-design",
-      "state": "queued",
+      "state": "deferred", "deferredNote": "VENTRA archived 2026-11-13 (c-aa359f36)",
       "priority": 2,
       "dependsOn": [
         "W-1"
@@ -318,7 +318,7 @@
       "phase": 4,
       "module": "website",
       "owner": "ventra-store",
-      "state": "queued",
+      "state": "deferred", "deferredNote": "VENTRA archived 2026-11-13 (c-aa359f36)",
       "priority": 2,
       "dependsOn": [
         "W-1"
@@ -349,7 +349,7 @@
       "phase": 4,
       "module": "website",
       "owner": "ventra-store",
-      "state": "queued",
+      "state": "deferred", "deferredNote": "VENTRA archived 2026-11-13 (c-aa359f36)",
       "priority": 2,
       "dependsOn": [
         "W-8"
@@ -379,7 +379,7 @@
       "phase": 4,
       "module": "website",
       "owner": "ventra-store",
-      "state": "queued",
+      "state": "deferred", "deferredNote": "VENTRA archived 2026-11-13 (c-aa359f36)",
       "priority": 2,
       "dependsOn": [
         "W-9"
@@ -414,7 +414,7 @@
       "phase": 4,
       "module": "website",
       "owner": "ventra-store",
-      "state": "queued",
+      "state": "deferred", "deferredNote": "VENTRA archived 2026-11-13 (c-aa359f36)",
       "priority": 2,
       "dependsOn": [
         "W-1"
@@ -447,7 +447,7 @@
       "phase": 4,
       "module": "website",
       "owner": "ventra-marketing",
-      "state": "queued",
+      "state": "deferred", "deferredNote": "VENTRA archived 2026-11-13 (c-aa359f36)",
       "priority": 3,
       "dependsOn": [
         "W-1"
@@ -476,7 +476,7 @@
       "phase": 4,
       "module": "website",
       "owner": "ventra-marketing",
-      "state": "queued",
+      "state": "deferred", "deferredNote": "VENTRA archived 2026-11-13 (c-aa359f36)",
       "priority": 3,
       "dependsOn": [
         "W-2"
@@ -508,7 +508,7 @@
       "phase": 4,
       "module": "website",
       "owner": "ventra-qa",
-      "state": "queued",
+      "state": "deferred", "deferredNote": "VENTRA archived 2026-11-13 (c-aa359f36)",
       "priority": 3,
       "dependsOn": [
         "W-2",
@@ -536,7 +536,7 @@
       "phase": 4,
       "module": "website",
       "owner": "ventra-store",
-      "state": "queued",
+      "state": "deferred", "deferredNote": "VENTRA archived 2026-11-13 (c-aa359f36)",
       "priority": 3,
       "dependsOn": [
         "W-1"

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-12T20:55:00Z",
+  "updatedAt": "2026-11-13T16:15:00Z",
   "integrationBranch": "agent/develop",
   "lastRun": {
     "id": "c-ceead848",
@@ -1038,7 +1038,7 @@
     },
     {
       "id": "A-3",
-      "title": "Setter Test Lab /tools/setter-lab: isolated page on the real chat service — type a customer message, see the AI reply (scripted model when no key), the qualification decisions and extracted needs, the CRM contact/lead record written, the follow-up plan, and a simulated booking through the shared permission check",
+      "title": "Setter Test Lab /tools/setter-lab: isolated page on the real chat service \u2014 type a customer message, see the AI reply (scripted model when no key), the qualification decisions and extracted needs, the CRM contact/lead record written, the follow-up plan, and a simulated booking through the shared permission check",
       "phase": 1,
       "module": "setter",
       "owner": "ventra-feature",
@@ -1090,7 +1090,7 @@
         {
           "at": "2026-11-09T21:09:00.000Z",
           "kind": "review",
-          "detail": "ventra-review FAIL: blocker — anonymous server-action POST with model:'real' could run the paid Anthropic model with no auth or rate limit; minors: state size caps, answers key allowlist, lab gate() wrapper could mislead (production setter/agent.ts does not call gate()). Sent back once."
+          "detail": "ventra-review FAIL: blocker \u2014 anonymous server-action POST with model:'real' could run the paid Anthropic model with no auth or rate limit; minors: state size caps, answers key allowlist, lab gate() wrapper could mislead (production setter/agent.ts does not call gate()). Sent back once."
         },
         {
           "at": "2026-11-09T21:18:00.000Z",
@@ -1114,7 +1114,7 @@
     },
     {
       "id": "A-4",
-      "title": "Receptionist Test Lab /tools/receptionist-lab: run a simulated inbound call through the real Receptionist turn pipeline with Vapi-shaped fixtures — caller says X, see transcript, tool actions (availability, book, reschedule, cancel, transfer, message), mode enforcement, CRM/call record written; placeholder for the real test call",
+      "title": "Receptionist Test Lab /tools/receptionist-lab: run a simulated inbound call through the real Receptionist turn pipeline with Vapi-shaped fixtures \u2014 caller says X, see transcript, tool actions (availability, book, reschedule, cancel, transfer, message), mode enforcement, CRM/call record written; placeholder for the real test call",
       "phase": 1,
       "module": "receptionist",
       "owner": "ventra-voice",
@@ -1177,7 +1177,7 @@
     },
     {
       "id": "A-5",
-      "title": "Connections inventory for the front office: website chat, Instagram/Messenger (Meta), WhatsApp Business, Vapi telephony webhooks, Google Calendar OAuth, Twilio SMS, Postmark — configured vs verified (harmless checks only), webhook URLs and verification steps, what the owner must create/approve, platform messaging rules",
+      "title": "Connections inventory for the front office: website chat, Instagram/Messenger (Meta), WhatsApp Business, Vapi telephony webhooks, Google Calendar OAuth, Twilio SMS, Postmark \u2014 configured vs verified (harmless checks only), webhook URLs and verification steps, what the owner must create/approve, platform messaging rules",
       "phase": 1,
       "module": "platform",
       "owner": "ventra-setup",
@@ -1267,7 +1267,7 @@
       "phase": 1,
       "module": "receptionist",
       "owner": "ventra-voice",
-      "state": "queued",
+      "state": "deferred", "deferredNote": "VENTRA archived 2026-11-13 (c-aa359f36)",
       "priority": 2,
       "dependsOn": [
         "A-2",
@@ -1487,7 +1487,7 @@
       "phase": 1,
       "module": "setter",
       "owner": "ventra-setup",
-      "state": "queued",
+      "state": "deferred", "deferredNote": "VENTRA archived 2026-11-13 (c-aa359f36)",
       "priority": 3,
       "dependsOn": [
         "A-5",
@@ -1568,7 +1568,7 @@
       "phase": 1,
       "module": "receptionist",
       "owner": "ventra-voice",
-      "state": "queued",
+      "state": "deferred", "deferredNote": "VENTRA archived 2026-11-13 (c-aa359f36)",
       "priority": 4,
       "dependsOn": [
         "A-4",
@@ -1771,7 +1771,7 @@
       "phase": 1,
       "module": "marketing",
       "owner": "ventra-marketing",
-      "state": "queued",
+      "state": "deferred", "deferredNote": "VENTRA archived 2026-11-13 (c-aa359f36)",
       "priority": 2,
       "dependsOn": [
         "M-0"
@@ -3778,7 +3778,7 @@
         {
           "at": "2026-11-11T16:45:00Z",
           "kind": "note",
-          "detail": "Follow-up (not a task yet): owner note for an opted-out contact still says 'Meta 24h window closed, reply from the app' — misleading wording in lib/front-office/pending-actions.ts / jobs.ts. Behaviour is correct (fails safe)."
+          "detail": "Follow-up (not a task yet): owner note for an opted-out contact still says 'Meta 24h window closed, reply from the app' \u2014 misleading wording in lib/front-office/pending-actions.ts / jobs.ts. Behaviour is correct (fails safe)."
         }
       ],
       "blocker": null,
@@ -4797,7 +4797,7 @@
       "phase": "A",
       "module": "receptionist",
       "owner": "ventra-voice",
-      "state": "queued",
+      "state": "deferred", "deferredNote": "VENTRA archived 2026-11-13 (c-aa359f36)",
       "priority": 1,
       "dependsOn": [
         "A-14"
@@ -6220,6 +6220,293 @@
       "blocker": null,
       "notes": "Also consider: lab-usage MODEL_PRICES lacks Claude 5.x ids (lib/front-office/lab-usage.ts, separate task if changed).",
       "updatedAt": "2026-11-12T20:55:00Z"
+    },
+    {
+      "phase": 1,
+      "module": "platform",
+      "priority": 1,
+      "branch": null,
+      "worktree": "~/Developer/VENTRA-DASHBOARD",
+      "startedAt": "2026-11-13T11:46:44Z",
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "plan": "Owner request 13 Nov: Telegram \u2194 Orchestrator (Chief of Staff)",
+      "id": "O-1",
+      "title": "Telegram long-polling worker for the Orchestrator (Chief of Staff): status answers, project-checked instructions via Coordinator controls, Needs Dylan alerts, LaunchAgent supervision",
+      "owner": "ventra-devops",
+      "state": "implemented",
+      "dependsOn": [],
+      "scope": [
+        "~/Developer/VENTRA-DASHBOARD/telegram/**",
+        "~/Developer/VENTRA-DASHBOARD/src/telegram.mjs",
+        "~/Developer/VENTRA-DASHBOARD/public/js/views/orchestrator.js"
+      ],
+      "acceptance": [
+        "With the dashboard window closed, a status request in Telegram returns the right app and task IDs",
+        "A test Needs Dylan blocker arrives as an alert while independent work continues",
+        "Worker restart and a simulated outage reconnect; replaying an update creates no second job",
+        "Status visible at http://127.0.0.1:4177/#/orchestrator?tab=telegram"
+      ],
+      "evidence": [
+        {
+          "at": "2026-11-13T11:46:44Z",
+          "kind": "test",
+          "level": "local",
+          "model": "claude-sonnet (implementation and tests)",
+          "detail": "npm test in VENTRA-DASHBOARD: 135/135 pass (20 new telegram tests: allowlist, status with app+task IDs, project question, replay dedupe, command ledger, reconnect/backoff, restart recovery of queued alert, alert dedupe, offline answers from stored records, token never persisted, simulated outage, alert digest, display ids, restart endpoint, test alert)."
+        }
+      ],
+      "blocker": null,
+      "notes": "Live verification waits for O-1-D."
+    },
+    {
+      "phase": 1,
+      "module": "platform",
+      "priority": 1,
+      "branch": null,
+      "worktree": "~/Developer/VENTRA-DASHBOARD",
+      "startedAt": "2026-11-13T11:46:44Z",
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "plan": "Owner request 13 Nov: Telegram \u2194 Orchestrator (Chief of Staff)",
+      "id": "O-1-D",
+      "title": "Run the Orchestrator Mac setup (Telegram worker, global Chief of Staff connector, dashboard restart)",
+      "owner": "owner",
+      "state": "blocked",
+      "dependsOn": [],
+      "scope": [],
+      "acceptance": [
+        "Orchestrator \u2192 Telegram shows Connected"
+      ],
+      "evidence": [],
+      "blocker": {
+        "owner": true,
+        "reason": "Installing a LaunchAgent and restarting the dashboard need Terminal on the Mac; agents cannot type there. Two Claude Telegram plugin sessions are polling the bot, and Telegram allows only one poller.",
+        "action": "Close the Claude sessions running the Telegram plugin (ventra-master windows), then run in Terminal: cd ~/Developer/VENTRA-DASHBOARD && bash orchestrator/setup-mac.sh",
+        "where": "Terminal on the Mac mini",
+        "unlocks": "O-1 live Telegram checks and ORCH-01 (Chief of Staff in every Claude Code folder, verified from AIMONEYPRINTER, VENTRA-FEATURES and a non-repo folder)",
+        "continuing": "ORCH-02 hub code and tests (done locally); AMP-003 at the next Coordinator cycle"
+      },
+      "notes": ""
+    },
+    {
+      "phase": 1,
+      "module": "platform",
+      "priority": 1,
+      "branch": null,
+      "worktree": "~/Developer/VENTRA-DASHBOARD",
+      "startedAt": "2026-11-13T12:08:01Z",
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "plan": "Owner request 13 Nov: Chief of Staff everywhere (ORCH-01..04)",
+      "notes": "",
+      "blocker": null,
+      "scope": [
+        "~/Developer/VENTRA-DASHBOARD/orchestrator/**",
+        "~/Developer/VENTRA-DASHBOARD/mcp/**",
+        "~/Developer/VENTRA-DASHBOARD/hub/**"
+      ],
+      "id": "ORCH-01",
+      "title": "Chief of Staff MCP connector at Claude Code user scope (works from any folder)",
+      "owner": "ventra-devops",
+      "state": "implemented",
+      "dependsOn": [],
+      "acceptance": [
+        "claude mcp get chief-of-staff connected from AIMONEYPRINTER, VENTRA-FEATURES and a non-repo folder",
+        "status tool names app + task IDs"
+      ],
+      "evidence": [
+        {
+          "at": "2026-11-13T12:08:01Z",
+          "kind": "test",
+          "level": "local",
+          "model": "claude-sonnet (implementation and tests)",
+          "detail": "npm test 155/155 (stdio server spawned from os.tmpdir(): 5 tools, status with AiMoneyPrinter + AMP ids, ambiguous instruction asks, retried request_id \u2192 one command). mcp/probe.mjs run from /tmp in the VM: initialize + tools/list OK."
+        }
+      ]
+    },
+    {
+      "phase": 1,
+      "module": "platform",
+      "priority": 1,
+      "branch": null,
+      "worktree": "~/Developer/VENTRA-DASHBOARD",
+      "startedAt": "2026-11-13T12:08:01Z",
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "plan": "Owner request 13 Nov: Chief of Staff everywhere (ORCH-01..04)",
+      "notes": "",
+      "blocker": null,
+      "scope": [
+        "~/Developer/VENTRA-DASHBOARD/orchestrator/**",
+        "~/Developer/VENTRA-DASHBOARD/mcp/**",
+        "~/Developer/VENTRA-DASHBOARD/hub/**"
+      ],
+      "id": "ORCH-02",
+      "title": "Authenticated HTTPS Chief of Staff hub on an always-on host + Mac worker check-in/queue",
+      "owner": "ventra-devops",
+      "state": "implemented",
+      "dependsOn": [],
+      "acceptance": [
+        "OAuth-protected /mcp works in claude.ai Connectors",
+        "Mac offline \u2192 status shows last check-in timestamp and Mac jobs stay queued",
+        "reconnect/retry never starts a job twice"
+      ],
+      "evidence": [
+        {
+          "at": "2026-11-13T12:08:01Z",
+          "kind": "test",
+          "level": "local",
+          "model": "claude-sonnet (implementation and tests)",
+          "detail": "npm test: full OAuth flow (DCR allowlist, owner-code lockout, PKCE, refresh), 401 + resource_metadata, agent key check, offline labelling, single dispatch + idempotent ack, Mac agent exactly-once across restart. Local smoke: hub/server.mjs healthz OK, /mcp 401 with resource_metadata, OAuth metadata served."
+        }
+      ]
+    },
+    {
+      "phase": 1,
+      "module": "platform",
+      "priority": 1,
+      "branch": null,
+      "worktree": "~/Developer/VENTRA-DASHBOARD",
+      "startedAt": "2026-11-13T12:08:01Z",
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "plan": "Owner request 13 Nov: Chief of Staff everywhere (ORCH-01..04)",
+      "notes": "",
+      "blocker": null,
+      "scope": [
+        "~/Developer/VENTRA-DASHBOARD/orchestrator/**",
+        "~/Developer/VENTRA-DASHBOARD/mcp/**",
+        "~/Developer/VENTRA-DASHBOARD/hub/**"
+      ],
+      "id": "ORCH-03",
+      "title": "Same controls in Claude and Telegram: blocking / ready to test / project instructions incl. queue_next with Sonnet, channel recorded",
+      "owner": "ventra-devops",
+      "state": "implemented",
+      "dependsOn": [],
+      "acceptance": [
+        "Same task IDs from Claude, Telegram and dashboard",
+        "localhost links labelled",
+        "instructions go through Coordinator controls with channel recorded"
+      ],
+      "evidence": [
+        {
+          "at": "2026-11-13T12:08:01Z",
+          "kind": "test",
+          "level": "local",
+          "model": "claude-sonnet (implementation and tests)",
+          "detail": "npm test: one snapshot \u2192 identical task IDs via Telegram formatter, local MCP and hub MCP; localhost links labelled; ledger + owner-note marker record the channel; queue_next reports cap refusal and keeps the task queued."
+        }
+      ]
+    },
+    {
+      "phase": 1,
+      "module": "platform",
+      "priority": 1,
+      "branch": null,
+      "worktree": "~/Developer/VENTRA-DASHBOARD",
+      "startedAt": "2026-11-13T12:08:01Z",
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "plan": "Owner request 13 Nov: Chief of Staff everywhere (ORCH-01..04)",
+      "notes": "",
+      "blocker": null,
+      "scope": [
+        "~/Developer/VENTRA-DASHBOARD/orchestrator/**",
+        "~/Developer/VENTRA-DASHBOARD/mcp/**",
+        "~/Developer/VENTRA-DASHBOARD/hub/**"
+      ],
+      "id": "ORCH-04",
+      "title": "Live verification: unrelated folder, other device, dashboard closed, Mac offline queueing, same task across channels after reconnect",
+      "owner": "ventra-qa",
+      "state": "deferred", "deferredNote": "VENTRA archived 2026-11-13 (c-aa359f36)",
+      "dependsOn": [
+        "O-1-D",
+        "ORCH-02-D"
+      ],
+      "acceptance": [
+        "Results recorded with the connector setup"
+      ],
+      "evidence": []
+    },
+    {
+      "phase": 1,
+      "module": "platform",
+      "priority": 1,
+      "branch": null,
+      "worktree": "~/Developer/VENTRA-DASHBOARD",
+      "startedAt": "2026-11-13T12:08:01Z",
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "plan": "Owner request 13 Nov: Chief of Staff everywhere (ORCH-01..04)",
+      "notes": "",
+      "blocker": {
+        "owner": true,
+        "reason": "An always-on host costs money and needs your account; agents never sign up or spend.",
+        "action": "Approve a host (recommended: Render web service from hub/render.yaml with a 1 GB disk, paid plan; price shown before you confirm). Create it in your Render account, set HUB_OWNER_CODE and HUB_AGENT_KEY as secret env vars (generate each with: openssl rand -hex 24), then put {\"url\":\"<service URL>\",\"agentKey\":\"<HUB_AGENT_KEY>\"} in ~/.ventra-dashboard/hub.json (chmod 600) and re-run orchestrator/setup-mac.sh. Or tell the Coordinator to deploy it for you once approved.",
+        "where": "dashboard.render.com \u2192 New \u2192 Blueprint (repo with hub/render.yaml) \u2014 steps in ~/Developer/VENTRA-DASHBOARD/hub/README.md",
+        "unlocks": "ORCH-02 live, ORCH-02-D2 Claude connector, status and instructions while the Mac sleeps",
+        "continuing": "Local connector (ORCH-01), Telegram (O-1), AiMoneyPrinter AMP-003"
+      },
+      "scope": [
+        "~/Developer/VENTRA-DASHBOARD/orchestrator/**",
+        "~/Developer/VENTRA-DASHBOARD/mcp/**",
+        "~/Developer/VENTRA-DASHBOARD/hub/**"
+      ],
+      "id": "ORCH-02-D",
+      "title": "Authorise always-on hosting for the Chief of Staff hub (paid)",
+      "owner": "owner",
+      "state": "blocked",
+      "dependsOn": [],
+      "acceptance": [
+        "Hub URL answers /healthz"
+      ],
+      "evidence": []
+    },
+    {
+      "phase": 1,
+      "module": "platform",
+      "priority": 1,
+      "branch": null,
+      "worktree": "~/Developer/VENTRA-DASHBOARD",
+      "startedAt": "2026-11-13T12:08:01Z",
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "plan": "Owner request 13 Nov: Chief of Staff everywhere (ORCH-01..04)",
+      "notes": "When the hub is live: claude.ai \u2192 Settings \u2192 Connectors \u2192 Add custom connector \u2192 name Chief of Staff, URL <hub URL>/mcp \u2192 Connect \u2192 enter your owner code. Unlocks ORCH-04 other-device checks.",
+      "blocker": null,
+      "scope": [
+        "~/Developer/VENTRA-DASHBOARD/orchestrator/**",
+        "~/Developer/VENTRA-DASHBOARD/mcp/**",
+        "~/Developer/VENTRA-DASHBOARD/hub/**"
+      ],
+      "id": "ORCH-02-D2",
+      "title": "Add the Chief of Staff connector in Claude (phone, browser, other computers)",
+      "owner": "owner",
+      "state": "deferred", "deferredNote": "VENTRA archived 2026-11-13 (c-aa359f36)",
+      "dependsOn": [
+        "ORCH-02-D"
+      ],
+      "acceptance": [
+        "Chief of Staff tools appear in Claude on the phone"
+      ],
+      "evidence": []
     }
   ]
 }

@@ -1,0 +1,1932 @@
+{
+  "version": 1,
+  "project": "aimp",
+  "app": "aimoneyprinter",
+  "updatedAt": "2026-11-13T16:15:00Z",
+  "integrationBranch": "aimp/foundation",
+  "worktree": "~/Developer/AIMONEYPRINTER",
+  "codingModel": "sonnet",
+  "phases": [
+    {
+      "id": "f",
+      "title": "Foundation and reuse",
+      "tier": "launch"
+    },
+    {
+      "id": "o",
+      "title": "Onboarding, ideas and business selection",
+      "tier": "launch"
+    },
+    {
+      "id": "b",
+      "title": "Brand and product creation",
+      "tier": "launch"
+    },
+    {
+      "id": "w",
+      "title": "In-house website builder and multi-tenant publishing",
+      "tier": "launch"
+    },
+    {
+      "id": "p",
+      "title": "Payments, orders and automatic delivery",
+      "tier": "launch"
+    },
+    {
+      "id": "m",
+      "title": "Organic marketing and lead capture",
+      "tier": "launch"
+    },
+    {
+      "id": "a",
+      "title": "Autopilot, operations and release",
+      "tier": "launch"
+    },
+    {
+      "id": "p1",
+      "title": "P1 \u00b7 After the first store works end to end",
+      "tier": "backlog"
+    },
+    {
+      "id": "p2",
+      "title": "P2 \u00b7 Expansion backlog",
+      "tier": "backlog"
+    }
+  ],
+  "lastRun": {
+    "id": "c-aa359f36",
+    "startedAt": "2026-11-13T16:04:56Z",
+    "endedAt": "2026-11-13T16:45:00Z",
+    "summary": "AMP-001 and AMP-001-D done; AMP-003 (commerce core migration + RLS isolation tests) and AMP-030 (second demo store) verified locally (1147/1142 pass/0 fail) but uncommitted: coordinator cannot commit in the AMP repo (AMP-005-D)."
+  },
+  "tasks": [
+    {
+      "id": "AMP-001",
+      "title": "Audit the dashboard and VENTRA worktrees; classify auth, onboarding, research, branding, website/store, checkout, CRM, marketing and workflow code as reuse / extend / build",
+      "phase": "f",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-research",
+      "state": "done",
+      "priority": 1,
+      "dependsOn": [],
+      "scope": [],
+      "acceptance": [
+        "Record the actual repo, branch, local start command, routes, and evidence for what works."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": "2026-11-13T16:15:00Z",
+      "lastRunId": "c-aa359f36",
+      "runIds": ["c-aa359f36"],
+      "commits": [],
+      "evidence": [
+        {
+          "at": "2026-11-13T11:27:04Z",
+          "kind": "note",
+          "level": "Local",
+          "detail": "docs/agents/AIMP_AUDIT.md: repo ~/Developer/AIMONEYPRINTER, branch aimp/foundation @ 04e0080, 16 uncommitted AiMoneyPrinter entries, start command (port 3040), routes, module map with evidence."
+        },
+        {
+          "at": "2026-11-13T16:15:00Z",
+          "kind": "test",
+          "level": "Local",
+          "detail": "Coordinator c-aa359f36 re-ran checks in the standalone repo (aimp/foundation @ 2085c70, tree clean): npm run typecheck exit 0; npm test 1136 tests, 1131 pass, 5 todo, 0 fail. Audit doc committed with this board."
+        }
+      ],
+      "blocker": null,
+      "notes": "Audit written to docs/agents/AIMP_AUDIT.md (2026-11-13, master session, Local read-only). Tests not re-run in the worktree until AMP-001-D repairs git.",
+      "legacy": [
+        "aimp-1.2"
+      ],
+      "model": null
+    },
+    {
+      "id": "AMP-001-D",
+      "title": "Repair the AiMoneyPrinter worktree git link",
+      "phase": "f",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "owner",
+      "state": "done",
+      "priority": 1,
+      "dependsOn": [],
+      "scope": [],
+      "acceptance": [
+        "Dylan completes: Run in Terminal: git -C ~/Developer/VENTRA-CLEAN worktree repair ~/Developer/AIMONEYPRINTER"
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": "2026-11-13T16:15:00Z",
+      "lastRunId": "c-aa359f36",
+      "runIds": ["c-aa359f36"],
+      "commits": ["8ce30e5"],
+      "evidence": [
+        {
+          "at": "2026-11-13T16:15:00Z",
+          "kind": "note",
+          "level": "Local",
+          "detail": "Resolved by owner (OWNER_NOTES 2026-11-13 20:55): AIMONEYPRINTER became its own git repository instead of a repaired worktree. Coordinator checked: git status clean on aimp/foundation, log shows 2085c70 and 8ce30e5."
+        }
+      ],
+      "blocker": null,
+      "notes": "Owner action split from the implementation task (Needs Dylan). Resolved 2026-11-13 by repository split.",
+      "legacy": [
+        "aimp-1.1"
+      ],
+      "model": null
+    },
+    {
+      "id": "AMP-002",
+      "title": "Register AiMoneyPrinter in the local dashboard and seed this backlog with dependencies, owner flags and test links",
+      "phase": "f",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "coordinator",
+      "state": "done",
+      "priority": 1,
+      "dependsOn": [],
+      "scope": [],
+      "acceptance": [
+        "Opening AiMoneyPrinter shows its own checklist and updates survive refresh."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": "2026-11-13T11:34:13Z",
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [
+        {
+          "level": "local",
+          "at": "2026-11-13T11:34:13Z",
+          "by": "coordinator (Cowork session)",
+          "link": "http://127.0.0.1:4177/#/build?app=aimoneyprinter&step=AMP-002",
+          "kind": "browser",
+          "detail": "Live dashboard 11:32 UTC: Projects \u2192 AiMoneyPrinter \u2192 Build Steps shows its own 53-step AMP checklist (launch P0 39 / backlog 14), Needs Dylan and Ready to test sections. Reorder check: AMP-012 moved above AMP-011, page reloaded, order persisted in API and UI, then restored.",
+          "model": null
+        },
+        {
+          "kind": "browser",
+          "level": "local",
+          "at": "2026-11-13T11:34:53Z",
+          "model": null,
+          "detail": "Re-check after reload 11:37 UTC: page shows 53 unique AMP steps, phase order AMP-010/011/012/013 restored, Needs Dylan (3). Browser check on http://127.0.0.1:4177/#/build?app=aimoneyprinter."
+        }
+      ],
+      "blocker": null,
+      "notes": "Board docs/agents/AIMP_BOARD.json; dashboard project \"aimp\" reads it; tracker http://127.0.0.1:4177/#/build?app=aimoneyprinter.",
+      "legacy": [],
+      "model": "opus (coordinator session, not a coding job)"
+    },
+    {
+      "id": "AMP-003",
+      "title": "Data model and shared interfaces: workspaces, businesses, domains, site versions, products, files, orders, jobs, permissions; tenant-aware access checks",
+      "phase": "f",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-backend",
+      "state": "verified",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-001"
+      ],
+      "scope": [
+        "apps/web/lib/aimp/contracts.ts",
+        "apps/web/lib/aimp/data/**",
+        "supabase/migrations/202611140001_aimp_commerce_core.sql",
+        "apps/web/test/aimp-data-*"
+      ],
+      "acceptance": [
+        "Two test businesses can use the same engine while private data stays scoped to its owner."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": "2026-11-13T16:15:00Z",
+      "finishedAt": null,
+      "lastRunId": "c-aa359f36",
+      "runIds": ["c-aa359f36"],
+      "commits": [],
+      "evidence": [
+        {
+          "at": "2026-11-13T16:15:00Z",
+          "kind": "note",
+          "level": "Local",
+          "detail": "Coordinator check: no aimp migration in supabase/migrations and no aimp-data test, so the acceptance was not yet met; state corrected from implemented to running. Dispatched to ventra-backend (model sonnet): promote the proposed SQL to migration 202611140001, add lib/aimp/data, PGlite two-business isolation test.",
+          "model": "sonnet"
+        },
+        {
+          "at": "2026-11-13T16:40:00Z",
+          "kind": "review",
+          "level": "Local",
+          "detail": "ventra-review: approve with nits (no tenant-isolation hole; RLS on all 12 tables, security definer search_path='' with owner checks, anon column grants only). Findings fixed in one rework round by ventra-backend (sonnet): full-chain migration test, composite tenant FKs on order_items/fulfilments/usage_ledger, lab workspaces refused by create_business/create_product, engine-by-model rule in SQL and rows.ts, asset_public needs qa_status=pass, hidden .catch removed. Rework not re-reviewed yet.",
+          "model": "sonnet"
+        },
+        {
+          "at": "2026-11-13T16:42:00Z",
+          "kind": "test",
+          "level": "Local",
+          "detail": "Coordinator ran in ~/Developer/AIMONEYPRINTER: lint exit 0; typecheck exit 0; npm test 1147 tests, 1142 pass, 5 todo, 0 fail (baseline 1136/1131). Files: supabase/migrations/202611140001_aimp_commerce_core.sql, lib/aimp/contracts.ts, lib/aimp/data/{rows,index}.ts, test/aimp-data-{isolation,rows,chain}.test.ts. UNCOMMITTED: see AMP-005-D.",
+          "model": "sonnet"
+        }
+      ],
+      "blocker": null,
+      "notes": "Partial work exists: lib/aimp/contracts.ts (\u00a712.4) and docs/aimp/proposed/aimp_commerce_core.sql (\u00a712.3, RLS, PGlite-validated). Review decides what to extend; migration goes to local Supabase only.",
+      "legacy": [
+        "aimp-1.3",
+        "aimp-1.4",
+        "aimp-5.1"
+      ],
+      "model": null
+    },
+    {
+      "id": "AMP-005-D",
+      "title": "Let coordinator cycles run git and ventra-git inside ~/Developer/AIMONEYPRINTER",
+      "phase": "f",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "owner",
+      "state": "blocked",
+      "priority": 1,
+      "dependsOn": [],
+      "scope": [],
+      "acceptance": [
+        "A coordinator cycle can run `ventra-git commit` for files in ~/Developer/AIMONEYPRINTER without a permission prompt."
+      ],
+      "verifyLevel": "local",
+      "plan": "Owner note 2026-11-13 20:55 (commit AMP work in that repo)",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": "2026-11-13T16:40:00Z",
+      "finishedAt": null,
+      "lastRunId": "c-aa359f36",
+      "runIds": ["c-aa359f36"],
+      "commits": [],
+      "evidence": [
+        {
+          "at": "2026-11-13T16:40:00Z",
+          "kind": "note",
+          "level": "Local",
+          "detail": "Cycle c-aa359f36: the session's only allowed working directory is VENTRA-FEATURES. `cd /Users/dylan/Developer/AIMONEYPRINTER` was refused (outside allowed directories), and `VENTRA_REPO=... ventra-git commit` asked for approval, which a non-interactive cycle cannot give. Read-only `git -C ... status/diff --stat` and npm --prefix checks work."
+        }
+      ],
+      "blocker": {
+        "reason": "Coordinator sessions cannot commit in ~/Developer/AIMONEYPRINTER: the launcher only grants VENTRA-FEATURES as a working directory.",
+        "needsApproval": true,
+        "owner": true,
+        "action": "Add ~/Developer/AIMONEYPRINTER as an allowed directory for coordinator cycles (launcher --add-dir, or additionalDirectories in the settings the launcher uses), or run ventra-git yourself for the paths listed in HANDOFF.md.",
+        "where": "Agent Dashboard launcher settings on the Mac mini",
+        "why": "Verified AMP-003 and AMP-030 work is waiting uncommitted in the AiMoneyPrinter repo.",
+        "unlocks": "Commits for AMP-003, AMP-030 and every later AMP task.",
+        "continuing": "Specialists still build and the coordinator still verifies with npm --prefix; work is held uncommitted with per-task file lists.",
+        "since": "2026-11-13T16:40:00Z"
+      },
+      "notes": "Never worked around: no settings or guard edits by the coordinator.",
+      "legacy": [],
+      "model": null
+    },
+    {
+      "id": "AMP-004",
+      "title": "Local/test environments, provider adapters, fixtures and feature flags; every integration has a clear disabled or disconnected state",
+      "phase": "f",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-backend",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-003"
+      ],
+      "scope": [],
+      "acceptance": [
+        "The app and core workflow run locally with labelled fixtures when external credentials are missing."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null
+    },
+    {
+      "id": "AMP-010",
+      "title": "Reuse sign-in and workspace creation; mobile onboarding for budget, time, interests, skills and preferred effort",
+      "phase": "o",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-web-design",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-003"
+      ],
+      "scope": [],
+      "acceptance": [
+        "A user can leave and resume onboarding without losing answers."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [
+        "aimp-2.1"
+      ],
+      "model": null
+    },
+    {
+      "id": "AMP-011",
+      "title": "Blueprint library: downloadable planners, trackers, checklists and niche kits sharing one document engine; outputs, costs, QA, fulfilment and marketing defaults",
+      "phase": "o",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-feature",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-003"
+      ],
+      "scope": [],
+      "acceptance": [
+        "A versioned blueprint can generate a consistent launch plan from validated inputs."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "Pilot family chosen (reversible): printable planners.",
+      "legacy": [
+        "aimp-3.0"
+      ],
+      "model": null
+    },
+    {
+      "id": "AMP-012",
+      "title": "Opportunity Finder: five specific ideas ranked by demand evidence, startup cost, competition, workload and automation potential; sources, dates and confidence stored",
+      "phase": "o",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-feature",
+      "state": "implemented",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-011"
+      ],
+      "scope": [],
+      "acceptance": [
+        "Each idea explains what to sell, to whom, and why it fits. Missing evidence is visible. The score is presented as a fit score."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "Partial work exists: lib/aimp/opportunity-scoring.ts (deterministic rubric, 5/5 tests per README) and lib/aimp/preview/recommend.ts. Five-idea flow with stored sources to build.",
+      "legacy": [
+        "aimp-2.2",
+        "aimp-2.3"
+      ],
+      "model": null
+    },
+    {
+      "id": "AMP-013",
+      "title": "Opportunity preview and selection: sample product, brand, storefront, costs, price assumptions, owner actions; save the chosen blueprint, allow edits",
+      "phase": "o",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-web-design",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-012",
+        "AMP-010"
+      ],
+      "scope": [],
+      "acceptance": [
+        "One selected idea creates one durable business record and kicks off its build once."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [
+        "aimp-2.4"
+      ],
+      "model": null
+    },
+    {
+      "id": "AMP-020",
+      "title": "Business name options, branding, colours, tone, listing copy and optional visual assets",
+      "phase": "b",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-feature",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-013"
+      ],
+      "scope": [],
+      "acceptance": [
+        "Approved brand settings populate product previews, the store and marketing materials consistently."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [
+        "aimp-4.2"
+      ],
+      "model": null
+    },
+    {
+      "id": "AMP-021",
+      "title": "Product Factory v1: AI structured spec and content, rendered to a real PDF or ZIP through reusable templates",
+      "phase": "b",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-feature",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-011",
+        "AMP-004"
+      ],
+      "scope": [],
+      "acceptance": [
+        "A buyer-ready file opens correctly, with usable pages and the content advertised in the listing."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [
+        "aimp-3.1"
+      ],
+      "model": null
+    },
+    {
+      "id": "AMP-022",
+      "title": "Product validation, previews, approval, regeneration and versioning (required sections, integrity, layout, listing consistency)",
+      "phase": "b",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-feature",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-021"
+      ],
+      "scope": [],
+      "acceptance": [
+        "Failed files stay in review. The merchant can preview the exact version buyers will receive."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [
+        "aimp-3.2",
+        "aimp-3.3"
+      ],
+      "model": null
+    },
+    {
+      "id": "AMP-023",
+      "title": "Catalogue and pricing: titles, descriptions, cover images, price suggestions, fee and margin estimates",
+      "phase": "b",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-feature",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-022",
+        "AMP-020"
+      ],
+      "scope": [],
+      "acceptance": [
+        "The seller can approve or edit the listing, and checkout uses the stored price."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null
+    },
+    {
+      "id": "AMP-024",
+      "title": "Private master files, separate approved previews, order-authorised downloads, purchased version retained",
+      "phase": "b",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-backend",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-003",
+        "AMP-022"
+      ],
+      "scope": [],
+      "acceptance": [
+        "A buyer can download the purchased file. Other tenants and unauthorised visitors cannot retrieve it."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [
+        "aimp-5.3"
+      ],
+      "model": null
+    },
+    {
+      "id": "AMP-030",
+      "title": "Connect the in-house generator to validated branding and product data; home, catalogue, product, contact and policy pages from reusable mobile-first components",
+      "phase": "w",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-web-design",
+      "state": "verified",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-020",
+        "AMP-023"
+      ],
+      "scope": [
+        "apps/web/lib/aimp/storefront/**",
+        "apps/web/app/s/**",
+        "apps/web/app/tools/storefront/**",
+        "apps/web/test/aimp-storefront-multi.test.ts"
+      ],
+      "acceptance": [
+        "Two businesses can use the same renderer with different brands and products."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": "2026-11-13T16:15:00Z",
+      "finishedAt": null,
+      "lastRunId": "c-aa359f36",
+      "runIds": ["c-aa359f36"],
+      "commits": [],
+      "evidence": [
+        {
+          "at": "2026-11-13T16:15:00Z",
+          "kind": "note",
+          "level": "Local",
+          "detail": "Coordinator check: only one demo store exists and aimp-storefront.test.ts has no two-business test, so acceptance not met. Dispatched to ventra-web-design (model sonnet) to add a second fixture store and a multi-store test. Dependencies AMP-020/023 are not done; this gap-closing work runs on fixtures.",
+          "model": "sonnet"
+        },
+        {
+          "at": "2026-11-13T16:42:00Z",
+          "kind": "test",
+          "level": "Local",
+          "detail": "Diff read by coordinator (load.ts slug map, pure render-config.ts, layout uses renderConfig, demo-store-b.ts Iron & Oak, test/aimp-storefront-multi.test.ts 5 tests). ventra-review: clean. Lint 0, typecheck 0, npm test 1147/1142 pass/5 todo/0 fail. Not browser-checked (/s/iron-and-oak). UNCOMMITTED: see AMP-005-D.",
+          "model": "sonnet"
+        },
+        {
+          "at": "2026-11-13T11:27:04Z",
+          "kind": "note",
+          "level": "Local",
+          "detail": "docs/aimp/README.md (12 Nov): 1119 tests (1114 pass, 5 todo), tsc + eslint clean, next build passes; mobile/desktop screenshots without overflow. Not re-run since."
+        }
+      ],
+      "blocker": null,
+      "notes": "Partial work exists: lib/aimp/storefront/* + app/s/[store] renderer with validated config; one demo store (slow-morning); /tools/storefront.",
+      "legacy": [
+        "aimp-4.1",
+        "aimp-4.3"
+      ],
+      "model": null
+    },
+    {
+      "id": "AMP-031",
+      "title": "Draft, preview, edit, publish, pause and rollback; published site versions stored separately from drafts",
+      "phase": "w",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-web-design",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-030"
+      ],
+      "scope": [],
+      "acceptance": [
+        "Draft changes stay private until published. A failed update leaves the previous published version serving."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null
+    },
+    {
+      "id": "AMP-032",
+      "title": "Route each store's hostname or local test hostname to its business; unique slugs, canonical URLs, product metadata, sitemaps",
+      "phase": "w",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-backend",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-031"
+      ],
+      "scope": [],
+      "acceptance": [
+        "Two test stores resolve correctly and show their own listings and checkout. Unknown hosts return a safe response."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [
+        "aimp-5.2"
+      ],
+      "model": null
+    },
+    {
+      "id": "AMP-033",
+      "title": "Connect the production wildcard domain; verify HTTPS, hostname routing and publish behaviour",
+      "phase": "w",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-backend",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-032",
+        "AMP-033-D"
+      ],
+      "scope": [],
+      "acceptance": [
+        "Two public test storefronts load correctly."
+      ],
+      "verifyLevel": "live",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null
+    },
+    {
+      "id": "AMP-033-D",
+      "title": "Production store domain and wildcard DNS",
+      "phase": "w",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "owner",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-032"
+      ],
+      "scope": [],
+      "acceptance": [
+        "Dylan completes: Choose the store root domain, add a wildcard DNS record and add the domain to the Vercel project"
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "Owner action split from the implementation task (Needs Dylan). Becomes Needs Dylan when AMP-032 is verified.",
+      "legacy": [],
+      "model": null
+    },
+    {
+      "id": "AMP-040",
+      "title": "Seller onboarding and readiness with Stripe Connect; seller revenue separate from AiMoneyPrinter's software billing",
+      "phase": "p",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-backend",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-003",
+        "AMP-004"
+      ],
+      "scope": [],
+      "acceptance": [
+        "Checkout stays disabled until that seller can accept payments. Disconnected and incomplete accounts show the next action."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "Build against fixtures/mocked Stripe until AMP-043-D.",
+      "legacy": [
+        "aimp-6.2"
+      ],
+      "model": null
+    },
+    {
+      "id": "AMP-041",
+      "title": "Checkout and order records: store, product, price and seller resolved on the server; signed events; success, failure, delayed and duplicate reconciliation",
+      "phase": "p",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-backend",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-040",
+        "AMP-023"
+      ],
+      "scope": [],
+      "acceptance": [
+        "Unpaid orders produce no delivery. Replaying an event does not create a second order or fulfilment."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [
+        "aimp-6.3"
+      ],
+      "model": null
+    },
+    {
+      "id": "AMP-042",
+      "title": "Fulfilment, buyer confirmation, delivery email, secure link reissue, order history, basic refund and support handling",
+      "phase": "p",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-backend",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-041",
+        "AMP-024"
+      ],
+      "scope": [],
+      "acceptance": [
+        "A paid order delivers the correct file once. A failed delivery can retry, and support can reissue access for the right order."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [
+        "aimp-6.4"
+      ],
+      "model": null
+    },
+    {
+      "id": "AMP-043",
+      "title": "Provider-test checkout with a connected Stripe test seller: success, failure, delayed payment, duplicate event and refund scenarios",
+      "phase": "p",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-qa",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-042",
+        "AMP-032",
+        "AMP-043-D"
+      ],
+      "scope": [],
+      "acceptance": [
+        "Evidence links the payment, seller, order, purchased file and delivery result."
+      ],
+      "verifyLevel": "provider",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null
+    },
+    {
+      "id": "AMP-043-D",
+      "title": "Stripe TEST keys and Connect platform (test mode)",
+      "phase": "p",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "owner",
+      "state": "blocked",
+      "priority": 1,
+      "dependsOn": [],
+      "scope": [],
+      "acceptance": [
+        "Dylan completes: In Stripe test mode copy the secret key and enable Connect; put STRIPE_SECRET_KEY=sk_test_\u2026 (and the webhook secret from `stripe listen`) into ~/Developer/AIMONEYPRINTER/apps/web/.env.local \u2014 never paste keys into chat or the dashboard"
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": {
+        "reason": "Provider-test checkout and seller onboarding need a real Stripe test account; agents never create accounts or read .env files.",
+        "needsApproval": true,
+        "owner": true,
+        "action": "In Stripe test mode copy the secret key and enable Connect; put STRIPE_SECRET_KEY=sk_test_\u2026 (and the webhook secret from `stripe listen`) into ~/Developer/AIMONEYPRINTER/apps/web/.env.local \u2014 never paste keys into chat or the dashboard",
+        "where": "dashboard.stripe.com (Test mode) \u2192 Developers \u2192 API keys, and Settings \u2192 Connect",
+        "why": "Provider-test checkout and seller onboarding need a real Stripe test account; agents never create accounts or read .env files.",
+        "unlocks": "AMP-043 provider-test checkout and delivery; AMP-044 test billing.",
+        "continuing": "AMP-040\u2013042 on fixtures; AMP-050/051 campaign generation and export.",
+        "since": "2026-11-13T11:27:04Z"
+      },
+      "notes": "Owner action split from the implementation task (Needs Dylan).",
+      "legacy": [
+        "aimp-6.1"
+      ],
+      "model": null
+    },
+    {
+      "id": "AMP-044",
+      "title": "AiMoneyPrinter subscriptions, plan entitlements, usage allowances, cancellation and test billing",
+      "phase": "p",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-backend",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-040",
+        "AMP-043-D"
+      ],
+      "scope": [],
+      "acceptance": [
+        "Changing a software plan updates product entitlements independently of merchant sales and buyer orders."
+      ],
+      "verifyLevel": "provider",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null
+    },
+    {
+      "id": "AMP-050",
+      "title": "Niche-specific launch campaign from the actual catalogue: product links, audience, channel, content plan, schedule",
+      "phase": "m",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-feature",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-023",
+        "AMP-020"
+      ],
+      "scope": [],
+      "acceptance": [
+        "The campaign links to the right products and uses the approved brand and claims."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [
+        "aimp-7.1"
+      ],
+      "model": null
+    },
+    {
+      "id": "AMP-051",
+      "title": "Generate and export Pins, images, captions, short-video scripts and SEO copy with a review queue",
+      "phase": "m",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-feature",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-050"
+      ],
+      "scope": [],
+      "acceptance": [
+        "The merchant can preview and export a complete campaign while a publishing account is pending."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null
+    },
+    {
+      "id": "AMP-052",
+      "title": "One social connector first (Pinterest): authorisation, scheduling, status reconciliation, retries, pause and reconnect",
+      "phase": "m",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-backend",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-051",
+        "AMP-052-D"
+      ],
+      "scope": [],
+      "acceptance": [
+        "A scheduled post shows its provider-confirmed outcome. Failed, duplicate and disconnected cases are visible and recoverable."
+      ],
+      "verifyLevel": "provider",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "Connector code and sandbox tests can be built before access; provider verification waits for AMP-052-D.",
+      "legacy": [
+        "aimp-7.2",
+        "aimp-7.3"
+      ],
+      "model": null
+    },
+    {
+      "id": "AMP-052-D",
+      "title": "Pinterest developer app and test account",
+      "phase": "m",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "owner",
+      "state": "blocked",
+      "priority": 1,
+      "dependsOn": [],
+      "scope": [],
+      "acceptance": [
+        "Dylan completes: Create a Pinterest Business account and a developer app, request Trial/Standard API access, and add the app id/secret to ~/Developer/AIMONEYPRINTER/apps/web/.env.local"
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": {
+        "reason": "Publishing needs real Pinterest API access; agents cannot create accounts or request API access.",
+        "needsApproval": true,
+        "owner": true,
+        "action": "Create a Pinterest Business account and a developer app, request Trial/Standard API access, and add the app id/secret to ~/Developer/AIMONEYPRINTER/apps/web/.env.local",
+        "where": "developers.pinterest.com \u2192 My apps (Business account)",
+        "why": "Publishing needs real Pinterest API access; agents cannot create accounts or request API access.",
+        "unlocks": "AMP-052 provider-test publishing and AMP-054 first real organic post.",
+        "continuing": "AMP-050/051 campaign generation and export; AMP-053 opt-in forms.",
+        "since": "2026-11-13T11:27:04Z"
+      },
+      "notes": "Owner action split from the implementation task (Needs Dylan).",
+      "legacy": [
+        "aimp-7.0"
+      ],
+      "model": null
+    },
+    {
+      "id": "AMP-053",
+      "title": "Opt-in forms, sample delivery, CRM tagging, consent records, basic source tracking",
+      "phase": "m",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-backend",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-032"
+      ],
+      "scope": [],
+      "acceptance": [
+        "A subscriber reaches the correct store's list with their consent and source recorded."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null
+    },
+    {
+      "id": "AMP-054",
+      "title": "Verify the first real organic publishing workflow through an authorised test account",
+      "phase": "m",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-qa",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-052",
+        "AMP-052-D"
+      ],
+      "scope": [],
+      "acceptance": [
+        "The dashboard records the published URL or provider-confirmed failure."
+      ],
+      "verifyLevel": "provider",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null
+    },
+    {
+      "id": "AMP-060",
+      "title": "Orchestrate generation, publishing, fulfilment and scheduling on the existing job runner; persisted steps, retries, resumable checkpoints",
+      "phase": "a",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-backend",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-004"
+      ],
+      "scope": [],
+      "acceptance": [
+        "A temporary failure can recover without duplicate orders, posts or generation charges."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null
+    },
+    {
+      "id": "AMP-061",
+      "title": "Merchant automation settings, approvals, usage caps, activity feed and actionable failure alerts",
+      "phase": "a",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-feature",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-060"
+      ],
+      "scope": [],
+      "acceptance": [
+        "An owner can pause future marketing, see what ran, and approve only the actions that require approval."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null
+    },
+    {
+      "id": "AMP-062",
+      "title": "Merchant dashboard: sales, refunds, deliveries, visits, scheduled posts, estimated costs, required actions",
+      "phase": "a",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-web-design",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-041"
+      ],
+      "scope": [],
+      "acceptance": [
+        "Dashboard figures reconcile with test orders and clearly label estimates or missing cost data."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null
+    },
+    {
+      "id": "AMP-063",
+      "title": "Platform operations: connection secrets, admin job recovery, support queue, audit history, rate limits, backups, restore, export, deletion",
+      "phase": "a",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-backend",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-003",
+        "AMP-060"
+      ],
+      "scope": [],
+      "acceptance": [
+        "A failed job can be recovered, a backup restored, and a tenant's export generated without exposing another tenant's data."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null
+    },
+    {
+      "id": "AMP-064",
+      "title": "Full local release check: signup \u2192 five ideas \u2192 product \u2192 publish \u2192 checkout \u2192 delivery \u2192 campaign; mobile flows and two-tenant isolation",
+      "phase": "a",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-qa",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-013",
+        "AMP-024",
+        "AMP-032",
+        "AMP-042",
+        "AMP-051"
+      ],
+      "scope": [],
+      "acceptance": [
+        "Record the build or commit, test routes, evidence, elapsed setup time and any manual intervention."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [
+        "aimp-8.1",
+        "aimp-8.2"
+      ],
+      "model": null
+    },
+    {
+      "id": "AMP-065",
+      "title": "Public landing page, demonstration store, pilot onboarding, policy drafts and measurement plan",
+      "phase": "a",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-web-design",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-064"
+      ],
+      "scope": [],
+      "acceptance": [
+        "Pilot materials and measurement are ready for review. Use observed results for marketing claims."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null
+    },
+    {
+      "id": "AMP-066",
+      "title": "Authorised live pilot: first genuine purchase, fulfilment, seller payment status and organic publishing",
+      "phase": "a",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-qa",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-065",
+        "AMP-043",
+        "AMP-054",
+        "AMP-033",
+        "AMP-066-D"
+      ],
+      "scope": [],
+      "acceptance": [
+        "Capture live evidence and log anything the owner still had to do."
+      ],
+      "verifyLevel": "live",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null
+    },
+    {
+      "id": "AMP-066-D",
+      "title": "Authorise the live pilot (real money, public launch)",
+      "phase": "a",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "owner",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-065"
+      ],
+      "scope": [],
+      "acceptance": [
+        "Dylan completes: Approve the live pilot: live Stripe keys, public launch of the demo store, and the pilot budget"
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "Owner action split from the implementation task (Needs Dylan). Becomes Needs Dylan when AMP-065 is verified.",
+      "legacy": [],
+      "model": null
+    },
+    {
+      "id": "AMP-110",
+      "title": "Visual and personalised products: printable art and made-to-order with buyer inputs, private uploads, payment-triggered generation, QA, capped retries, manual review",
+      "phase": "p1",
+      "module": "aimp",
+      "tier": "P1",
+      "owner": "ventra-feature",
+      "state": "queued",
+      "priority": 3,
+      "dependsOn": [
+        "AMP-064"
+      ],
+      "scope": [],
+      "acceptance": [
+        "A custom test order produces the right file or escalates with a clear reason."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null
+    },
+    {
+      "id": "AMP-111",
+      "title": "AI website editor and custom domains: validated edits, preview, publish with rollback, domain ownership and connection status",
+      "phase": "p1",
+      "module": "aimp",
+      "tier": "P1",
+      "owner": "ventra-web-design",
+      "state": "queued",
+      "priority": 3,
+      "dependsOn": [
+        "AMP-031",
+        "AMP-064"
+      ],
+      "scope": [],
+      "acceptance": [
+        "A seller can update a site and connect an authorised domain without affecting other stores."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null
+    },
+    {
+      "id": "AMP-112",
+      "title": "Catalogue growth: bundles, upsells, variants, pricing suggestions, evidence-based listing improvements",
+      "phase": "p1",
+      "module": "aimp",
+      "tier": "P1",
+      "owner": "ventra-feature",
+      "state": "queued",
+      "priority": 3,
+      "dependsOn": [
+        "AMP-062",
+        "AMP-064"
+      ],
+      "scope": [],
+      "acceptance": [
+        "An owner can review a proposed change and trace it back to store performance."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null
+    },
+    {
+      "id": "AMP-113",
+      "title": "Expanded marketing: eligible Instagram, Facebook and TikTok connections, consented email sequences, unsubscribe handling, Search Console reporting",
+      "phase": "p1",
+      "module": "aimp",
+      "tier": "P1",
+      "owner": "ventra-backend",
+      "state": "queued",
+      "priority": 3,
+      "dependsOn": [
+        "AMP-054",
+        "AMP-064"
+      ],
+      "scope": [],
+      "acceptance": [
+        "Each connected channel reports its own permissions, publish status and failures."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null
+    },
+    {
+      "id": "AMP-114",
+      "title": "Inbound sales and customer support reusing VENTRA Setter logic: product questions, order status, link reissue, escalation",
+      "phase": "p1",
+      "module": "aimp",
+      "tier": "P1",
+      "owner": "ventra-feature",
+      "state": "queued",
+      "priority": 3,
+      "dependsOn": [
+        "AMP-042",
+        "AMP-064"
+      ],
+      "scope": [],
+      "acceptance": [
+        "The assistant answers from approved data and verifies access before exposing order details."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null
+    },
+    {
+      "id": "AMP-115",
+      "title": "Business Advisor and reporting: weekly summaries, attribution, margins, store health, conversion insights, suggested experiments",
+      "phase": "p1",
+      "module": "aimp",
+      "tier": "P1",
+      "owner": "ventra-feature",
+      "state": "queued",
+      "priority": 3,
+      "dependsOn": [
+        "AMP-062",
+        "AMP-064"
+      ],
+      "scope": [],
+      "acceptance": [
+        "Recommendations cite the store data behind them and show where evidence is limited."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null
+    },
+    {
+      "id": "AMP-116",
+      "title": "Business setup and exit: registration guidance, editable policies, subscription exit, export, store pause or retirement",
+      "phase": "p1",
+      "module": "aimp",
+      "tier": "P1",
+      "owner": "ventra-feature",
+      "state": "queued",
+      "priority": 3,
+      "dependsOn": [
+        "AMP-063",
+        "AMP-064"
+      ],
+      "scope": [],
+      "acceptance": [
+        "The owner sees the actions they need to complete and can export their supported business data."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null
+    },
+    {
+      "id": "AMP-210",
+      "title": "Digital memberships: recurring billing, access entitlements, scheduled releases, archives, renewals, cancellations",
+      "phase": "p2",
+      "module": "aimp",
+      "tier": "P2",
+      "owner": "ventra-backend",
+      "state": "queued",
+      "priority": 4,
+      "dependsOn": [
+        "AMP-064"
+      ],
+      "scope": [],
+      "acceptance": [
+        "Members get access on payment, lose it on cancellation, and receive scheduled releases."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null
+    },
+    {
+      "id": "AMP-211",
+      "title": "Print-on-demand: supplier products, mockups, order routing, shipment tracking, margin estimates, returns",
+      "phase": "p2",
+      "module": "aimp",
+      "tier": "P2",
+      "owner": "ventra-backend",
+      "state": "queued",
+      "priority": 4,
+      "dependsOn": [
+        "AMP-064"
+      ],
+      "scope": [],
+      "acceptance": [
+        "A test order routes to the supplier and tracking flows back."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null
+    },
+    {
+      "id": "AMP-212",
+      "title": "Micro-tools from vetted templates: hosting, access, billing, versioning, maintenance",
+      "phase": "p2",
+      "module": "aimp",
+      "tier": "P2",
+      "owner": "ventra-feature",
+      "state": "queued",
+      "priority": 4,
+      "dependsOn": [
+        "AMP-064"
+      ],
+      "scope": [],
+      "acceptance": [
+        "A template tool is published, gated by purchase and versioned."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null
+    },
+    {
+      "id": "AMP-213",
+      "title": "Paid ads: creative, draft campaigns, authorised ad accounts, approved budgets, spend and conversion measurement, pause at limits",
+      "phase": "p2",
+      "module": "aimp",
+      "tier": "P2",
+      "owner": "ventra-feature",
+      "state": "queued",
+      "priority": 4,
+      "dependsOn": [
+        "AMP-064"
+      ],
+      "scope": [],
+      "acceptance": [
+        "No spend happens without an approved budget; spend stops at the limit."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null
+    },
+    {
+      "id": "AMP-214",
+      "title": "Multiple businesses: switching, separate budgets and connections, portfolio reporting, independent pause or retirement",
+      "phase": "p2",
+      "module": "aimp",
+      "tier": "P2",
+      "owner": "ventra-web-design",
+      "state": "queued",
+      "priority": 4,
+      "dependsOn": [
+        "AMP-064"
+      ],
+      "scope": [],
+      "acceptance": [
+        "Two businesses run side by side without sharing budgets or connections."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null
+    },
+    {
+      "id": "AMP-215",
+      "title": "International rollout: seller eligibility, currency, checkout, payout, policy and localisation per market",
+      "phase": "p2",
+      "module": "aimp",
+      "tier": "P2",
+      "owner": "ventra-research",
+      "state": "queued",
+      "priority": 4,
+      "dependsOn": [
+        "AMP-064"
+      ],
+      "scope": [],
+      "acceptance": [
+        "Each new market has a verified checklist before enabling."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null
+    },
+    {
+      "id": "AMP-216",
+      "title": "Outcome-based recommendations from permissioned aggregate data: ranking by observed sales, costs and owner time, with sample size and uncertainty",
+      "phase": "p2",
+      "module": "aimp",
+      "tier": "P2",
+      "owner": "ventra-research",
+      "state": "queued",
+      "priority": 4,
+      "dependsOn": [
+        "AMP-064"
+      ],
+      "scope": [],
+      "acceptance": [
+        "Recommendations show sample size and uncertainty."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null
+    }
+  ]
+}

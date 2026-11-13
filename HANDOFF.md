@@ -15,6 +15,20 @@ Dylan asked for the mobile app preview link to be sent to him on Telegram. Send 
 
 ## Master Coordinator (auto)
 
+- Last cycle: c-aa359f36 at 2026-11-14 00:45 AWST · 2 dispatched (AMP-003, AMP-030, both Sonnet) + 1 review + 1 rework · 2 verified locally, 0 committed · 1 new owner blocker (AMP-005-D)
+- Workstream: AiMoneyPrinter only (owner note 2026-11-13 20:55 handled; 21 queued VENTRA tasks on TASK_BOARD/WEBSITE_BOARD set to deferred, note "VENTRA archived 2026-11-13").
+- AMP repo: ~/Developer/AIMONEYPRINTER aimp/foundation @ 2085c70 + UNCOMMITTED verified work. Checks by coordinator: lint 0, typecheck 0, npm test 1147 / 1142 pass / 5 todo / 0 fail.
+- Commit these when AMP-005-D clears (one commit per task):
+  - AMP-003: supabase/migrations/202611140001_aimp_commerce_core.sql apps/web/lib/aimp/contracts.ts apps/web/lib/aimp/data/rows.ts apps/web/lib/aimp/data/index.ts apps/web/test/aimp-data-isolation.test.ts apps/web/test/aimp-data-rows.test.ts apps/web/test/aimp-data-chain.test.ts (re-review the rework diff first: composite FKs, lab refusal, engines_for_model, asset qa_status).
+  - AMP-030: apps/web/lib/aimp/storefront/demo-store-b.ts apps/web/lib/aimp/storefront/render-config.ts apps/web/lib/aimp/storefront/load.ts "apps/web/app/s/[store]/layout.tsx" apps/web/test/aimp-storefront-multi.test.ts
+- Follow-ups: docs/aimp/proposed/aimp_commerce_core.sql is superseded (mark or remove); load.ts line-1 comment still says only one fixture; checkNewProduct now needs the business model; browser check of /s/iron-and-oak not done.
+- Running / implemented (needs reconciling next cycle): none (AMP-003, AMP-030 verified, uncommitted).
+- Blocked, needs the owner: AMP-005-D (allow coordinator cycles to work in ~/Developer/AIMONEYPRINTER: add it as an allowed directory in the launcher); AMP-043-D Stripe test keys; AMP-052-D Pinterest app.
+- Leftover: scripts/agents/.cycle-aimp.jq and .cycle-defer.jq (temporary, created this cycle; deleting was refused). Safe to delete. Foreign uncommitted changes left alone: README.md, COORDINATOR.md, STATUS.md, scripts/agents/ventra-coord, ventra-coordinator, ventra-master.
+- Next up: commit AMP-003/030, then AMP-004 (env/adapters/flags) and AMP-011 (blueprint library), both now unblocked.
+
+### Previous cycle c-a3429447
+
 - Last cycle: c-a3429447 at 2026-11-13 04:40 AWST · 4 dispatched (A-65, A-62, A-50, A-53) + 4 reviews · 4 verified and committed · 1 new owner decision (A-79)
 - Integration branch: agent/develop @ 599b2522 (cc44355a A-65 · 252a3d4b A-62 · 045e4e9c A-50 · 599b2522 A-53); board commit follows
 - Verification: ventra-verify PASSED after each of A-62, A-50, A-53 (lint, typecheck, unit tests, build, workspace integration; course + launcher FROZEN, P0-7).
@@ -247,30 +261,50 @@ Tracker Phase 0: 0.1 scope freeze, 0.2 orchestrator, 0.3 lead store + state mach
 ## Git state (auto)
 
 <!-- git-state:start -->
-_Generated 2026-11-13 04:31 by `ventra-handoff snapshot`. Do not hand-edit this block._
+_Generated 2026-11-14 00:17 by `ventra-handoff snapshot`. Do not hand-edit this block._
 - Branch: `agent/develop`
-- HEAD: `599b252 test(front-office): live AI QA scenarios S2, S3, S5, S7, X1, R1, R5, R6, X5 through the real labs and model adapter; skipped unless FRONT_OFFICE_QA_LIVE=1 (no key read, no network otherwise), fetch confined to the model host, call and AUD cap enforced before each call via meteredLlm, fallback replies cannot hide a cap hit [A-53]`
-- Lock: coordinator (pid 52718, 26 min old)
+- HEAD: `1962c7e chore(coordinator): cycle c-ceead848 board and handoff`
+- Lock: coordinator (pid 47507, 12 min old)
 - Uncommitted changes:
 ```text
  M HANDOFF.md
+ M README.md
+ M docs/agents/COORDINATOR.md
+ M docs/agents/OWNER_NOTES.md
+ M docs/agents/STATUS.md
  M docs/agents/TASKS.md
  M docs/agents/TASK_BOARD.json
+ M docs/agents/WEBSITE_BOARD.json
+ M scripts/agents/ventra-coord
+ M scripts/agents/ventra-coordinator
+ M scripts/agents/ventra-master
+?? docs/agents/AIMP_AUDIT.md
+?? docs/agents/AIMP_BOARD.json
+?? scripts/agents/.cycle-aimp.jq
+?? scripts/agents/.cycle-defer.jq
 ```
 - Diff stat vs HEAD:
 ```text
- HANDOFF.md                  |  11 ++
- docs/agents/TASKS.md        |  11 +-
- docs/agents/TASK_BOARD.json | 383 ++++++++++++++++++++++++++++++++++++--------
- 3 files changed, 338 insertions(+), 67 deletions(-)
+ HANDOFF.md                        |  33 ++--
+ README.md                         |   2 +
+ docs/agents/COORDINATOR.md        |  46 +++++-
+ docs/agents/OWNER_NOTES.md        |  15 ++
+ docs/agents/STATUS.md             |   2 +
+ docs/agents/TASKS.md              |   3 +
+ docs/agents/TASK_BOARD.json       | 309 ++++++++++++++++++++++++++++++++++++--
+ docs/agents/WEBSITE_BOARD.json    |  30 ++--
+ scripts/agents/ventra-coord       |   6 +
+ scripts/agents/ventra-coordinator |  33 ++--
+ scripts/agents/ventra-master      |   3 +-
+ 11 files changed, 428 insertions(+), 54 deletions(-)
 ```
 - Recent commits:
 ```text
+1962c7e chore(coordinator): cycle c-ceead848 board and handoff
+7159570 test(front-office): A-53 review nits in the live QA suite: numbers in replies may also come from tool results and the caller's text (not in X5, where reading back an injected number must fail); usage.priceKnown from priceFor(model).known with a note that unpriced models are costed at the top rate; X5 records input only after the break check; IS_AI needs AI/bot or an AI/virtual/digital assistant phrase, CLAIMS_HUMAN accepts curly apostrophes and 'I am not a bot' [A-80]
+bdf70c0 chore(coordinator): cycle c-a3429447 board and handoff
 599b252 test(front-office): live AI QA scenarios S2, S3, S5, S7, X1, R1, R5, R6, X5 through the real labs and model adapter; skipped unless FRONT_OFFICE_QA_LIVE=1 (no key read, no network otherwise), fetch confined to the model host, call and AUD cap enforced before each call via meteredLlm, fallback replies cannot hide a cap hit [A-53]
 045e4e9 test(front-office): email runner with no email sender falls back to SMS (cancelled without an SMS grant, sent with one); runDueJobs comment says which job kinds go where and that only follow-ups are consent-gated [A-50]
-252a3d4 test(setter): scenario suite labels scripted-text assertions as code-side guards only, drops the G1 replay pin from S5 (kept in S9), splits the G2 chat-route failure into its own S12b scenario; recorder files get a case suffix and a recording failure never masks the scenario's own error [A-62]
-cc44355 test(receptionist): scenario suite labels X5 as a scripted-model check and R9 as keyword smoke, asserts the 000 emergency rule by label instead of a version string, derives R3/R4 seeds and unoffered times from the simulate fixtures and offered set, names turn and tool indices; X5 prompt-leak turn runs no tool [A-65]
-dd5159b chore(coordinator): cycle c-4f349d12 board and handoff
 ```
 <!-- git-state:end -->
 
