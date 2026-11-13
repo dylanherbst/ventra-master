@@ -2,7 +2,7 @@
   "version": 1,
   "project": "aimp",
   "app": "aimoneyprinter",
-  "updatedAt": "2026-11-13T18:58:00Z",
+  "updatedAt": "2026-11-13T19:25:00Z",
   "integrationBranch": "aimp/foundation",
   "worktree": "~/Developer/AIMONEYPRINTER",
   "codingModel": "sonnet",
@@ -54,10 +54,10 @@
     }
   ],
   "lastRun": {
-    "id": "c-712dc75a",
-    "startedAt": "2026-11-13T18:07:57Z",
-    "endedAt": "2026-11-13T19:00:00Z",
-    "summary": "3 dispatched on Sonnet (AMP-023, AMP-032, AMP-060) + 3 reviews + 3 rework rounds; 3 verified locally (lint 0, typecheck 0, 1487/1481 pass/0 fail), 0 committed: AMP-005-D still blocks commits in the AMP repo. New follow-ups AMP-034, AMP-045."
+    "id": "c-79d5e30f",
+    "startedAt": "2026-11-13T18:41:57Z",
+    "endedAt": "2026-11-13T19:25:00Z",
+    "summary": "AMP-041 and AMP-034 verified locally (Sonnet; AMP-041 reviewed APPROVE); 1508 tests 0 fail; held uncommitted in the AMP repo by AMP-005-D"
   },
   "tasks": [
     {
@@ -278,13 +278,14 @@
       "worktree": "~/Developer/AIMONEYPRINTER",
       "startedAt": "2026-11-13T16:40:00Z",
       "finishedAt": null,
-      "lastRunId": "c-712dc75a",
+      "lastRunId": "c-79d5e30f",
       "runIds": [
         "c-aa359f36",
         "c-a7fe8df1",
         "c-960d5bfe",
         "c-f428b679",
-        "c-712dc75a"
+        "c-712dc75a",
+        "c-79d5e30f"
       ],
       "commits": [],
       "evidence": [
@@ -322,6 +323,11 @@
           "at": "2026-11-13T18:13:00Z",
           "kind": "note",
           "detail": "Re-checked c-712dc75a: `VENTRA_REPO=~/Developer/AIMONEYPRINTER ventra-git checks` and `cd ~/Developer/AIMONEYPRINTER && ventra-git checks` both answered 'requires approval'. Still blocked; not worked around."
+        },
+        {
+          "at": "2026-11-13T18:45:00Z",
+          "kind": "note",
+          "detail": "Re-checked c-79d5e30f: cd into ~/Developer/AIMONEYPRINTER refused (only VENTRA-FEATURES allowed). Not worked around. 18 verified tasks waiting."
         }
       ],
       "blocker": {
@@ -338,7 +344,7 @@
       "notes": "Never worked around: no settings or guard edits by the coordinator.",
       "legacy": [],
       "model": null,
-      "updatedAt": "2026-11-13T18:13:00Z"
+      "updatedAt": "2026-11-13T19:25:00Z"
     },
     {
       "id": "AMP-004",
@@ -1356,32 +1362,82 @@
       "module": "aimp",
       "tier": "P0",
       "owner": "ventra-backend",
-      "state": "queued",
+      "state": "verified",
       "priority": 1,
       "dependsOn": [
         "AMP-040",
         "AMP-023"
       ],
-      "scope": [],
+      "scope": [
+        "apps/web/lib/aimp/checkout/**",
+        "apps/web/lib/aimp/orders/**",
+        "apps/web/app/api/aimp/checkout/**",
+        "apps/web/app/api/aimp/webhooks/**",
+        "apps/web/app/tools/aimp-checkout/**",
+        "apps/web/test/aimp-checkout-*.test.ts",
+        "apps/web/test/aimp-orders-*.test.ts"
+      ],
       "acceptance": [
-        "Unpaid orders produce no delivery. Replaying an event does not create a second order or fulfilment."
+        "Checkout resolves store, product, price and seller server-side from the store and catalogue listing; client-sent prices are ignored.",
+        "Checkout is refused when the seller is not ready (sellers gate) or the listing is not approved/published.",
+        "A pending order record is created before redirect; only a verified paid event (fake Stripe provider on fixtures, signature checked) marks it paid.",
+        "Unpaid orders produce no delivery. Replaying an event does not create a second order or fulfilment.",
+        "Isolated test page /tools/aimp-checkout with DEMO/LIVE and connection-state indicators; lint, typecheck and npm test pass."
       ],
       "verifyLevel": "local",
       "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
       "branch": "aimp/foundation",
       "worktree": "~/Developer/AIMONEYPRINTER",
-      "startedAt": null,
-      "finishedAt": null,
-      "lastRunId": null,
-      "runIds": [],
+      "startedAt": "2026-11-13T18:50:00Z",
+      "finishedAt": "2026-11-13T19:25:00Z",
+      "lastRunId": "c-79d5e30f",
+      "runIds": [
+        "c-79d5e30f"
+      ],
       "commits": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "at": "2026-11-13T19:20:00Z",
+          "kind": "typecheck",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "coordinator: npm --prefix ~/Developer/AIMONEYPRINTER/apps/web run typecheck exit 0"
+        },
+        {
+          "at": "2026-11-13T19:20:00Z",
+          "kind": "lint",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "coordinator: npm run lint (eslint --max-warnings 0) exit 0"
+        },
+        {
+          "at": "2026-11-13T19:22:00Z",
+          "kind": "test",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "coordinator: npm test 1508 total / 1502 pass / 0 fail / 1 skipped / 5 todo (was 1488); 19 new tests in aimp-checkout-service and aimp-orders-paid"
+        },
+        {
+          "at": "2026-11-13T19:23:00Z",
+          "kind": "review",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "ventra-review APPROVE: server-side resolution, gate before order write, HMAC timingSafeEqual 300s tolerance, replay/second-event idempotent, amount/currency mismatch not paid, prod 503 unless AIMP_TOOLS_ENABLED, fixture secret only; 4 low findings recorded in notes"
+        },
+        {
+          "at": "2026-11-13T19:24:00Z",
+          "kind": "note",
+          "level": "Local",
+          "detail": "Commit attempted path blocked: cd into ~/Developer/AIMONEYPRINTER refused (AMP-005-D). No browser check of /tools/aimp-checkout."
+        }
+      ],
       "blocker": null,
-      "notes": "",
+      "notes": "Held uncommitted (AMP-005-D). Files: apps/web/lib/aimp/orders/ apps/web/lib/aimp/checkout/ apps/web/app/api/aimp/checkout/ apps/web/app/api/aimp/webhooks/ apps/web/app/tools/aimp-checkout/ apps/web/test/aimp-checkout-service.test.ts apps/web/test/aimp-orders-paid.test.ts. In-memory order store only; orders + payment_events migration still needed (proposed columns in HANDOFF c-79d5e30f). Review low findings: unbounded in-memory store, failed order not retryable with the same key, replay does not compare buyerEmail, body cap counts chars. AMP-042 hook: checkout.onOrderPaid, isDeliverable, createOrderBook.",
       "legacy": [
         "aimp-6.3"
       ],
-      "model": null
+      "model": "sonnet",
+      "updatedAt": "2026-11-13T19:25:00Z"
     },
     {
       "id": "AMP-042",
@@ -2479,7 +2535,7 @@
       "model": null
     },
     {
-      "state": "queued",
+      "state": "verified",
       "priority": 1,
       "dependsOn": [
         "AMP-032"
@@ -2495,20 +2551,36 @@
       ],
       "branch": "aimp/foundation",
       "worktree": "/Users/dylan/Developer/AIMONEYPRINTER",
-      "startedAt": null,
-      "finishedAt": null,
-      "lastRunId": "c-712dc75a",
+      "startedAt": "2026-11-13T18:50:00Z",
+      "finishedAt": "2026-11-13T19:25:00Z",
+      "lastRunId": "c-79d5e30f",
       "runIds": [
-        "c-712dc75a"
+        "c-712dc75a",
+        "c-79d5e30f"
       ],
       "commits": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "at": "2026-11-13T19:05:00Z",
+          "kind": "diff",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "coordinator read STORE_SLUG constants and their use in validateStoreConfig and createSite message"
+        },
+        {
+          "at": "2026-11-13T19:06:00Z",
+          "kind": "test",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "coordinator: npm test 1488 / 1482 pass / 0 fail (+1 vs 1487 baseline); typecheck 0 and lint 0 in the combined run with AMP-041"
+        }
+      ],
       "blocker": null,
-      "notes": "Found by AMP-032 review (c-712dc75a). Fail-closed today (such a store never resolves).",
-      "model": null,
+      "notes": "Held uncommitted (AMP-005-D). Files: apps/web/lib/aimp/storefront/schema.ts (STORE_SLUG, STORE_SLUG_MAX=42, STORE_SLUG_MESSAGE), apps/web/lib/aimp/site-versions/store.ts (message), apps/web/test/aimp-site-versions-rework.test.ts (+1 test). DB rule: ^[a-z0-9][a-z0-9-]{1,40}[a-z0-9]$ (3-42); app additionally refuses double hyphens. schema.ts and site-versions/store.ts also carry earlier held tasks' changes: commit after AMP-030/031/032.",
+      "model": "sonnet",
       "verifyLevel": "local",
       "createdAt": "2026-11-13T18:45:00Z",
-      "updatedAt": "2026-11-13T18:45:00Z",
+      "updatedAt": "2026-11-13T19:25:00Z",
       "id": "AMP-034",
       "title": "Align storefront slug rules with the database: storefront/schema.ts and site-versions/store.ts use hosts matchesSitesSlugCheck (3-42 chars) instead of 3-63",
       "owner": "ventra-web-design"
