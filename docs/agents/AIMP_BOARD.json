@@ -2,7 +2,7 @@
   "version": 1,
   "project": "aimp",
   "app": "aimoneyprinter",
-  "updatedAt": "2026-11-13T16:15:00Z",
+  "updatedAt": "2026-11-13T17:15:00Z",
   "integrationBranch": "aimp/foundation",
   "worktree": "~/Developer/AIMONEYPRINTER",
   "codingModel": "sonnet",
@@ -44,20 +44,20 @@
     },
     {
       "id": "p1",
-      "title": "P1 \u00b7 After the first store works end to end",
+      "title": "P1 · After the first store works end to end",
       "tier": "backlog"
     },
     {
       "id": "p2",
-      "title": "P2 \u00b7 Expansion backlog",
+      "title": "P2 · Expansion backlog",
       "tier": "backlog"
     }
   ],
   "lastRun": {
-    "id": "c-aa359f36",
-    "startedAt": "2026-11-13T16:04:56Z",
-    "endedAt": "2026-11-13T16:45:00Z",
-    "summary": "AMP-001 and AMP-001-D done; AMP-003 (commerce core migration + RLS isolation tests) and AMP-030 (second demo store) verified locally (1147/1142 pass/0 fail) but uncommitted: coordinator cannot commit in the AMP repo (AMP-005-D)."
+    "id": "c-a7fe8df1",
+    "startedAt": "2026-11-13T16:34:56Z",
+    "endedAt": "2026-11-13T17:16:00Z",
+    "summary": "AMP-004, AMP-011, AMP-012, AMP-010 verified locally (Sonnet, reviewed, 1212 tests 0 fail); all uncommitted because AMP-005-D still blocks commits in the AiMoneyPrinter repo."
   },
   "tasks": [
     {
@@ -81,7 +81,9 @@
       "startedAt": null,
       "finishedAt": "2026-11-13T16:15:00Z",
       "lastRunId": "c-aa359f36",
-      "runIds": ["c-aa359f36"],
+      "runIds": [
+        "c-aa359f36"
+      ],
       "commits": [],
       "evidence": [
         {
@@ -125,8 +127,12 @@
       "startedAt": null,
       "finishedAt": "2026-11-13T16:15:00Z",
       "lastRunId": "c-aa359f36",
-      "runIds": ["c-aa359f36"],
-      "commits": ["8ce30e5"],
+      "runIds": [
+        "c-aa359f36"
+      ],
+      "commits": [
+        "8ce30e5"
+      ],
       "evidence": [
         {
           "at": "2026-11-13T16:15:00Z",
@@ -172,7 +178,7 @@
           "by": "coordinator (Cowork session)",
           "link": "http://127.0.0.1:4177/#/build?app=aimoneyprinter&step=AMP-002",
           "kind": "browser",
-          "detail": "Live dashboard 11:32 UTC: Projects \u2192 AiMoneyPrinter \u2192 Build Steps shows its own 53-step AMP checklist (launch P0 39 / backlog 14), Needs Dylan and Ready to test sections. Reorder check: AMP-012 moved above AMP-011, page reloaded, order persisted in API and UI, then restored.",
+          "detail": "Live dashboard 11:32 UTC: Projects → AiMoneyPrinter → Build Steps shows its own 53-step AMP checklist (launch P0 39 / backlog 14), Needs Dylan and Ready to test sections. Reorder check: AMP-012 moved above AMP-011, page reloaded, order persisted in API and UI, then restored.",
           "model": null
         },
         {
@@ -216,7 +222,9 @@
       "startedAt": "2026-11-13T16:15:00Z",
       "finishedAt": null,
       "lastRunId": "c-aa359f36",
-      "runIds": ["c-aa359f36"],
+      "runIds": [
+        "c-aa359f36"
+      ],
       "commits": [],
       "evidence": [
         {
@@ -242,7 +250,7 @@
         }
       ],
       "blocker": null,
-      "notes": "Partial work exists: lib/aimp/contracts.ts (\u00a712.4) and docs/aimp/proposed/aimp_commerce_core.sql (\u00a712.3, RLS, PGlite-validated). Review decides what to extend; migration goes to local Supabase only.",
+      "notes": "Partial work exists: lib/aimp/contracts.ts (§12.4) and docs/aimp/proposed/aimp_commerce_core.sql (§12.3, RLS, PGlite-validated). Review decides what to extend; migration goes to local Supabase only.",
       "legacy": [
         "aimp-1.3",
         "aimp-1.4",
@@ -270,8 +278,11 @@
       "worktree": "~/Developer/AIMONEYPRINTER",
       "startedAt": "2026-11-13T16:40:00Z",
       "finishedAt": null,
-      "lastRunId": "c-aa359f36",
-      "runIds": ["c-aa359f36"],
+      "lastRunId": "c-a7fe8df1",
+      "runIds": [
+        "c-aa359f36",
+        "c-a7fe8df1"
+      ],
       "commits": [],
       "evidence": [
         {
@@ -279,6 +290,12 @@
           "kind": "note",
           "level": "Local",
           "detail": "Cycle c-aa359f36: the session's only allowed working directory is VENTRA-FEATURES. `cd /Users/dylan/Developer/AIMONEYPRINTER` was refused (outside allowed directories), and `VENTRA_REPO=... ventra-git commit` asked for approval, which a non-interactive cycle cannot give. Read-only `git -C ... status/diff --stat` and npm --prefix checks work."
+        },
+        {
+          "at": "2026-11-13T17:15:00Z",
+          "kind": "note",
+          "level": "Local",
+          "detail": "Re-checked in cycle c-a7fe8df1: cd into ~/Developer/AIMONEYPRINTER and VENTRA_REPO=... ventra-git status both still need approval. Still blocked; now 6 verified tasks held uncommitted (AMP-003, 030, 004, 011, 012, 010)."
         }
       ],
       "blocker": {
@@ -288,7 +305,7 @@
         "action": "Add ~/Developer/AIMONEYPRINTER as an allowed directory for coordinator cycles (launcher --add-dir, or additionalDirectories in the settings the launcher uses), or run ventra-git yourself for the paths listed in HANDOFF.md.",
         "where": "Agent Dashboard launcher settings on the Mac mini",
         "why": "Verified AMP-003 and AMP-030 work is waiting uncommitted in the AiMoneyPrinter repo.",
-        "unlocks": "Commits for AMP-003, AMP-030 and every later AMP task.",
+        "unlocks": "Commits for AMP-003, AMP-030, AMP-004, AMP-011, AMP-012, AMP-010 and every later AMP task.",
         "continuing": "Specialists still build and the coordinator still verifies with npm --prefix; work is held uncommitted with per-task file lists.",
         "since": "2026-11-13T16:40:00Z"
       },
@@ -303,12 +320,16 @@
       "module": "aimp",
       "tier": "P0",
       "owner": "ventra-backend",
-      "state": "queued",
+      "state": "verified",
       "priority": 1,
       "dependsOn": [
         "AMP-003"
       ],
-      "scope": [],
+      "scope": [
+        "apps/web/lib/aimp/providers/**",
+        "apps/web/lib/aimp/flags.ts",
+        "apps/web/test/aimp-providers-*.test.ts"
+      ],
       "acceptance": [
         "The app and core workflow run locally with labelled fixtures when external credentials are missing."
       ],
@@ -316,16 +337,46 @@
       "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
       "branch": "aimp/foundation",
       "worktree": "~/Developer/AIMONEYPRINTER",
-      "startedAt": null,
-      "finishedAt": null,
-      "lastRunId": null,
-      "runIds": [],
+      "startedAt": "2026-11-13T16:45:00Z",
+      "finishedAt": "2026-11-13T16:45:00Z",
+      "lastRunId": "c-a7fe8df1",
+      "runIds": [
+        "c-a7fe8df1"
+      ],
       "commits": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "at": "2026-11-13T16:45:00Z",
+          "kind": "note",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "Dispatched to ventra-backend (sonnet) in cycle c-a7fe8df1: provider registry with disabled/disconnected/fixture states, labelled fixtures, flags."
+        },
+        {
+          "at": "2026-11-13T16:45:00Z",
+          "kind": "review",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "ventra-review (sonnet): approve with nits on both; medium/low findings fixed in one rework round by the same specialist (sonnet)."
+        },
+        {
+          "at": "2026-11-13T16:45:00Z",
+          "kind": "test",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "Coordinator ran in ~/Developer/AIMONEYPRINTER after rework: lint exit 0, typecheck exit 0, npm test 1170 tests, 1165 pass, 5 todo, 0 fail (cycle baseline 1147/1142). UNCOMMITTED: commits blocked by AMP-005-D."
+        },
+        {
+          "at": "2026-11-13T16:45:00Z",
+          "kind": "diff",
+          "level": "Local",
+          "detail": "Files: lib/aimp/flags.ts, lib/aimp/providers/{types,status,fixtures,registry,index}.ts, test/aimp-providers-registry.test.ts (11 tests). Live needs explicit AIMP_<P>_LIVE=1 plus credentials; test status labelled demo data; secrets presence-only."
+        }
+      ],
       "blocker": null,
-      "notes": "",
+      "notes": "Credential variable names in providers/status.ts PROVIDER_META are guesses (ANTHROPIC_API_KEY, STRIPE_SECRET_KEY, RESEND_API_KEY, SUPABASE_URL/SERVICE_ROLE_KEY, PINTEREST_ACCESS_TOKEN, VERCEL_API_TOKEN). No live adapters yet.",
       "legacy": [],
-      "model": null
+      "model": "sonnet"
     },
     {
       "id": "AMP-010",
@@ -334,12 +385,16 @@
       "module": "aimp",
       "tier": "P0",
       "owner": "ventra-web-design",
-      "state": "queued",
+      "state": "verified",
       "priority": 1,
       "dependsOn": [
         "AMP-003"
       ],
-      "scope": [],
+      "scope": [
+        "apps/web/lib/aimp/onboarding/**",
+        "apps/web/app/tools/aimp-onboarding/**",
+        "apps/web/test/aimp-onboarding-*.test.ts"
+      ],
       "acceptance": [
         "A user can leave and resume onboarding without losing answers."
       ],
@@ -347,18 +402,42 @@
       "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
       "branch": "aimp/foundation",
       "worktree": "~/Developer/AIMONEYPRINTER",
-      "startedAt": null,
-      "finishedAt": null,
-      "lastRunId": null,
-      "runIds": [],
+      "startedAt": "2026-11-13T16:47:00Z",
+      "finishedAt": "2026-11-13T17:15:00Z",
+      "lastRunId": "c-a7fe8df1",
+      "runIds": [
+        "c-a7fe8df1"
+      ],
       "commits": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "at": "2026-11-13T16:47:00Z",
+          "kind": "note",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "Dispatched to ventra-web-design (sonnet): onboarding answers model with validation and save/resume, mobile test page /tools/aimp-onboarding."
+        },
+        {
+          "at": "2026-11-13T17:15:00Z",
+          "kind": "test",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "Coordinator ran in ~/Developer/AIMONEYPRINTER after rework: lint exit 0, typecheck exit 0, npm test 1212 tests, 1207 pass, 5 todo, 0 fail. Not browser-checked (local HTTP to the dev server needs approval in coordinator sessions). UNCOMMITTED: commits blocked by AMP-005-D."
+        },
+        {
+          "at": "2026-11-13T17:15:00Z",
+          "kind": "review",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "ventra-review: request changes (limits mismatch with finder, 1-char items, draft key collisions). Fixed by ventra-web-design (sonnet); re-review approve. toProfile returns FinderProfile, test feeds it into findOpportunities. Files: lib/aimp/onboarding/{model,store}.ts, app/tools/aimp-onboarding/page.tsx, test/aimp-onboarding-{model,store}.test.ts."
+        }
+      ],
       "blocker": null,
-      "notes": "",
+      "notes": "Uses labelled demo key draftKey(demo-user, demo-workspace): no clean reusable sign-in/workspace hook found; wiring real identity is a follow-up. Drafts stored in this browser only.",
       "legacy": [
         "aimp-2.1"
       ],
-      "model": null
+      "model": "sonnet"
     },
     {
       "id": "AMP-011",
@@ -367,12 +446,15 @@
       "module": "aimp",
       "tier": "P0",
       "owner": "ventra-feature",
-      "state": "queued",
+      "state": "verified",
       "priority": 1,
       "dependsOn": [
         "AMP-003"
       ],
-      "scope": [],
+      "scope": [
+        "apps/web/lib/aimp/blueprints/**",
+        "apps/web/test/aimp-blueprint-*.test.ts"
+      ],
       "acceptance": [
         "A versioned blueprint can generate a consistent launch plan from validated inputs."
       ],
@@ -380,18 +462,48 @@
       "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
       "branch": "aimp/foundation",
       "worktree": "~/Developer/AIMONEYPRINTER",
-      "startedAt": null,
-      "finishedAt": null,
-      "lastRunId": null,
-      "runIds": [],
+      "startedAt": "2026-11-13T16:45:00Z",
+      "finishedAt": "2026-11-13T16:45:00Z",
+      "lastRunId": "c-a7fe8df1",
+      "runIds": [
+        "c-a7fe8df1"
+      ],
       "commits": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "at": "2026-11-13T16:45:00Z",
+          "kind": "note",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "Dispatched to ventra-feature (sonnet) in cycle c-a7fe8df1: versioned blueprint library (printable planners pilot) and deterministic launch-plan generation from validated inputs."
+        },
+        {
+          "at": "2026-11-13T16:45:00Z",
+          "kind": "review",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "ventra-review (sonnet): approve with nits on both; medium/low findings fixed in one rework round by the same specialist (sonnet)."
+        },
+        {
+          "at": "2026-11-13T16:45:00Z",
+          "kind": "test",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "Coordinator ran in ~/Developer/AIMONEYPRINTER after rework: lint exit 0, typecheck exit 0, npm test 1170 tests, 1165 pass, 5 todo, 0 fail (cycle baseline 1147/1142). UNCOMMITTED: commits blocked by AMP-005-D."
+        },
+        {
+          "at": "2026-11-13T16:45:00Z",
+          "kind": "diff",
+          "level": "Local",
+          "detail": "Files: lib/aimp/blueprints/{schema,registry,plan,index}.ts, test/aimp-blueprint-library.test.ts (11 tests). Planner v1.0.0 + tracker/checklist/niche-kit on one document engine; deterministic generateLaunchPlan with typed errors; reuses preview/blueprints.ts pin ideas."
+        }
+      ],
       "blocker": null,
-      "notes": "Pilot family chosen (reversible): printable planners.",
+      "notes": "Pilot family: printable planners. Input ranges and A$ cost defaults are placeholders to confirm; salesToCoverCost ignores fees/GST (preview/profit.ts not wired yet).",
       "legacy": [
         "aimp-3.0"
       ],
-      "model": null
+      "model": "sonnet"
     },
     {
       "id": "AMP-012",
@@ -400,12 +512,16 @@
       "module": "aimp",
       "tier": "P0",
       "owner": "ventra-feature",
-      "state": "implemented",
+      "state": "verified",
       "priority": 1,
       "dependsOn": [
         "AMP-011"
       ],
-      "scope": [],
+      "scope": [
+        "apps/web/lib/aimp/opportunities/**",
+        "apps/web/app/tools/opportunity-finder/**",
+        "apps/web/test/aimp-opportunity-*.test.ts"
+      ],
       "acceptance": [
         "Each idea explains what to sell, to whom, and why it fits. Missing evidence is visible. The score is presented as a fit score."
       ],
@@ -413,19 +529,43 @@
       "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
       "branch": "aimp/foundation",
       "worktree": "~/Developer/AIMONEYPRINTER",
-      "startedAt": null,
-      "finishedAt": null,
-      "lastRunId": null,
-      "runIds": [],
+      "startedAt": "2026-11-13T16:47:00Z",
+      "finishedAt": "2026-11-13T17:15:00Z",
+      "lastRunId": "c-a7fe8df1",
+      "runIds": [
+        "c-a7fe8df1"
+      ],
       "commits": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "at": "2026-11-13T16:47:00Z",
+          "kind": "note",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "Reconciled: state implemented had no scope or evidence (only partial scoring code), so set to running. Dispatched to ventra-feature (sonnet): five-idea finder with stored sources/dates/confidence and fit score, test page /tools/opportunity-finder."
+        },
+        {
+          "at": "2026-11-13T17:15:00Z",
+          "kind": "test",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "Coordinator ran in ~/Developer/AIMONEYPRINTER after rework: lint exit 0, typecheck exit 0, npm test 1212 tests, 1207 pass, 5 todo, 0 fail. Not browser-checked (local HTTP to the dev server needs approval in coordinator sessions). UNCOMMITTED: commits blocked by AMP-005-D."
+        },
+        {
+          "at": "2026-11-13T17:15:00Z",
+          "kind": "review",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "ventra-review: approve with nits; fixed in one rework round (PROFILE_LIMITS exported, internal label for blueprint-default cost evidence, live-mode no-signals note, candidate.id keying, fixture confidence capped low, a11y). Files: lib/aimp/opportunities/{types,profile,candidates,find,index}.ts, app/tools/opportunity-finder/page.tsx, test/aimp-opportunity-finder.test.ts."
+        }
+      ],
       "blocker": null,
-      "notes": "Partial work exists: lib/aimp/opportunity-scoring.ts (deterministic rubric, 5/5 tests per README) and lib/aimp/preview/recommend.ts. Five-idea flow with stored sources to build.",
+      "notes": "Open: rubric has 6 factors (repeatPurchases extra); startup cost includes optional promotion (budgets under A$28 exclude all); demo catalogue is sample data, real sources need a liveSignals adapter.",
       "legacy": [
         "aimp-2.2",
         "aimp-2.3"
       ],
-      "model": null
+      "model": "sonnet"
     },
     {
       "id": "AMP-013",
@@ -657,7 +797,9 @@
       "startedAt": "2026-11-13T16:15:00Z",
       "finishedAt": null,
       "lastRunId": "c-aa359f36",
-      "runIds": ["c-aa359f36"],
+      "runIds": [
+        "c-aa359f36"
+      ],
       "commits": [],
       "evidence": [
         {
@@ -963,7 +1105,7 @@
       "dependsOn": [],
       "scope": [],
       "acceptance": [
-        "Dylan completes: In Stripe test mode copy the secret key and enable Connect; put STRIPE_SECRET_KEY=sk_test_\u2026 (and the webhook secret from `stripe listen`) into ~/Developer/AIMONEYPRINTER/apps/web/.env.local \u2014 never paste keys into chat or the dashboard"
+        "Dylan completes: In Stripe test mode copy the secret key and enable Connect; put STRIPE_SECRET_KEY=sk_test_… (and the webhook secret from `stripe listen`) into ~/Developer/AIMONEYPRINTER/apps/web/.env.local — never paste keys into chat or the dashboard"
       ],
       "verifyLevel": "local",
       "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
@@ -979,11 +1121,11 @@
         "reason": "Provider-test checkout and seller onboarding need a real Stripe test account; agents never create accounts or read .env files.",
         "needsApproval": true,
         "owner": true,
-        "action": "In Stripe test mode copy the secret key and enable Connect; put STRIPE_SECRET_KEY=sk_test_\u2026 (and the webhook secret from `stripe listen`) into ~/Developer/AIMONEYPRINTER/apps/web/.env.local \u2014 never paste keys into chat or the dashboard",
-        "where": "dashboard.stripe.com (Test mode) \u2192 Developers \u2192 API keys, and Settings \u2192 Connect",
+        "action": "In Stripe test mode copy the secret key and enable Connect; put STRIPE_SECRET_KEY=sk_test_… (and the webhook secret from `stripe listen`) into ~/Developer/AIMONEYPRINTER/apps/web/.env.local — never paste keys into chat or the dashboard",
+        "where": "dashboard.stripe.com (Test mode) → Developers → API keys, and Settings → Connect",
         "why": "Provider-test checkout and seller onboarding need a real Stripe test account; agents never create accounts or read .env files.",
         "unlocks": "AMP-043 provider-test checkout and delivery; AMP-044 test billing.",
-        "continuing": "AMP-040\u2013042 on fixtures; AMP-050/051 campaign generation and export.",
+        "continuing": "AMP-040–042 on fixtures; AMP-050/051 campaign generation and export.",
         "since": "2026-11-13T11:27:04Z"
       },
       "notes": "Owner action split from the implementation task (Needs Dylan).",
@@ -1153,7 +1295,7 @@
         "needsApproval": true,
         "owner": true,
         "action": "Create a Pinterest Business account and a developer app, request Trial/Standard API access, and add the app id/secret to ~/Developer/AIMONEYPRINTER/apps/web/.env.local",
-        "where": "developers.pinterest.com \u2192 My apps (Business account)",
+        "where": "developers.pinterest.com → My apps (Business account)",
         "why": "Publishing needs real Pinterest API access; agents cannot create accounts or request API access.",
         "unlocks": "AMP-052 provider-test publishing and AMP-054 first real organic post.",
         "continuing": "AMP-050/051 campaign generation and export; AMP-053 opt-in forms.",
@@ -1355,7 +1497,7 @@
     },
     {
       "id": "AMP-064",
-      "title": "Full local release check: signup \u2192 five ideas \u2192 product \u2192 publish \u2192 checkout \u2192 delivery \u2192 campaign; mobile flows and two-tenant isolation",
+      "title": "Full local release check: signup → five ideas → product → publish → checkout → delivery → campaign; mobile flows and two-tenant isolation",
       "phase": "a",
       "module": "aimp",
       "tier": "P0",

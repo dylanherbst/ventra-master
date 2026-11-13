@@ -15,6 +15,22 @@ Dylan asked for the mobile app preview link to be sent to him on Telegram. Send 
 
 ## Master Coordinator (auto)
 
+- Last cycle: c-a7fe8df1 at 2026-11-14 01:15 AWST · 4 dispatched (AMP-004, AMP-011, AMP-012, AMP-010, all Sonnet) + 3 reviews + 4 rework rounds · 4 verified locally, 0 committed · 0 new blockers
+- Integration branch: agent/develop @ 8cff670 (board commit follows). AMP repo: ~/Developer/AIMONEYPRINTER aimp/foundation @ 2085c70 + UNCOMMITTED verified work. Coordinator checks: lint 0, typecheck 0, npm test 1212 / 1207 pass / 5 todo / 0 fail.
+- Commit these when AMP-005-D clears (one commit per task; AMP-003 and AMP-030 file lists below under c-aa359f36):
+  - AMP-004: apps/web/lib/aimp/flags.ts apps/web/lib/aimp/providers/ apps/web/test/aimp-providers-registry.test.ts
+  - AMP-011: apps/web/lib/aimp/blueprints/ apps/web/test/aimp-blueprint-library.test.ts
+  - AMP-012: apps/web/lib/aimp/opportunities/ apps/web/app/tools/opportunity-finder/ apps/web/test/aimp-opportunity-finder.test.ts
+  - AMP-010: apps/web/lib/aimp/onboarding/ apps/web/app/tools/aimp-onboarding/ apps/web/test/aimp-onboarding-model.test.ts apps/web/test/aimp-onboarding-store.test.ts (imports opportunities: commit after AMP-012)
+- Not browser-checked: /tools/opportunity-finder, /tools/aimp-onboarding, /s/iron-and-oak (local HTTP needs approval in coordinator sessions).
+- Owner decisions (non-blocking): provider credential variable names in providers/status.ts are guesses; blueprint input ranges and A$ cost defaults are placeholders; finder startup cost includes the optional A$20 promotion; onboarding uses a demo identity key until a sign-in hook is wired.
+- Running / implemented (needs reconciling next cycle): none.
+- Blocked, needs the owner: AMP-005-D (add ~/Developer/AIMONEYPRINTER as an allowed directory for coordinator cycles; 6 verified tasks waiting), AMP-043-D Stripe test keys, AMP-052-D Pinterest app.
+- Leftover: scripts/agents/.cycle-*.jq from the previous cycle (temp, safe to delete). Foreign uncommitted changes left alone: README.md, COORDINATOR.md, STATUS.md, scripts/agents/ventra-coord, ventra-coordinator, ventra-master.
+- Next up: commit the six tasks; then AMP-013 (opportunity preview and selection, now unblocked), AMP-021 (Product Factory v1, unblocked by AMP-011 + AMP-004), AMP-060 (job orchestration).
+
+### Previous cycle c-aa359f36
+
 - Last cycle: c-aa359f36 at 2026-11-14 00:45 AWST · 2 dispatched (AMP-003, AMP-030, both Sonnet) + 1 review + 1 rework · 2 verified locally, 0 committed · 1 new owner blocker (AMP-005-D)
 - Workstream: AiMoneyPrinter only (owner note 2026-11-13 20:55 handled; 21 queued VENTRA tasks on TASK_BOARD/WEBSITE_BOARD set to deferred, note "VENTRA archived 2026-11-13").
 - AMP repo: ~/Developer/AIMONEYPRINTER aimp/foundation @ 2085c70 + UNCOMMITTED verified work. Checks by coordinator: lint 0, typecheck 0, npm test 1147 / 1142 pass / 5 todo / 0 fail.
@@ -261,50 +277,44 @@ Tracker Phase 0: 0.1 scope freeze, 0.2 orchestrator, 0.3 lead store + state mach
 ## Git state (auto)
 
 <!-- git-state:start -->
-_Generated 2026-11-14 00:17 by `ventra-handoff snapshot`. Do not hand-edit this block._
+_Generated 2026-11-14 00:59 by `ventra-handoff snapshot`. Do not hand-edit this block._
 - Branch: `agent/develop`
-- HEAD: `1962c7e chore(coordinator): cycle c-ceead848 board and handoff`
-- Lock: coordinator (pid 47507, 12 min old)
+- HEAD: `8cff670 chore(coordinator): cycle c-aa359f36 board and handoff; AiMoneyPrinter only: AMP-001/001-D done, AMP-003/030 verified (uncommitted in AMP repo, AMP-005-D), VENTRA queued tasks deferred, AMP audit added`
+- Lock: coordinator (pid 57730, 24 min old)
 - Uncommitted changes:
 ```text
  M HANDOFF.md
  M README.md
+ M docs/agents/AIMP_BOARD.json
  M docs/agents/COORDINATOR.md
- M docs/agents/OWNER_NOTES.md
  M docs/agents/STATUS.md
  M docs/agents/TASKS.md
- M docs/agents/TASK_BOARD.json
- M docs/agents/WEBSITE_BOARD.json
  M scripts/agents/ventra-coord
  M scripts/agents/ventra-coordinator
  M scripts/agents/ventra-master
-?? docs/agents/AIMP_AUDIT.md
-?? docs/agents/AIMP_BOARD.json
 ?? scripts/agents/.cycle-aimp.jq
 ?? scripts/agents/.cycle-defer.jq
 ```
 - Diff stat vs HEAD:
 ```text
- HANDOFF.md                        |  33 ++--
+ HANDOFF.md                        |  16 +++
  README.md                         |   2 +
- docs/agents/COORDINATOR.md        |  46 +++++-
- docs/agents/OWNER_NOTES.md        |  15 ++
+ docs/agents/AIMP_BOARD.json       | 260 +++++++++++++++++++++++++++++---------
+ docs/agents/COORDINATOR.md        |  46 ++++++-
  docs/agents/STATUS.md             |   2 +
- docs/agents/TASKS.md              |   3 +
- docs/agents/TASK_BOARD.json       | 309 ++++++++++++++++++++++++++++++++++++--
- docs/agents/WEBSITE_BOARD.json    |  30 ++--
+ docs/agents/TASKS.md              |   6 +-
  scripts/agents/ventra-coord       |   6 +
- scripts/agents/ventra-coordinator |  33 ++--
+ scripts/agents/ventra-coordinator |  33 +++--
  scripts/agents/ventra-master      |   3 +-
- 11 files changed, 428 insertions(+), 54 deletions(-)
+ 9 files changed, 299 insertions(+), 75 deletions(-)
 ```
 - Recent commits:
 ```text
+8cff670 chore(coordinator): cycle c-aa359f36 board and handoff; AiMoneyPrinter only: AMP-001/001-D done, AMP-003/030 verified (uncommitted in AMP repo, AMP-005-D), VENTRA queued tasks deferred, AMP audit added
 1962c7e chore(coordinator): cycle c-ceead848 board and handoff
 7159570 test(front-office): A-53 review nits in the live QA suite: numbers in replies may also come from tool results and the caller's text (not in X5, where reading back an injected number must fail); usage.priceKnown from priceFor(model).known with a note that unpriced models are costed at the top rate; X5 records input only after the break check; IS_AI needs AI/bot or an AI/virtual/digital assistant phrase, CLAIMS_HUMAN accepts curly apostrophes and 'I am not a bot' [A-80]
 bdf70c0 chore(coordinator): cycle c-a3429447 board and handoff
 599b252 test(front-office): live AI QA scenarios S2, S3, S5, S7, X1, R1, R5, R6, X5 through the real labs and model adapter; skipped unless FRONT_OFFICE_QA_LIVE=1 (no key read, no network otherwise), fetch confined to the model host, call and AUD cap enforced before each call via meteredLlm, fallback replies cannot hide a cap hit [A-53]
-045e4e9 test(front-office): email runner with no email sender falls back to SMS (cancelled without an SMS grant, sent with one); runDueJobs comment says which job kinds go where and that only follow-ups are consent-gated [A-50]
 ```
 <!-- git-state:end -->
 
