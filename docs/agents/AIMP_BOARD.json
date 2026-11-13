@@ -2,7 +2,7 @@
   "version": 1,
   "project": "aimp",
   "app": "aimoneyprinter",
-  "updatedAt": "2026-11-13T17:32:06Z",
+  "updatedAt": "2026-11-13T17:58:40Z",
   "integrationBranch": "aimp/foundation",
   "worktree": "~/Developer/AIMONEYPRINTER",
   "codingModel": "sonnet",
@@ -54,10 +54,10 @@
     }
   ],
   "lastRun": {
-    "id": "c-960d5bfe",
-    "startedAt": "2026-11-13T17:04:57Z",
-    "endedAt": "2026-11-13T17:32:06Z",
-    "summary": "4 dispatched (AMP-013, AMP-021, AMP-040, AMP-022, all Sonnet), 4 reviews, 4 reworks; 4 verified locally (lint 0, typecheck 0, 1285/1279 pass/0 fail); 0 committed: AMP-005-D still blocks commits in ~/Developer/AIMONEYPRINTER (10 verified tasks held)."
+    "id": "c-f428b679",
+    "startedAt": "2026-11-13T17:34:57Z",
+    "endedAt": "2026-11-13T17:58:40Z",
+    "summary": "AMP-020, AMP-024, AMP-031 verified locally (Sonnet, reviewed, 1 rework each, 1376 tests 0 fail); held uncommitted in the AMP repo by AMP-005-D (13 tasks waiting)."
   },
   "tasks": [
     {
@@ -278,11 +278,12 @@
       "worktree": "~/Developer/AIMONEYPRINTER",
       "startedAt": "2026-11-13T16:40:00Z",
       "finishedAt": null,
-      "lastRunId": "c-960d5bfe",
+      "lastRunId": "c-f428b679",
       "runIds": [
         "c-aa359f36",
         "c-a7fe8df1",
-        "c-960d5bfe"
+        "c-960d5bfe",
+        "c-f428b679"
       ],
       "commits": [],
       "evidence": [
@@ -303,6 +304,18 @@
           "level": "Local",
           "kind": "note",
           "detail": "Re-checked in cycle c-960d5bfe: VENTRA_REPO=~/Developer/AIMONEYPRINTER ventra-git status still requires approval. Still blocked; 6 verified tasks held uncommitted."
+        },
+        {
+          "at": "2026-11-13T17:36:55Z",
+          "level": "Local",
+          "kind": "note",
+          "detail": "Re-checked in cycle c-f428b679: VENTRA_REPO=~/Developer/AIMONEYPRINTER ventra-git status still answers 'This command requires approval'. Still blocked; 10 verified tasks held uncommitted (AMP-003, 004, 010, 011, 012, 013, 021, 022, 030, 040)."
+        },
+        {
+          "at": "2026-11-13T17:58:40Z",
+          "level": "Local",
+          "kind": "note",
+          "detail": "End of cycle c-f428b679: 13 verified tasks now held uncommitted (added AMP-020, AMP-024, AMP-031)."
         }
       ],
       "blocker": {
@@ -319,7 +332,7 @@
       "notes": "Never worked around: no settings or guard edits by the coordinator.",
       "legacy": [],
       "model": null,
-      "updatedAt": "2026-11-13T17:06:15Z"
+      "updatedAt": "2026-11-13T17:58:40Z"
     },
     {
       "id": "AMP-004",
@@ -645,31 +658,58 @@
       "module": "aimp",
       "tier": "P0",
       "owner": "ventra-feature",
-      "state": "queued",
+      "state": "verified",
       "priority": 1,
       "dependsOn": [
         "AMP-013"
       ],
-      "scope": [],
+      "scope": [
+        "apps/web/lib/aimp/branding/**",
+        "apps/web/app/tools/aimp-branding/**",
+        "apps/web/test/aimp-branding-*.test.ts"
+      ],
       "acceptance": [
-        "Approved brand settings populate product previews, the store and marketing materials consistently."
+        "Approved brand settings populate product previews, the store and marketing materials consistently.",
+        "Deterministic branding generator (no live AI calls): 3+ name options, palette with WCAG AA contrast, tone, listing copy; approving produces one approved BrandProfile per business, exposed through an adapter a storefront config and product previews can consume (no edits to storefront or products in this task)."
       ],
       "verifyLevel": "local",
       "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
       "branch": "aimp/foundation",
       "worktree": "~/Developer/AIMONEYPRINTER",
-      "startedAt": null,
-      "finishedAt": null,
-      "lastRunId": null,
-      "runIds": [],
+      "startedAt": "2026-11-13T17:36:00Z",
+      "finishedAt": "2026-11-13T17:58:40Z",
+      "lastRunId": "c-f428b679",
+      "runIds": [
+        "c-f428b679"
+      ],
       "commits": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "at": "2026-11-13T17:47:35Z",
+          "level": "Local",
+          "kind": "test",
+          "detail": "Coordinator ran in ~/Developer/AIMONEYPRINTER after all three specialists (Sonnet) returned: lint exit 0, typecheck exit 0, npm test 1354 tests / 1348 pass / 0 fail / 1 skipped (qpdf) / 5 todo (baseline 1285). Branding adds 24 tests. Files: lib/aimp/branding/{contrast,types,validate,generate,store,service,adapters,index}.ts, app/tools/aimp-branding/{page.tsx,branding-demo.tsx}, test/aimp-branding-{generate,service}.test.ts. Not browser-checked. Sent to ventra-review."
+        },
+        {
+          "at": "2026-11-13T17:49:01Z",
+          "level": "Local",
+          "kind": "review",
+          "detail": "ventra-review: request changes. High: adapters accept non-approved brands; nearest storefront theme can disagree with the brand and blush accentInk/accent is ~4.3:1 (fails AA). Medium: slugs not unique across tenants. Low: rename silently changes slug, `in` vs Object.hasOwn, generator copy can trip the income-promise check, channels assumes 6-digit hex. Contrast maths, determinism, single-approved invariant, tenant scoping, test-page XSS checked fine. Sent back to ventra-feature (sonnet) for one rework round."
+        },
+        {
+          "at": "2026-11-13T17:58:40Z",
+          "level": "Local",
+          "kind": "test",
+          "detail": "After one rework round (ventra-feature, sonnet): all 7 review items + nits fixed. Coordinator ran: lint exit 0, typecheck exit 0, npm test 1376 / 1370 pass / 0 fail / 1 skipped (qpdf) / 5 todo. Branding tests 32. Coordinator read adapters.ts:13 (BrandNotApprovedError unless status approved) and service.ts:175 (isSlugTaken checked on approve)."
+        }
+      ],
       "blocker": null,
-      "notes": "",
+      "notes": "Verified locally, UNCOMMITTED (AMP-005-D). Commit: apps/web/lib/aimp/branding/ apps/web/app/tools/aimp-branding/ apps/web/test/aimp-branding-generate.test.ts apps/web/test/aimp-branding-service.test.ts. Follow-ups: storefront renders named themes only (exact brand palette needs a storefront change); DB store needs a unique index on approved slugs; /tools/aimp-branding not browser-checked.",
       "legacy": [
         "aimp-4.2"
       ],
-      "model": null
+      "model": "sonnet",
+      "updatedAt": "2026-11-13T17:58:40Z"
     },
     {
       "id": "AMP-021",
@@ -843,32 +883,60 @@
       "module": "aimp",
       "tier": "P0",
       "owner": "ventra-backend",
-      "state": "queued",
+      "state": "verified",
       "priority": 1,
       "dependsOn": [
         "AMP-003",
         "AMP-022"
       ],
-      "scope": [],
+      "scope": [
+        "apps/web/lib/aimp/files/**",
+        "apps/web/app/api/aimp/files/**",
+        "apps/web/app/tools/secure-files/**",
+        "apps/web/test/aimp-files-*.test.ts"
+      ],
       "acceptance": [
-        "A buyer can download the purchased file. Other tenants and unauthorised visitors cannot retrieve it."
+        "A buyer can download the purchased file. Other tenants and unauthorised visitors cannot retrieve it.",
+        "Master files and approved previews stored separately; download grants are order-bound, tenant-scoped, HMAC-signed and expiring; revoke and reissue; denied for other tenants, expired, revoked, unpaid or tampered tokens; every decision audit-logged."
       ],
       "verifyLevel": "local",
       "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
       "branch": "aimp/foundation",
       "worktree": "~/Developer/AIMONEYPRINTER",
-      "startedAt": null,
-      "finishedAt": null,
-      "lastRunId": null,
-      "runIds": [],
+      "startedAt": "2026-11-13T17:36:00Z",
+      "finishedAt": "2026-11-13T17:58:40Z",
+      "lastRunId": "c-f428b679",
+      "runIds": [
+        "c-f428b679"
+      ],
       "commits": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "at": "2026-11-13T17:47:35Z",
+          "level": "Local",
+          "kind": "test",
+          "detail": "Coordinator checks (same run): lint 0, typecheck 0, npm test 1354/1348 pass/0 fail. Files adds 23 tests. Files: lib/aimp/files/{types,storage,token,config,service,handler,demo,index}.ts, app/api/aimp/files/[token]/route.ts, app/tools/secure-files/{page.tsx,actions.ts}, test/aimp-files-delivery.test.ts. Signing secret read by env name AIMP_FILES_SIGNING_SECRET (no value set or read by coordinator). Not browser-checked. Sent to ventra-review (security)."
+        },
+        {
+          "at": "2026-11-13T17:49:01Z",
+          "level": "Local",
+          "kind": "review",
+          "detail": "ventra-review: request changes. High: approving v2 marks v1 superseded and breaks paid buyers' v1 links and reissue (service.ts approvedOrThrow). Medium: non-canonical base64url signatures accepted (test flaky ~1/16); revoke/expiry race with tryConsume; unbounded in-memory audit log; concurrent reissue leaves two active grants; config error escapes try (500); unvalidated contentType header. Low: refundOrder guard, demo tool open in production builds. HMAC/timingSafeEqual, path traversal guards, tenant checks, Content-Disposition sanitising, secret handling checked fine. Sent back to ventra-backend (sonnet) for one rework round."
+        },
+        {
+          "at": "2026-11-13T17:58:40Z",
+          "level": "Local",
+          "kind": "test",
+          "detail": "After one rework round (ventra-backend, sonnet): A1-C2 + nits fixed. Coordinator ran: lint 0, typecheck 0, npm test 1376/1370 pass/0 fail. Files tests 32. Coordinator read service.ts:76 (approved or superseded with approvedHash for delivery), token.ts:26 (canonical base64url check for sig and body), service.ts:117 replaceActive, service.ts:214 atomic tryConsume."
+        }
+      ],
       "blocker": null,
-      "notes": "",
+      "notes": "Verified locally, UNCOMMITTED (AMP-005-D). Commit: apps/web/lib/aimp/files/ \"apps/web/app/api/aimp/files/[token]/route.ts\" apps/web/app/tools/secure-files/ apps/web/test/aimp-files-delivery.test.ts. Follow-ups: Supabase Storage FileStorage + DB GrantStore/OrderBook (download_grants table with atomic consume, file audit events) — live answers 503 until then; real watermarked previews; new env names AIMP_FILES_SIGNING_SECRET and AIMP_TOOLS_ENABLED (names only, no values set).",
       "legacy": [
         "aimp-5.3"
       ],
-      "model": null
+      "model": "sonnet",
+      "updatedAt": "2026-11-13T17:58:40Z"
     },
     {
       "id": "AMP-030",
@@ -940,29 +1008,56 @@
       "module": "aimp",
       "tier": "P0",
       "owner": "ventra-web-design",
-      "state": "queued",
+      "state": "verified",
       "priority": 1,
       "dependsOn": [
         "AMP-030"
       ],
-      "scope": [],
+      "scope": [
+        "apps/web/lib/aimp/site-versions/**",
+        "apps/web/app/tools/site-publish/**",
+        "apps/web/test/aimp-site-versions-*.test.ts"
+      ],
       "acceptance": [
-        "Draft changes stay private until published. A failed update leaves the previous published version serving."
+        "Draft changes stay private until published. A failed update leaves the previous published version serving.",
+        "Draft/publish/pause/rollback store keeps immutable published versions apart from the draft; resolvePublished(slug) returns the last good published version (or paused/none); a publish whose config fails validation leaves the previous version serving. Wiring /s/[store] to it is a follow-up task."
       ],
       "verifyLevel": "local",
       "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
       "branch": "aimp/foundation",
       "worktree": "~/Developer/AIMONEYPRINTER",
-      "startedAt": null,
-      "finishedAt": null,
-      "lastRunId": null,
-      "runIds": [],
+      "startedAt": "2026-11-13T17:36:00Z",
+      "finishedAt": "2026-11-13T17:58:40Z",
+      "lastRunId": "c-f428b679",
+      "runIds": [
+        "c-f428b679"
+      ],
       "commits": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "at": "2026-11-13T17:47:35Z",
+          "level": "Local",
+          "kind": "test",
+          "detail": "Coordinator checks (same run): lint 0, typecheck 0, npm test 1354/1348 pass/0 fail. Site versions adds 22 tests. Files: lib/aimp/site-versions/{store,messages,demo,index}.ts, app/tools/site-publish/{page.tsx,site-publish-demo.tsx}, test/aimp-site-versions-{lifecycle,isolation}.test.ts. /s/[store] not yet wired (follow-up). Not browser-checked. Sent to ventra-review."
+        },
+        {
+          "at": "2026-11-13T17:49:01Z",
+          "level": "Local",
+          "kind": "review",
+          "detail": "ventra-review: request changes. Medium: PublishedVersion record not frozen and getVersion returns the internal object, so a caller can swap the live config. Low-medium: resolvePublished fails closed to none if validation tightens; rollback blocked with misleading message. Nits: no-op publish duplicates a version, StrictMode double seed. Draft leakage none, commit interleaving safe, cloning at boundaries, tenant isolation, test-page safety checked fine. Out of scope follow-ups: storefront/tenant.ts slug 3-63 vs migration 3-42; DB mapping (one published row + archived, published_at check, sites.draft_config/draft_revision, sites.paused, site_events). Sent back to ventra-web-design (sonnet) for one rework round."
+        },
+        {
+          "at": "2026-11-13T17:58:40Z",
+          "level": "Local",
+          "kind": "test",
+          "detail": "After one rework round (ventra-web-design, sonnet): items 1,3,4,6 fixed (2 out of scope). Coordinator ran: lint 0, typecheck 0, npm test 1376/1370 pass/0 fail. Site-version tests 27. Coordinator read store.ts:168 (whole PublishedVersion record deep-frozen incl. source)."
+        }
+      ],
       "blocker": null,
-      "notes": "",
+      "notes": "Verified locally, UNCOMMITTED (AMP-005-D). Commit: apps/web/lib/aimp/site-versions/ apps/web/app/tools/site-publish/ apps/web/test/aimp-site-versions-lifecycle.test.ts apps/web/test/aimp-site-versions-isolation.test.ts apps/web/test/aimp-site-versions-rework.test.ts. Follow-ups (carry into AMP-032): wire /s/[store] to resolvePublished (paused page, notFound for none) with a shared or DB-backed store; slug length mismatch storefront/tenant.ts 3-63 vs migration 3-42; DB mapping per review (archived rows keep published_at, sites.draft_config/draft_revision, sites.paused, site_events).",
       "legacy": [],
-      "model": null
+      "model": "sonnet",
+      "updatedAt": "2026-11-13T17:58:40Z"
     },
     {
       "id": "AMP-032",
@@ -986,16 +1081,19 @@
       "worktree": "~/Developer/AIMONEYPRINTER",
       "startedAt": null,
       "finishedAt": null,
-      "lastRunId": null,
-      "runIds": [],
+      "lastRunId": "c-f428b679",
+      "runIds": [
+        "c-f428b679"
+      ],
       "commits": [],
       "evidence": [],
       "blocker": null,
-      "notes": "",
+      "notes": "Carry from AMP-031 (c-f428b679): wire app/s/[store] to site-versions resolvePublished; align slug length rules (storefront/tenant.ts vs migration sites.slug check); DB mapping for site versions per AMP-031 review.",
       "legacy": [
         "aimp-5.2"
       ],
-      "model": null
+      "model": null,
+      "updatedAt": "2026-11-13T17:58:40Z"
     },
     {
       "id": "AMP-033",
