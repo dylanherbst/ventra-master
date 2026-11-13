@@ -15,6 +15,22 @@ Dylan asked for the mobile app preview link to be sent to him on Telegram. Send 
 
 ## Master Coordinator (auto)
 
+- Last cycle: c-712dc75a at 2026-11-14 03:00 AWST · 3 dispatched (AMP-023, AMP-032, AMP-060, all Sonnet) + 3 reviews (1 approve, 2 request changes) + 3 fix rounds · 3 verified locally, 0 committed · 0 new owner blockers
+- Integration branch: agent/develop @ d03c51c (board commit follows). AMP repo: ~/Developer/AIMONEYPRINTER aimp/foundation @ 2085c70 + UNCOMMITTED verified work (now 16 tasks). Coordinator checks: lint 0, typecheck 0, npm test 1487 / 1481 pass / 0 fail / 1 skipped (qpdf) / 5 todo.
+- AMP-005-D re-checked this cycle: `ventra-git` in the AMP repo still answers "requires approval". Not worked around.
+- Commit these when AMP-005-D clears (after the lists below, one commit per task):
+  - AMP-023: apps/web/lib/aimp/catalogue/ apps/web/app/tools/catalogue/ apps/web/test/aimp-catalogue-pricing.test.ts apps/web/test/aimp-catalogue-service.test.ts (after AMP-020, AMP-022, AMP-024)
+  - AMP-032: apps/web/lib/aimp/hosts/ apps/web/proxy.ts apps/web/app/sitemap.ts apps/web/app/robots.ts apps/web/lib/aimp/storefront/tenant.ts apps/web/lib/aimp/storefront/load.ts "apps/web/app/s/[store]/" apps/web/test/aimp-hosts-resolve.test.ts apps/web/test/aimp-hosts-seo.test.ts (after AMP-030 and AMP-031; shares load.ts and layout.tsx with AMP-030)
+  - AMP-060: apps/web/lib/aimp/jobs/ apps/web/app/tools/aimp-jobs/ apps/web/test/aimp-jobs-runner.test.ts apps/web/test/aimp-jobs-handlers.test.ts (after AMP-004)
+- Owner decisions (non-blocking, reversible): catalogue platform fee 0% (estimate), price bounds A$3–A$100, family default price bands invented; `www.<root>` treated as platform host; /api reachable on store hosts until AMP-041; failed jobs can be retried with the same key. New env NAMES only (no values): AIMP_STORE_TEST_DOMAIN, AIMP_PUBLIC_ASSET_HOSTS.
+- Follow-ups queued: AMP-034 (slug 63→42 in storefront/schema.ts and site-versions), AMP-045 (provider idempotency keys). Also: jobs migration + runner trigger route, DB-backed StoreRegistry (live sitemap empty until then), wire catalogue listings into storefront and checkout (AMP-041).
+- Running / implemented (needs reconciling next cycle): none.
+- Blocked, needs the owner: AMP-005-D (add ~/Developer/AIMONEYPRINTER as an allowed directory for coordinator cycles; 16 verified tasks waiting), AMP-043-D Stripe test keys, AMP-052-D Pinterest app.
+- Leftover temp files (safe to delete, not committed): docs/agents/.cycle-c712*.{mjs,json,jq} plus older .cycle-* files. Foreign uncommitted changes left alone: README.md, COORDINATOR.md, STATUS.md, scripts/agents/ventra-coord, ventra-coordinator, ventra-master.
+- Next up: commit the 16 tasks; then AMP-041 (checkout + order records, now unblocked by AMP-023), AMP-050 (launch campaign, unblocked by AMP-023), AMP-053 (opt-in/CRM, unblocked by AMP-032), AMP-034, AMP-045, AMP-061.
+
+### Previous cycle c-f428b679
+
 - Last cycle: c-f428b679 at 2026-11-14 01:34 AWST · 3 dispatched (AMP-020, AMP-024, AMP-031, all Sonnet) + 3 reviews (all "request changes") + 3 rework rounds · 3 verified locally, 0 committed · 0 new blockers
 - Integration branch: agent/develop @ 8e55095 (board commit follows). AMP repo: ~/Developer/AIMONEYPRINTER aimp/foundation @ 2085c70 + UNCOMMITTED verified work (now 13 tasks). Coordinator checks after rework: lint 0, typecheck 0, npm test 1376 / 1370 pass / 0 fail / 1 skipped (qpdf) / 5 todo.
 - Commit these when AMP-005-D clears (after the lists below, one commit per task):
@@ -310,10 +326,10 @@ Tracker Phase 0: 0.1 scope freeze, 0.2 orchestrator, 0.3 lead store + state mach
 ## Git state (auto)
 
 <!-- git-state:start -->
-_Generated 2026-11-14 01:59 by `ventra-handoff snapshot`. Do not hand-edit this block._
+_Generated 2026-11-14 02:35 by `ventra-handoff snapshot`. Do not hand-edit this block._
 - Branch: `agent/develop`
-- HEAD: `8e55095 chore(coordinator): cycle c-960d5bfe board and handoff; AMP-013, AMP-021, AMP-040, AMP-022 verified locally (Sonnet, reviewed, 1285 tests 0 fail), held uncommitted in the AMP repo by AMP-005-D`
-- Lock: coordinator (pid 83497, 24 min old)
+- HEAD: `d03c51c chore(coordinator): cycle c-f428b679 board and handoff; AMP-020, AMP-024, AMP-031 verified locally (Sonnet, reviewed, reworked, 1376 tests 0 fail), held uncommitted in the AMP repo by AMP-005-D`
+- Lock: coordinator (pid 98191, 27 min old)
 - Uncommitted changes:
 ```text
  M HANDOFF.md
@@ -325,6 +341,14 @@ _Generated 2026-11-14 01:59 by `ventra-handoff snapshot`. Do not hand-edit this 
  M scripts/agents/ventra-coord
  M scripts/agents/ventra-coordinator
  M scripts/agents/ventra-master
+?? docs/agents/.cycle-c712-1.json
+?? docs/agents/.cycle-c712-2.json
+?? docs/agents/.cycle-c712-3.json
+?? docs/agents/.cycle-c712-4.json
+?? docs/agents/.cycle-c712-5.json
+?? docs/agents/.cycle-c712-6.json
+?? docs/agents/.cycle-c712-run.jq
+?? docs/agents/.cycle-c712.mjs
 ?? docs/agents/.cycle-c960-1.json
 ?? docs/agents/.cycle-c960-2.json
 ?? docs/agents/.cycle-c960-3.json
@@ -344,24 +368,24 @@ _Generated 2026-11-14 01:59 by `ventra-handoff snapshot`. Do not hand-edit this 
 ```
 - Diff stat vs HEAD:
 ```text
- HANDOFF.md                        |  15 ++++
+ HANDOFF.md                        |  16 ++
  README.md                         |   2 +
- docs/agents/AIMP_BOARD.json       | 182 +++++++++++++++++++++++++++++---------
- docs/agents/COORDINATOR.md        |  46 +++++++++-
+ docs/agents/AIMP_BOARD.json       | 315 ++++++++++++++++++++++++++++++++++----
+ docs/agents/COORDINATOR.md        |  46 +++++-
  docs/agents/STATUS.md             |   2 +
- docs/agents/TASKS.md              |   3 +
- scripts/agents/ventra-coord       |   6 ++
- scripts/agents/ventra-coordinator |  33 ++++---
+ docs/agents/TASKS.md              |   5 +
+ scripts/agents/ventra-coord       |   6 +
+ scripts/agents/ventra-coordinator |  33 ++--
  scripts/agents/ventra-master      |   3 +-
- 9 files changed, 235 insertions(+), 57 deletions(-)
+ 9 files changed, 380 insertions(+), 48 deletions(-)
 ```
 - Recent commits:
 ```text
+d03c51c chore(coordinator): cycle c-f428b679 board and handoff; AMP-020, AMP-024, AMP-031 verified locally (Sonnet, reviewed, reworked, 1376 tests 0 fail), held uncommitted in the AMP repo by AMP-005-D
 8e55095 chore(coordinator): cycle c-960d5bfe board and handoff; AMP-013, AMP-021, AMP-040, AMP-022 verified locally (Sonnet, reviewed, 1285 tests 0 fail), held uncommitted in the AMP repo by AMP-005-D
 a4a22e0 chore(coordinator): cycle c-a7fe8df1 board and handoff; AMP-004, AMP-011, AMP-012, AMP-010 verified locally (Sonnet, reviewed, 1212 tests 0 fail), held uncommitted in the AMP repo by AMP-005-D
 8cff670 chore(coordinator): cycle c-aa359f36 board and handoff; AiMoneyPrinter only: AMP-001/001-D done, AMP-003/030 verified (uncommitted in AMP repo, AMP-005-D), VENTRA queued tasks deferred, AMP audit added
 1962c7e chore(coordinator): cycle c-ceead848 board and handoff
-7159570 test(front-office): A-53 review nits in the live QA suite: numbers in replies may also come from tool results and the caller's text (not in X5, where reading back an injected number must fail); usage.priceKnown from priceFor(model).known with a note that unpriced models are costed at the top rate; X5 records input only after the break check; IS_AI needs AI/bot or an AI/virtual/digital assistant phrase, CLAIMS_HUMAN accepts curly apostrophes and 'I am not a bot' [A-80]
 ```
 <!-- git-state:end -->
 

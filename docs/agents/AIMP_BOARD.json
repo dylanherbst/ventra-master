@@ -2,7 +2,7 @@
   "version": 1,
   "project": "aimp",
   "app": "aimoneyprinter",
-  "updatedAt": "2026-11-13T17:58:40Z",
+  "updatedAt": "2026-11-13T18:58:00Z",
   "integrationBranch": "aimp/foundation",
   "worktree": "~/Developer/AIMONEYPRINTER",
   "codingModel": "sonnet",
@@ -54,10 +54,10 @@
     }
   ],
   "lastRun": {
-    "id": "c-f428b679",
-    "startedAt": "2026-11-13T17:34:57Z",
-    "endedAt": "2026-11-13T17:58:40Z",
-    "summary": "AMP-020, AMP-024, AMP-031 verified locally (Sonnet, reviewed, 1 rework each, 1376 tests 0 fail); held uncommitted in the AMP repo by AMP-005-D (13 tasks waiting)."
+    "id": "c-712dc75a",
+    "startedAt": "2026-11-13T18:07:57Z",
+    "endedAt": "2026-11-13T19:00:00Z",
+    "summary": "3 dispatched on Sonnet (AMP-023, AMP-032, AMP-060) + 3 reviews + 3 rework rounds; 3 verified locally (lint 0, typecheck 0, 1487/1481 pass/0 fail), 0 committed: AMP-005-D still blocks commits in the AMP repo. New follow-ups AMP-034, AMP-045."
   },
   "tasks": [
     {
@@ -278,12 +278,13 @@
       "worktree": "~/Developer/AIMONEYPRINTER",
       "startedAt": "2026-11-13T16:40:00Z",
       "finishedAt": null,
-      "lastRunId": "c-f428b679",
+      "lastRunId": "c-712dc75a",
       "runIds": [
         "c-aa359f36",
         "c-a7fe8df1",
         "c-960d5bfe",
-        "c-f428b679"
+        "c-f428b679",
+        "c-712dc75a"
       ],
       "commits": [],
       "evidence": [
@@ -316,6 +317,11 @@
           "level": "Local",
           "kind": "note",
           "detail": "End of cycle c-f428b679: 13 verified tasks now held uncommitted (added AMP-020, AMP-024, AMP-031)."
+        },
+        {
+          "at": "2026-11-13T18:13:00Z",
+          "kind": "note",
+          "detail": "Re-checked c-712dc75a: `VENTRA_REPO=~/Developer/AIMONEYPRINTER ventra-git checks` and `cd ~/Developer/AIMONEYPRINTER && ventra-git checks` both answered 'requires approval'. Still blocked; not worked around."
         }
       ],
       "blocker": {
@@ -332,7 +338,7 @@
       "notes": "Never worked around: no settings or guard edits by the coordinator.",
       "legacy": [],
       "model": null,
-      "updatedAt": "2026-11-13T17:58:40Z"
+      "updatedAt": "2026-11-13T18:13:00Z"
     },
     {
       "id": "AMP-004",
@@ -851,13 +857,17 @@
       "module": "aimp",
       "tier": "P0",
       "owner": "ventra-feature",
-      "state": "queued",
+      "state": "verified",
       "priority": 1,
       "dependsOn": [
         "AMP-022",
         "AMP-020"
       ],
-      "scope": [],
+      "scope": [
+        "apps/web/lib/aimp/catalogue/**",
+        "apps/web/app/tools/catalogue/**",
+        "apps/web/test/aimp-catalogue-*"
+      ],
       "acceptance": [
         "The seller can approve or edit the listing, and checkout uses the stored price."
       ],
@@ -865,16 +875,69 @@
       "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
       "branch": "aimp/foundation",
       "worktree": "~/Developer/AIMONEYPRINTER",
-      "startedAt": null,
-      "finishedAt": null,
-      "lastRunId": null,
-      "runIds": [],
+      "startedAt": "2026-11-13T18:13:00Z",
+      "finishedAt": "2026-11-13T18:40:00Z",
+      "lastRunId": "c-712dc75a",
+      "runIds": [
+        "c-712dc75a"
+      ],
       "commits": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "at": "2026-11-13T18:13:00Z",
+          "kind": "note",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "Dispatched by c-712dc75a to ventra-feature on Sonnet."
+        },
+        {
+          "at": "2026-11-13T18:35:00Z",
+          "kind": "note",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "Specialist returned (claim): lint 0, typecheck 0, suite 1435/1429 pass/0 fail/1 skip/5 todo (36 new). Files: lib/aimp/catalogue/{types,pricing,validate,store,service,storefront,demo,index}.ts, app/tools/catalogue/{page.tsx,actions.ts,state.ts}, test/aimp-catalogue-{pricing,service}.test.ts. Owner decisions: card fee 1.65%+30c reused from preview/generate.ts; PLATFORM_FEE_BP=0 (ESTIMATE); price bounds A$3-A$100; family default price bands invented as starting points. Sent to ventra-review."
+        },
+        {
+          "at": "2026-11-13T18:40:00Z",
+          "kind": "review",
+          "detail": "ventra-review c-712dc75a: approve, no blockers/majors; 10 minors. Fix round applied: cover-not-found no fake master role, explicit unprofitable fallback (profitable:false), -A$ negative format, cover businessId check, seeded-after-createDraft, listingIdFor, formatAud reuse, policy comment (checkout keeps approved price after product re-version until re-pin/re-approve), extra tests (store conflicts, cover edit after approval). Fix round not re-reviewed."
+        },
+        {
+          "at": "2026-11-13T18:40:00Z",
+          "kind": "lint",
+          "level": "Local",
+          "detail": "Coordinator: npm --prefix ~/Developer/AIMONEYPRINTER/apps/web run lint -> exit 0 (after all three tasks)."
+        },
+        {
+          "at": "2026-11-13T18:40:00Z",
+          "kind": "typecheck",
+          "level": "Local",
+          "detail": "Coordinator: npm --prefix .../apps/web run typecheck -> exit 0."
+        },
+        {
+          "at": "2026-11-13T18:40:00Z",
+          "kind": "test",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "Coordinator: npm --prefix .../apps/web test -> 1479 tests / 1473 pass / 0 fail / 1 skipped (qpdf) / 5 todo (before cycle: 1376). Catalogue tests 41 (aimp-catalogue-pricing, aimp-catalogue-service)."
+        },
+        {
+          "at": "2026-11-13T18:40:00Z",
+          "kind": "note",
+          "detail": "Held UNCOMMITTED by AMP-005-D. Commit list: apps/web/lib/aimp/catalogue/ apps/web/app/tools/catalogue/ apps/web/test/aimp-catalogue-pricing.test.ts apps/web/test/aimp-catalogue-service.test.ts (imports products, branding, files: commit after AMP-022, AMP-020, AMP-024). No browser check of /tools/catalogue (local HTTP needs approval)."
+        },
+        {
+          "at": "2026-11-13T18:58:00Z",
+          "kind": "test",
+          "level": "Local",
+          "detail": "Re-confirmed in final coordinator run: 1487 / 1481 pass / 0 fail; lint 0; typecheck 0."
+        }
+      ],
       "blocker": null,
       "notes": "",
       "legacy": [],
-      "model": null
+      "model": "sonnet",
+      "updatedAt": "2026-11-13T18:58:00Z"
     },
     {
       "id": "AMP-024",
@@ -1066,12 +1129,21 @@
       "module": "aimp",
       "tier": "P0",
       "owner": "ventra-backend",
-      "state": "queued",
+      "state": "verified",
       "priority": 1,
       "dependsOn": [
         "AMP-031"
       ],
-      "scope": [],
+      "scope": [
+        "apps/web/lib/aimp/hosts/**",
+        "apps/web/lib/aimp/storefront/tenant.ts",
+        "apps/web/lib/aimp/storefront/load.ts",
+        "apps/web/app/s/[store]/**",
+        "apps/web/app/sitemap.ts",
+        "apps/web/app/robots.ts",
+        "apps/web/proxy.ts",
+        "apps/web/test/aimp-hosts-*"
+      ],
       "acceptance": [
         "Two test stores resolve correctly and show their own listings and checkout. Unknown hosts return a safe response."
       ],
@@ -1079,21 +1151,77 @@
       "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
       "branch": "aimp/foundation",
       "worktree": "~/Developer/AIMONEYPRINTER",
-      "startedAt": null,
-      "finishedAt": null,
-      "lastRunId": "c-f428b679",
+      "startedAt": "2026-11-13T18:13:00Z",
+      "finishedAt": "2026-11-13T18:40:00Z",
+      "lastRunId": "c-712dc75a",
       "runIds": [
-        "c-f428b679"
+        "c-f428b679",
+        "c-712dc75a"
       ],
       "commits": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "at": "2026-11-13T18:13:00Z",
+          "kind": "note",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "Dispatched by c-712dc75a to ventra-backend on Sonnet. Touches storefront/load.ts and app/s/[store]/layout.tsx which also hold uncommitted AMP-030 changes: commit AMP-030 first, then AMP-032."
+        },
+        {
+          "at": "2026-11-13T18:22:00Z",
+          "kind": "note",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "Specialist returned (claim, not evidence): typecheck 0, full suite 1398/1392 pass/0 fail/1 skip/5 todo (22 new), lint 1 only from AMP-023 files. New lib/aimp/hosts/{slug,resolve,registry,seo,paths,index}.ts, app/sitemap.ts, app/robots.ts, app/s/[store]/{sitemap.xml,robots.txt}/route.ts, test/aimp-hosts-{resolve,seo}.test.ts; changed proxy.ts, storefront/tenant.ts, storefront/load.ts, app/s/[store]/{layout,page,contact/page,products/[product]/page,policies/[policy]/page,_ui/base}. Sent to ventra-review."
+        },
+        {
+          "at": "2026-11-13T18:35:00Z",
+          "kind": "review",
+          "detail": "ventra-review c-712dc75a: request changes, no blockers, no cross-tenant leak found. Majors: proxy 404s whole app on odd hosts with no store domain configured; storeBase reads x-forwarded-host while proxy reads host (broken links, spoofable); sitemap acceptance empty under demo-only registry. 7 minors. Sent back to the specialist for one rework round (schema.ts 63-vs-42 slug item deferred, out of scope)."
+        },
+        {
+          "at": "2026-11-13T18:40:00Z",
+          "kind": "review",
+          "detail": "Rework round done for all 10 items. Coordinator read proxy.ts, hosts/resolve.ts routeForHost/requestHeadersFor and app/s/[store]/_ui/base.ts: pass-through when no store domain configured; store-host header stripped then set only on rewrite; storeBase reads only that header. Rework not re-reviewed by ventra-review."
+        },
+        {
+          "at": "2026-11-13T18:40:00Z",
+          "kind": "lint",
+          "level": "Local",
+          "detail": "Coordinator: lint exit 0."
+        },
+        {
+          "at": "2026-11-13T18:40:00Z",
+          "kind": "typecheck",
+          "level": "Local",
+          "detail": "Coordinator: typecheck exit 0."
+        },
+        {
+          "at": "2026-11-13T18:40:00Z",
+          "kind": "test",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "Coordinator: full suite 1479 / 1473 pass / 0 fail / 1 skipped / 5 todo; aimp-hosts-resolve + aimp-hosts-seo = 28 tests."
+        },
+        {
+          "at": "2026-11-13T18:40:00Z",
+          "kind": "note",
+          "detail": "Held UNCOMMITTED by AMP-005-D. Commit after AMP-030 and AMP-031 (shares storefront/load.ts and app/s/[store]/layout.tsx with AMP-030). Commit list: apps/web/lib/aimp/hosts/ apps/web/proxy.ts apps/web/app/sitemap.ts apps/web/app/robots.ts apps/web/lib/aimp/storefront/tenant.ts apps/web/lib/aimp/storefront/load.ts \"apps/web/app/s/[store]/\" apps/web/test/aimp-hosts-resolve.test.ts apps/web/test/aimp-hosts-seo.test.ts. Follow-ups: storefront/schema.ts slug max 63 vs DB 42 and site-versions/store.ts message '3 to 63' (out of scope, queue); live sitemap empty until DB-backed StoreRegistry; /api reachable on store hosts (revisit at AMP-041); new env NAMES AIMP_STORE_TEST_DOMAIN, AIMP_PUBLIC_ASSET_HOSTS (no values). Not browser-checked."
+        },
+        {
+          "at": "2026-11-13T18:58:00Z",
+          "kind": "test",
+          "level": "Local",
+          "detail": "Re-confirmed in final coordinator run: 1487 / 1481 pass / 0 fail; lint 0; typecheck 0."
+        }
+      ],
       "blocker": null,
       "notes": "Carry from AMP-031 (c-f428b679): wire app/s/[store] to site-versions resolvePublished; align slug length rules (storefront/tenant.ts vs migration sites.slug check); DB mapping for site versions per AMP-031 review.",
       "legacy": [
         "aimp-5.2"
       ],
-      "model": null,
-      "updatedAt": "2026-11-13T17:58:40Z"
+      "model": "sonnet",
+      "updatedAt": "2026-11-13T18:58:00Z"
     },
     {
       "id": "AMP-033",
@@ -1606,12 +1734,16 @@
       "module": "aimp",
       "tier": "P0",
       "owner": "ventra-backend",
-      "state": "queued",
+      "state": "verified",
       "priority": 1,
       "dependsOn": [
         "AMP-004"
       ],
-      "scope": [],
+      "scope": [
+        "apps/web/lib/aimp/jobs/**",
+        "apps/web/app/tools/aimp-jobs/**",
+        "apps/web/test/aimp-jobs-*"
+      ],
       "acceptance": [
         "A temporary failure can recover without duplicate orders, posts or generation charges."
       ],
@@ -1619,16 +1751,63 @@
       "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
       "branch": "aimp/foundation",
       "worktree": "~/Developer/AIMONEYPRINTER",
-      "startedAt": null,
-      "finishedAt": null,
-      "lastRunId": null,
-      "runIds": [],
+      "startedAt": "2026-11-13T18:22:00Z",
+      "finishedAt": "2026-11-13T18:58:00Z",
+      "lastRunId": "c-712dc75a",
+      "runIds": [
+        "c-712dc75a"
+      ],
       "commits": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "at": "2026-11-13T18:22:00Z",
+          "kind": "note",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "Dispatched by c-712dc75a to ventra-backend on Sonnet after AMP-032 returned."
+        },
+        {
+          "at": "2026-11-13T18:40:00Z",
+          "kind": "note",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "Specialist returned (claim): typecheck 0, lint 0, suite 1474 pass. Files: lib/aimp/jobs/{types,registry,store,service,runner,handlers,demo,index}.ts, app/tools/aimp-jobs/{page.tsx,actions.ts}, test/aimp-jobs-{runner,handlers}.test.ts (31 tests). Proposed tables aimp_jobs, aimp_job_charges, aimp_job_tenant_pauses in store.ts header (no migration). Coordinator full-suite run above includes these tests (0 fail). Sent to ventra-review."
+        },
+        {
+          "at": "2026-11-13T18:58:00Z",
+          "kind": "review",
+          "detail": "ventra-review c-712dc75a: request changes, no blockers; majors: exactly-once only via in-process fake (providers take no key), guard/settle errors not isolated, no step timeout, enqueue conflict ignored businessId/runAt, SQL settle/charges FK under-specified. One rework fixed all within scope: at-least-once + stable key documented, key-honouring fake + effect-then-crash test, guard own try, settle outside handler try, Promise.allSettled, AbortSignal step timeout < lease, SHA-256 hash over {input,businessId,runAt} + conflict, retry(jobId), SQL header (security definer claim/settle, composite FKs, on delete restrict, lease index), safeText redaction, subtractive jitter, cost cannot exceed declared. Coordinator read runner.ts/types.ts for allSettled, timeout clamp, sha256. Rework not re-reviewed. Provider idempotency keys queued as AMP-045."
+        },
+        {
+          "at": "2026-11-13T18:58:00Z",
+          "kind": "lint",
+          "level": "Local",
+          "detail": "Coordinator: lint exit 0."
+        },
+        {
+          "at": "2026-11-13T18:58:00Z",
+          "kind": "typecheck",
+          "level": "Local",
+          "detail": "Coordinator: typecheck exit 0."
+        },
+        {
+          "at": "2026-11-13T18:58:00Z",
+          "kind": "test",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "Coordinator: full suite 1487 / 1481 pass / 0 fail / 1 skipped (qpdf) / 5 todo; aimp-jobs-runner + aimp-jobs-handlers ~43 tests."
+        },
+        {
+          "at": "2026-11-13T18:58:00Z",
+          "kind": "note",
+          "detail": "Held UNCOMMITTED by AMP-005-D. Commit list: apps/web/lib/aimp/jobs/ apps/web/app/tools/aimp-jobs/ apps/web/test/aimp-jobs-runner.test.ts apps/web/test/aimp-jobs-handlers.test.ts (imports providers: commit after AMP-004). No migration (proposed tables in jobs/store.ts header); no runner trigger route yet; no lease heartbeat. Not browser-checked."
+        }
+      ],
       "blocker": null,
       "notes": "",
       "legacy": [],
-      "model": null
+      "model": "sonnet",
+      "updatedAt": "2026-11-13T18:58:00Z"
     },
     {
       "id": "AMP-061",
@@ -2298,6 +2477,76 @@
       "notes": "",
       "legacy": [],
       "model": null
+    },
+    {
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-032"
+      ],
+      "scope": [
+        "apps/web/lib/aimp/storefront/schema.ts",
+        "apps/web/lib/aimp/site-versions/store.ts",
+        "apps/web/test/aimp-storefront*.test.ts",
+        "apps/web/test/aimp-site-versions-*.test.ts"
+      ],
+      "acceptance": [
+        "A 43-63 character slug is refused by validateStoreConfig and site-versions with the same message as the database rule; existing tests still pass."
+      ],
+      "branch": "aimp/foundation",
+      "worktree": "/Users/dylan/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-712dc75a",
+      "runIds": [
+        "c-712dc75a"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "Found by AMP-032 review (c-712dc75a). Fail-closed today (such a store never resolves).",
+      "model": null,
+      "verifyLevel": "local",
+      "createdAt": "2026-11-13T18:45:00Z",
+      "updatedAt": "2026-11-13T18:45:00Z",
+      "id": "AMP-034",
+      "title": "Align storefront slug rules with the database: storefront/schema.ts and site-versions/store.ts use hosts matchesSitesSlugCheck (3-42 chars) instead of 3-63",
+      "owner": "ventra-web-design"
+    },
+    {
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-060"
+      ],
+      "scope": [
+        "apps/web/lib/aimp/providers/**",
+        "apps/web/lib/aimp/jobs/handlers.ts",
+        "apps/web/test/aimp-providers-*.test.ts",
+        "apps/web/test/aimp-jobs-*.test.ts"
+      ],
+      "acceptance": [
+        "A crash after a provider effect and before the checkpoint does not repeat the effect at the provider (fake provider dedupes by key); fixtures honour the key."
+      ],
+      "branch": "aimp/foundation",
+      "worktree": "/Users/dylan/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-712dc75a",
+      "runIds": [
+        "c-712dc75a"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "From AMP-060 review (c-712dc75a): runner is at-least-once with stable keys; exactly-once needs providers to dedupe by key.",
+      "model": null,
+      "verifyLevel": "local",
+      "createdAt": "2026-11-13T18:45:00Z",
+      "updatedAt": "2026-11-13T18:45:00Z",
+      "id": "AMP-045",
+      "title": "Provider idempotency keys: every side-effecting provider adapter (llm generate, email send, social queuePost, storage) accepts and forwards an idempotency key; jobs handlers pass the per-step key",
+      "owner": "ventra-backend"
     }
   ]
 }
