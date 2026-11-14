@@ -179,7 +179,8 @@ function failSafe(s: PendingActionStore): PendingActionStore {
  * otherwise by email when an email sender is given. On the email runner (via 'email') all of them, reminders and rescues
  * included, go by email whenever the contact has a deliverable address and a sender is configured (A-48); with no email
  * sender configured the runner falls back to SMS for a contact with a phone; a follow-up then needs an SMS grant, while reminders and rescues are not
- * consent-gated (jobBlocked only checks follow-ups). */
+ * consent-gated (jobBlocked only checks follow-ups). Owner decision 2026-11-14 (A-79): this is intended (email first, SMS
+ * fallback exempt as transactional); pinned in front-office-consent-wiring.test.ts. */
 /** config: the business's Setter texts, or a loader that is only called when there are jobs to run. */
 /** permissions: the Setter's approval queue and mode (live runner: channelPermissions()); see the note at the top. */
 /** via: what this channel is ('sms', 'web-chat', 'email', 'voice'; runnerChannels() name), for the follow-up consent

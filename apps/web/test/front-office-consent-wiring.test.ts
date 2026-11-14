@@ -216,6 +216,45 @@ test('A-50 jobs: the email runner with no email sender falls back to SMS, so a c
   assert.equal(granted.texts.length, 1); assert.equal(granted.emails.length, 0);
 });
 
+// A-79 (owner decision 2026-11-14, no behaviour change): on the email runner the 24h/2h reminders and the no-show rescue
+// go by email first even when the contact has a mobile on file, and stay exempt from the SMS consent check when they
+// fall back to SMS (they are transactional). Worst case for consent: no grant, no inbound message.
+const runTransactional = async (kind: 'reminder-24h' | 'reminder-2h' | 'no-show-rescue', over: Partial<SetterContext['contact']>, withEmailSender: boolean) => {
+  const state = kind === 'no-show-rescue' ? 'no-show' : 'booked';
+  const ctx = { ...base({ email: 'sam@example.com', state, consent: { sms: false, email: false }, ...over }, false), appointment: { id: 'a1', starts: '2026-11-11T02:00:00Z' } };
+  const calls: string[] = []; const texts: string[] = []; const emails: string[] = [];
+  const rpc = async (fn: string) => {
+    calls.push(fn);
+    if (fn === 'fo_claim_jobs') return [{ id: 'j1', contact: CID, kind, step: 1, appointment: kind === 'no-show-rescue' ? null : 'a1' }];
+    if (fn === 'fo_contact_context') return ctx;
+    return null;
+  };
+  const store = createMemoryPendingActionStore({ workspaceId: '55555555-5555-4555-8555-555555555555', modes: () => ({ setter: 'automatic', receptionist: 'enquiry_only' }), owners: [], now: () => JOB_NOW });
+  const out = await runDueJobs({ rpc, auth: { channel: 'ch', key: 'k' }, send: async (to: string) => { texts.push(to); return { sent: false, sid: null }; }, email: withEmailSender ? async (to: string) => { emails.push(to); return { sent: false, id: null }; } : undefined, config: ventraSetterConfig, now: JOB_NOW, permissions: { store, quietHours: { start: 0, end: 0 } }, via: 'email' });
+  return { out: out[0], calls, texts, emails };
+};
+
+for (const kind of ['reminder-24h', 'reminder-2h', 'no-show-rescue'] as const) {
+  test(`A-79 jobs: ${kind} on the email runner goes by email first even with a mobile on file, with no consent grant`, async () => {
+    const r = await runTransactional(kind, {}, true);
+    assert.equal(r.out.outcome, 'done', r.out.note);
+    assert.deepEqual(r.emails, ['sam@example.com']);
+    assert.deepEqual(r.texts, [], 'no text when an email can be sent');
+    assert.ok(r.calls.includes('fo_log_outbound'));
+  });
+  test(`A-79 jobs: ${kind} falls back to SMS without an SMS grant (transactional), and an opt-out still wins`, async () => {
+    const r = await runTransactional(kind, {}, false);
+    assert.equal(r.out.outcome, 'done', r.out.note);
+    assert.deepEqual(r.texts, ['+61411111111']); assert.deepEqual(r.emails, []);
+    assert.ok(r.calls.includes('fo_log_outbound'));
+    for (const withEmailSender of [true, false]) {
+      const o = await runTransactional(kind, { optedOut: true, consent: { sms: true, email: true } }, withEmailSender);
+      assert.equal(o.out.outcome, 'cancelled');
+      assert.equal(o.texts.length + o.emails.length, 0); assert.ok(!o.calls.includes('fo_log_outbound'));
+    }
+  });
+}
+
 test('Meta out-of-window reroute reads contact.consent: SMS with a grant, owner task without one or with an older database', () => {
   const w = { recipient: 'ig-1', optedOut: false, lastInbound: '2026-11-01T00:00:00Z' };
   const c = { name: null, phone: '+61411111111', email: 'sam@example.com', state: 'qualifying', optedOut: false };
