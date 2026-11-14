@@ -2,7 +2,7 @@
   "version": 1,
   "project": "aimp",
   "app": "aimoneyprinter",
-  "updatedAt": "2026-11-14T10:04:12.194Z",
+  "updatedAt": "2026-11-14T10:08:55.880Z",
   "integrationBranch": "aimp/foundation",
   "worktree": "~/Developer/AIMONEYPRINTER",
   "codingModel": "sonnet",
@@ -56,8 +56,8 @@
   "lastRun": {
     "id": "c-d90206df",
     "startedAt": "2026-11-14T09:44:00Z",
-    "endedAt": "2026-11-14T10:04:12.194Z",
-    "summary": "AMP-042 fulfilment reviewed (PASS with follow-ups) and reworked for exactly-once delivery email (Fable): implemented. AMP-050 launch campaign (Fable): running. AMP-014 review waits for AMP-015 to be handed back. Still held uncommitted by AMP-005-D."
+    "endedAt": "2026-11-14T10:08:55.880Z",
+    "summary": "AMP-042 fulfilment reviewed (PASS with follow-ups) and reworked for exactly-once delivery email (Fable): verified. AMP-050 launch campaign (Fable): implemented. AMP-014 review waits for AMP-015 to be handed back. Still held uncommitted by AMP-005-D."
   },
   "tasks": [
     {
@@ -352,7 +352,7 @@
       "notes": "Never worked around: no settings or guard edits by the coordinator.",
       "legacy": [],
       "model": null,
-      "updatedAt": "2026-11-14T10:04:12.194Z"
+      "updatedAt": "2026-11-14T10:08:55.880Z"
     },
     {
       "id": "AMP-004",
@@ -724,7 +724,7 @@
       ],
       "notes": "Built by the owner's Cowork session (frontend agent, Fable), 2026-11-14. UNCOMMITTED. Files: apps/web/app/design-system/aimp-glass/ apps/web/app/start/ apps/web/app/tools/aimp-glass/page.tsx apps/web/test/aimp-glass-*.test.ts docs/aimp/glass-ui-notes.md. Routes: /start, /start/account, /start/tour, /start/goals, /start/showcase. Needs coordinator review + QA, a real sign-up test with Supabase configured, and real Safari/phone check. All later AMP UI work uses this library.",
       "model": "fable",
-      "updatedAt": "2026-11-14T10:04:12.194Z"
+      "updatedAt": "2026-11-14T10:08:55.880Z"
     },
     {
       "id": "AMP-015",
@@ -1545,7 +1545,7 @@
       "module": "aimp",
       "tier": "P0",
       "owner": "ventra-backend",
-      "state": "implemented",
+      "state": "verified",
       "priority": 1,
       "dependsOn": [
         "AMP-041",
@@ -1566,7 +1566,7 @@
       "branch": "aimp/foundation",
       "worktree": "~/Developer/AIMONEYPRINTER",
       "startedAt": "2026-11-14T09:00:10Z",
-      "finishedAt": "2026-11-14T09:21:08Z",
+      "finishedAt": "2026-11-14T10:08:55.880Z",
       "lastRunId": "c-d90206df",
       "runIds": [
         "c-d90206df"
@@ -1593,6 +1593,13 @@
           "level": "Local",
           "model": "fable",
           "detail": "[cd90 rework] ventra-backend (Fable) fixed defect 1: retries and lease takeovers reuse the order line's working grant and re-derive the same HMAC token (new fulfilment/link.ts, coordinator read it), so the email key is stable per delivery; support reissue gained an atomic claimReissue guard (requestKey, or same person+reason within 2 min). Changed: fulfilment/{service,types,store,handlers,demo,index}.ts, new fulfilment/link.ts, new test/aimp-fulfilment-once.test.ts (6 tests; coordinator read its assertions), test/aimp-fulfilment-delivery.test.ts (two grant-count assertions 2->1 and 3->1: they asserted the defect), docs/aimp/fulfilment-notes.md. Signature additions: FulfilmentDeps.grantToken (required), reissueAccess requestKey, store claimReissue/releaseReissue. Specialist-reported (not coordinator evidence): lint 0, typecheck 0, 1574 tests 0 fail."
+        },
+        {
+          "at": "2026-11-14T10:08:55.880Z",
+          "kind": "test",
+          "level": "Local",
+          "model": "fable",
+          "detail": "[cd90 test] coordinator ran after the rework and with AMP-050 files present: npm --prefix ~/Developer/AIMONEYPRINTER/apps/web test: 1588 tests, 1582 pass, 0 fail, 1 skipped, 5 todo; run typecheck: no errors; run lint (--max-warnings 0): no output. The rework itself was not re-reviewed by ventra-review (coordinator read link.ts and the new test assertions only)."
         }
       ],
       "blocker": null,
@@ -1601,7 +1608,7 @@
         "aimp-6.4"
       ],
       "model": "fable",
-      "updatedAt": "2026-11-14T10:04:12.194Z"
+      "updatedAt": "2026-11-14T10:08:55.880Z"
     },
     {
       "id": "AMP-043",
@@ -1716,7 +1723,7 @@
       "module": "aimp",
       "tier": "P0",
       "owner": "ventra-feature",
-      "state": "running",
+      "state": "implemented",
       "priority": 1,
       "dependsOn": [
         "AMP-023",
@@ -1741,14 +1748,22 @@
         "c-d90206df"
       ],
       "commits": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "at": "2026-11-14T10:08:55.880Z",
+          "kind": "note",
+          "level": "Local",
+          "model": "fable",
+          "detail": "[cd90] ventra-feature (Fable) returned 13 new files (lib/aimp/campaigns/*, app/tools/aimp-campaign/{page,actions}.tsx, test/aimp-campaign-plan.test.ts with 14 tests), no existing file touched. Coordinator checks with these files present: 1588 tests / 1582 pass / 0 fail / 1 skipped / 5 todo, typecheck clean, lint no output. NOT yet reviewed by ventra-review (budget ran out) and the page is not browser-checked, so it stays implemented. Specialist-reported limits: campaign links are relative paths unless AIMP_STORE_ROOT_DOMAIN or LAUNCHPAD_APP_ORIGIN is set (AMP-052 needs absolute); demo store is assumed live; fixture llm always falls back to the deterministic plan; a flagged niche (e.g. weight loss) yields no campaign."
+        }
+      ],
       "blocker": null,
       "notes": "",
       "legacy": [
         "aimp-7.1"
       ],
       "model": "fable",
-      "updatedAt": "2026-11-14T10:04:12.194Z"
+      "updatedAt": "2026-11-14T10:08:55.880Z"
     },
     {
       "id": "AMP-051",
