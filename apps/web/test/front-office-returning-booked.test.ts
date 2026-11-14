@@ -153,6 +153,19 @@ test('booked contact (all three modes): escalate_human without booking_change en
   }
 });
 
+test('A-64: the fixed customer lines are the approved wording and promise nothing beyond hand-off', () => {
+  assert.equal(SETTER_FALLBACK_REPLY, 'Thanks for your message. Someone from the team will get back to you shortly.');
+  assert.deepEqual(BOOKING_CHANGE_SAY, {
+    reschedule: "Thanks for letting us know. I've passed your request to change your booking to the team, and someone will be in touch.",
+    cancel: "Thanks for letting us know. I've passed your cancellation request to the team, and someone will be in touch.",
+  });
+  assert.equal(RETURNING_HANDOFF_SAY, "Thanks for your message. I've passed it to the team, and someone will be in touch.");
+  assert.equal(NO_BOOKING_SAY, "Thanks for your message. I can't see an upcoming booking on file, so I've asked someone from the team to check, and they will be in touch.");
+  for (const line of [BOOKING_CHANGE_SAY.reschedule, BOOKING_CHANGE_SAY.cancel, RETURNING_HANDOFF_SAY, NO_BOOKING_SAY]) {
+    assert.doesNotMatch(line, /\d|shortly|soon|today|within|definitely|guarantee|has been (moved|cancelled|changed)|is (moved|cancelled|changed)|stays as it is/i, line);
+  }
+});
+
 test('booked contact + model failure (A-55 on a returning turn): fixed fallback reply, human handoff, fallback prompt version', async () => {
   const a = bookedSetup('automatic', 'Hi, quick question about my call');
   const turn = await runSetterTurn(CID, a.deps(async () => { throw new Error('AI provider error (500).'); }));

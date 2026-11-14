@@ -78,6 +78,16 @@ export const SETTER_FALLBACK_PROMPT = 'setter/fallback@1';
 
 class MalformedModelResponse extends Error { constructor() { super('The model response had no content list.'); this.name = 'MalformedModelResponse'; } }
 
+/** A content block the loop can read without throwing: an object with a string type, text blocks with string text, tool_use
+ * blocks with a string id and name. Anything else makes the whole response malformed (fixed fallback, not a failed turn). */
+function wellFormedBlock(b: unknown): boolean {
+  if (!b || typeof b !== 'object') return false;
+  const x = b as Record<string, unknown>;
+  if (x.type === 'text') return typeof x.text === 'string';
+  if (x.type === 'tool_use') return typeof x.id === 'string' && typeof x.name === 'string';
+  return typeof x.type === 'string';
+}
+
 /** A safe code for a failed model call: the error class or provider status only, never its message or body. */
 export function modelFailureCode(e: unknown): string {
   if (e instanceof MalformedModelResponse) return 'malformed_response';
@@ -107,14 +117,14 @@ export const returningTools: ToolSpec[] = [
 /** What a booked contact hears after asking to move or cancel, in automatic and owner_approval mode (the AI cannot change
  * bookings, so a person does it and no approval item is created). enquiry_only uses decide()'s own refused words. */
 export const BOOKING_CHANGE_SAY: Record<'reschedule' | 'cancel', string> = {
-  reschedule: "I've passed this to the team and they'll get back to you to sort out the new time. Your current booking stays as it is until then.",
-  cancel: "I've passed your cancellation request to the team and they'll get back to you to confirm it.",
+  reschedule: "Thanks for letting us know. I've passed your request to change your booking to the team, and someone will be in touch.",
+  cancel: "Thanks for letting us know. I've passed your cancellation request to the team, and someone will be in touch.",
 };
 /** Any other hand-off to a person on a booked contact's turn (escalate_human without booking_change, or a model reply that
  * claimed the booking changed). Fixed text: never model wording. */
-export const RETURNING_HANDOFF_SAY = "I've passed your message to the team and a person will get back to you. Your booking stays as it is.";
+export const RETURNING_HANDOFF_SAY = "Thanks for your message. I've passed it to the team, and someone will be in touch.";
 /** Booked, but no upcoming booking on file (it may have already happened): a person checks; no model call, no guessed time. */
-export const NO_BOOKING_SAY = "Thanks for your message. I can't see an upcoming booking on file, so I've asked a person from the team to check and get back to you.";
+export const NO_BOOKING_SAY = "Thanks for your message. I can't see an upcoming booking on file, so I've asked someone from the team to check, and they will be in touch.";
 /** A returning-turn reply that claims a booking was moved, rescheduled, rebooked, cancelled or changed. Matched replies are
  * never sent: the fixed line goes instead and the contact is handed to a person. Broad on purpose (fails safe). */
 export const BOOKING_CHANGE_CLAIM = /\b(moved|re-?scheduled|re-?booked|cancell?ed|changed|shifted)\b/i;
@@ -236,8 +246,9 @@ export async function runSetterTurn(contactId: string, d: SetterDeps): Promise<S
   /** Hands the lead to a person (a 'transfer'). Returns what to tell the contact when it did not happen right away. */
   async function toPerson(intentIn: string, summaryIn: string, nextAction: string): Promise<string | null> {
     const intent = plainText(intentIn, 200), summary = plainText(summaryIn, 1500);
-    // TODO(A-14): whether a hand-off to a person is allowed in every mode is an open owner decision. This relies on
-    // decide('transfer') as it is today (always 'perform'); the hold and refuse branches below follow whatever it answers.
+    // Owner decision 2026-11-14 (A-14): a hand-off to a person is never held or refused, in any mode, so decide('transfer')
+    // is always 'perform' (pinned by front-office-setter-failure.test.ts for the model-failure fallback, whose caller
+    // ignores this return value). The hold and refuse branches below are defensive and unreachable today.
     const g = await act('transfer', { kind: 'transfer', reason: `${intent || 'follow up'}: ${summary}`.slice(0, 400) }, `Hand ${who} to a person: ${intent || 'follow up'}`, `setter:transfer:${contactId}:${d.now}:${actions.length}`, async () => {
       await handoff('human', intent, summary, nextAction);
       return { ok: true, note: 'Handed to a person. The AI stops replying to this contact.' };
@@ -383,7 +394,7 @@ export async function runSetterTurn(contactId: string, d: SetterDeps): Promise<S
     let res: LlmResponse;
     try {
       res = await d.llm({ system, messages, tools });
-      if (!res || !Array.isArray(res.content)) throw new MalformedModelResponse();
+      if (!res || !Array.isArray(res.content) || !res.content.every(wellFormedBlock)) throw new MalformedModelResponse();
     } catch (e) {
       // Task A-55 (G2): the model call failed. Only the model call is caught here: tool errors are already passed back
       // to the model, and store errors still fail the turn (the route answers 503) rather than promise a follow-up

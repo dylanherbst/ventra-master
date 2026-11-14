@@ -81,6 +81,36 @@ test('timeout, malformed response and an unknown error are each caught with a sa
   assert.equal(modelFailureCode(new Error(`AI provider error (500). ${SECRET}`)), 'model_error', 'only the exact adapter message maps to a status');
 });
 
+test('malformed content blocks inside the content array lead to the fallback reply, not a failed turn', async () => {
+  const bad: unknown[][] = [
+    [null], [undefined], ['just a string'], [42], [{}], [{ type: 7 }], [{ type: 'text' }], [{ type: 'text', text: 5 }],
+    [{ type: 'tool_use', name: 'save_answers', input: {} }], [{ type: 'tool_use', id: 't1', input: {} }],
+    [say('Fine so far'), null],
+  ];
+  for (const content of bad) {
+    for (const mode of MODES) {
+      const a = agentSetup(mode);
+      const { value: turn } = await quiet(() => runSetterTurn(CID, a.deps((async () => ({ content, stopReason: 'end_turn' })) as never)));
+      assert.equal(turn.reply, SETTER_FALLBACK_REPLY, `${mode} ${JSON.stringify(content)}`);
+      assert.equal(turn.modelFailure, 'malformed_response');
+      assert.deepEqual(a.db.handoffs.map(x => (x as { owner: string }).owner), ['human']);
+      assert.deepEqual(a.db.outbound, [{ message: SETTER_FALLBACK_REPLY, prompt: SETTER_FALLBACK_PROMPT }]);
+      assert.equal(a.db.appointment, null); assert.equal(a.pending.items.length, 0);
+    }
+  }
+});
+
+test('the fallback hand-off is never held or refused in any mode (A-14): the transfer is performed, so ignoring toPerson is safe', async () => {
+  for (const mode of MODES) {
+    const a = agentSetup(mode);
+    const { value: turn } = await quiet(() => runSetterTurn(CID, a.deps(throwing(new Error('AI provider error (500).')))));
+    const transfers = turn.actions.filter(x => x.action === 'transfer');
+    assert.deepEqual(transfers.map(x => x.decision), ['perform'], mode);
+    assert.equal(a.pending.items.length, 0, `${mode}: nothing held for approval`);
+    assert.equal(turn.handedTo, 'human'); assert.equal(turn.reply, SETTER_FALLBACK_REPLY);
+  }
+});
+
 test('the real Anthropic adapter against a 401 whose body echoes the key: no key or body in the turn or the logs', async () => {
   const a = agentSetup('automatic');
   const fake401 = (async () => new Response(JSON.stringify({ type: 'error', error: { type: 'authentication_error', message: `invalid x-api-key ${SECRET}` } }), { status: 401 })) as unknown as typeof fetch;
