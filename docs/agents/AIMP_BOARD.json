@@ -2,7 +2,7 @@
   "version": 1,
   "project": "aimp",
   "app": "aimoneyprinter",
-  "updatedAt": "2026-11-14T10:08:55.880Z",
+  "updatedAt": "2026-11-14T12:47:56.530Z",
   "integrationBranch": "aimp/foundation",
   "worktree": "~/Developer/AIMONEYPRINTER",
   "codingModel": "sonnet",
@@ -54,10 +54,10 @@
     }
   ],
   "lastRun": {
-    "id": "c-d90206df",
-    "startedAt": "2026-11-14T09:44:00Z",
-    "endedAt": "2026-11-14T10:08:55.880Z",
-    "summary": "AMP-042 fulfilment reviewed (PASS with follow-ups) and reworked for exactly-once delivery email (Fable): verified. AMP-050 launch campaign (Fable): implemented. AMP-014 review waits for AMP-015 to be handed back. Still held uncommitted by AMP-005-D."
+    "id": "c-82af1724",
+    "startedAt": "2026-11-14T12:14:00Z",
+    "endedAt": "2026-11-14T12:47:56.530Z",
+    "summary": "Reconciled the cut-off cycle c-6c238f0d. Verified locally (reviewed, reworked, 1671 tests 0 fail): AMP-050 launch campaign, AMP-061 merchant automation, AMP-067 first-journey acceptance run, AMP-068 public-site audit, AMP-126 plan-details check. Nothing committed in the AMP repo (AMP-005-D). New: AMP-046 files isolation defect, AMP-068-D public-site copy decisions."
   },
   "tasks": [
     {
@@ -104,7 +104,15 @@
       "legacy": [
         "aimp-1.2"
       ],
-      "model": null
+      "model": null,
+      "featureIds": [],
+      "frontendOwner": null,
+      "backendOwner": null,
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null
     },
     {
       "id": "AMP-001-D",
@@ -146,7 +154,15 @@
       "legacy": [
         "aimp-1.1"
       ],
-      "model": null
+      "model": null,
+      "featureIds": [],
+      "frontendOwner": null,
+      "backendOwner": null,
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null
     },
     {
       "id": "AMP-002",
@@ -192,7 +208,15 @@
       "blocker": null,
       "notes": "Board docs/agents/AIMP_BOARD.json; dashboard project \"aimp\" reads it; tracker http://127.0.0.1:4177/#/build?app=aimoneyprinter.",
       "legacy": [],
-      "model": "opus (coordinator session, not a coding job)"
+      "model": "opus (coordinator session, not a coding job)",
+      "featureIds": [],
+      "frontendOwner": null,
+      "backendOwner": null,
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null
     },
     {
       "id": "AMP-003",
@@ -256,7 +280,17 @@
         "aimp-1.4",
         "aimp-5.1"
       ],
-      "model": null
+      "model": null,
+      "featureIds": [
+        "I02"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-backend",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": "AMP-005-D (commit held)"
     },
     {
       "id": "AMP-005-D",
@@ -278,7 +312,7 @@
       "worktree": "~/Developer/AIMONEYPRINTER",
       "startedAt": "2026-11-13T16:40:00Z",
       "finishedAt": null,
-      "lastRunId": "c-d90206df",
+      "lastRunId": "c-82af1724",
       "runIds": [
         "c-aa359f36",
         "c-a7fe8df1",
@@ -286,7 +320,8 @@
         "c-f428b679",
         "c-712dc75a",
         "c-79d5e30f",
-        "c-d90206df"
+        "c-d90206df",
+        "c-82af1724"
       ],
       "commits": [],
       "evidence": [
@@ -336,6 +371,13 @@
           "level": "Local",
           "model": "fable",
           "detail": "[cd90] Re-checked: still blocked. git -C status/log are readable, but the session's only allowed directory is VENTRA-FEATURES (ls and cd into ~/Developer/AIMONEYPRINTER refused), so ventra-git commit cannot run there. Not worked around."
+        },
+        {
+          "at": "2026-11-14T12:47:56.530Z",
+          "kind": "note",
+          "level": "Local",
+          "model": null,
+          "detail": "[c82a] Re-checked: `cd ~/Developer/AIMONEYPRINTER && git ...` is refused for this session (only VENTRA-FEATURES is an allowed directory), so ventra-git cannot run in the AMP repo. Not worked around. 25 tasks are now verified and waiting to commit."
         }
       ],
       "blocker": {
@@ -352,7 +394,15 @@
       "notes": "Never worked around: no settings or guard edits by the coordinator.",
       "legacy": [],
       "model": null,
-      "updatedAt": "2026-11-14T10:08:55.880Z"
+      "updatedAt": "2026-11-14T12:47:56.530Z",
+      "featureIds": [],
+      "frontendOwner": null,
+      "backendOwner": null,
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": "AMP-005-D"
     },
     {
       "id": "AMP-004",
@@ -417,7 +467,118 @@
       "blocker": null,
       "notes": "Credential variable names in providers/status.ts PROVIDER_META are guesses (ANTHROPIC_API_KEY, STRIPE_SECRET_KEY, RESEND_API_KEY, SUPABASE_URL/SERVICE_ROLE_KEY, PINTEREST_ACCESS_TOKEN, VERCEL_API_TOKEN). No live adapters yet.",
       "legacy": [],
-      "model": "sonnet"
+      "model": "sonnet",
+      "featureIds": [
+        "I12"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-backend",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": "lib/aimp/providers (fixture adapters)",
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": "AMP-005-D (commit held)"
+    },
+    {
+      "id": "AMP-006",
+      "title": "Shared feature contracts: settle the five canonical-state decisions and write the first six contract files",
+      "phase": "f",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-backend",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-003"
+      ],
+      "scope": [
+        "docs/aimp/contracts/**",
+        "apps/web/lib/aimp/contracts.ts"
+      ],
+      "acceptance": [
+        "docs/aimp/contracts/CANONICAL_STATES.md records a decision for each of the five open points (waiting-for-owner job status, disputed orders, delivery retrying in the read model, marketing post status, per-store connection enum) and names the code that holds it.",
+        "Six contract files exist (onboarding and resume; business provisioning; products; store versions; payment; fulfilment), each with route and Figma frame, actor and permissions, request and response shapes, customer-visible states, events, fixtures and acceptance scenario.",
+        "The frontend agent has confirmed or corrected each file (recorded in the file)."
+      ],
+      "verifyLevel": "local",
+      "plan": "Owner directive 2026-11-14 18:10 item 2; build brief section 8",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-6c238f0d",
+        "c-82af1724"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "Frontend sign-off waits for the AMP-015 hand-back. Individual contract files are also written by each task as it starts (amp-feature-contract skill). AMP-061 assumed decision 1 (waiting for owner) = no job exists until approval; the wait is an approval record shown as needs_approval. Confirm or change it here. Job idempotency keys are now scoped per business (AMP-067).",
+      "legacy": [],
+      "model": null,
+      "updatedAt": "2026-11-14T12:47:56.530Z",
+      "featureIds": [],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-backend",
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null
+    },
+    {
+      "id": "AMP-007",
+      "title": "Internal: Chief of Staff Telegram connection, capture the failure and verify one real round trip",
+      "phase": "f",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-setup",
+      "state": "queued",
+      "priority": 2,
+      "dependsOn": [],
+      "scope": [
+        "docs/agents/STATUS.md"
+      ],
+      "acceptance": [
+        "The failure is captured (what was sent, what came back, when).",
+        "One real round trip is verified: an owner message reaches the session and the reply reaches the owner's Telegram."
+      ],
+      "verifyLevel": "local",
+      "plan": "Owner directive 2026-11-14 18:10 item 5",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-6c238f0d",
+        "c-82af1724"
+      ],
+      "commits": [],
+      "evidence": [
+        {
+          "at": "2026-11-14T12:47:56.530Z",
+          "kind": "note",
+          "level": "Local",
+          "model": null,
+          "detail": "[c82a] Unchanged: this cycle received no inbound Telegram message and no chat id, so it cannot capture the failure or send a test reply. Product queue not held."
+        }
+      ],
+      "blocker": null,
+      "notes": "Internal task, not a product feature. Unknown this cycle: a coordinator cycle receives no chat id and no inbound Telegram message, so it can neither reproduce the failure nor send a test reply. The product queue is not held by this.",
+      "legacy": [],
+      "model": null,
+      "updatedAt": "2026-11-14T12:47:56.530Z",
+      "internal": true,
+      "featureIds": [],
+      "frontendOwner": null,
+      "backendOwner": null,
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null
     },
     {
       "id": "AMP-010",
@@ -478,7 +639,18 @@
       "legacy": [
         "aimp-2.1"
       ],
-      "model": "sonnet"
+      "model": "sonnet",
+      "featureIds": [
+        "A01",
+        "A02"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": null,
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": "/tools/aimp-onboarding",
+      "requiredEvidence": "Local",
+      "currentBlocker": "AMP-005-D (commit held)"
     },
     {
       "id": "AMP-011",
@@ -544,7 +716,17 @@
       "legacy": [
         "aimp-3.0"
       ],
-      "model": "sonnet"
+      "model": "sonnet",
+      "featureIds": [
+        "B04"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-feature",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": "AMP-005-D (commit held)"
     },
     {
       "id": "AMP-012",
@@ -606,7 +788,19 @@
         "aimp-2.2",
         "aimp-2.3"
       ],
-      "model": "sonnet"
+      "model": "sonnet",
+      "featureIds": [
+        "B01",
+        "B02",
+        "B03"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-feature",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": "/tools/opportunity-finder",
+      "requiredEvidence": "Local",
+      "currentBlocker": "AMP-005-D (commit held)"
     },
     {
       "id": "AMP-013",
@@ -669,7 +863,18 @@
         "aimp-2.4"
       ],
       "model": "sonnet",
-      "updatedAt": "2026-11-13T17:21:41Z"
+      "updatedAt": "2026-11-13T17:21:41Z",
+      "featureIds": [
+        "A03",
+        "B05"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": null,
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": "/tools/opportunity-select",
+      "requiredEvidence": "Local",
+      "currentBlocker": "AMP-005-D (commit held)"
     },
     {
       "id": "AMP-014",
@@ -701,9 +906,10 @@
       "worktree": "~/Developer/AIMONEYPRINTER",
       "startedAt": "2026-11-14T09:00:10Z",
       "finishedAt": "2026-11-14T09:21:08Z",
-      "lastRunId": "c-d90206df",
+      "lastRunId": "c-82af1724",
       "runIds": [
-        "c-d90206df"
+        "c-d90206df",
+        "c-82af1724"
       ],
       "commits": [],
       "evidence": [
@@ -720,11 +926,29 @@
           "level": "Local",
           "model": "fable",
           "detail": "[cd90] Review + QA not started this cycle: AMP-015 (owner Cowork session) is editing the same paths (app/start, design-system/aimp-glass, test/aimp-glass-*), so a review now would read a moving target. Do it when the owner hands the paths back."
+        },
+        {
+          "at": "2026-11-14T12:47:56.530Z",
+          "kind": "note",
+          "level": "Local",
+          "model": null,
+          "detail": "[c82a] Review and QA still held: same paths as AMP-015 (reserved)."
         }
       ],
       "notes": "Built by the owner's Cowork session (frontend agent, Fable), 2026-11-14. UNCOMMITTED. Files: apps/web/app/design-system/aimp-glass/ apps/web/app/start/ apps/web/app/tools/aimp-glass/page.tsx apps/web/test/aimp-glass-*.test.ts docs/aimp/glass-ui-notes.md. Routes: /start, /start/account, /start/tour, /start/goals, /start/showcase. Needs coordinator review + QA, a real sign-up test with Supabase configured, and real Safari/phone check. All later AMP UI work uses this library.",
       "model": "fable",
-      "updatedAt": "2026-11-14T10:08:55.880Z"
+      "updatedAt": "2026-11-14T12:47:56.530Z",
+      "featureIds": [
+        "A01",
+        "A02"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": null,
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": "/tools/aimp-glass",
+      "requiredEvidence": "Local",
+      "currentBlocker": "AMP-005-D (commit held)"
     },
     {
       "id": "AMP-015",
@@ -755,12 +979,40 @@
       "worktree": "~/Developer/AIMONEYPRINTER",
       "startedAt": "2026-11-14T09:34:26Z",
       "finishedAt": null,
-      "lastRunId": null,
-      "runIds": [],
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-82af1724"
+      ],
       "commits": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "at": "2026-11-14T10:13:29.338Z",
+          "kind": "note",
+          "level": "Local",
+          "model": null,
+          "detail": "[c6c2] Reconcile: still reserved by the owner's Cowork session (17:36 note, restated 18:10); not abandoned coordinator work, left running and untouched."
+        },
+        {
+          "at": "2026-11-14T12:47:56.530Z",
+          "kind": "note",
+          "level": "Local",
+          "model": null,
+          "detail": "[c82a] Reconcile: still reserved by the owner's Cowork session (17:36 note; no later note hands it back). Left running and untouched; nothing dispatched into app/start, design-system/aimp-glass or test/aimp-glass-*."
+        }
+      ],
       "notes": "Owner request 2026-11-14 17:35 AWST: the app after sign-in must look like the login screens. Being built by the owner's Cowork session (frontend agent, Fable); coordinator must not dispatch or edit these paths until handed back.",
-      "model": "fable"
+      "model": "fable",
+      "featureIds": [
+        "A03"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": null,
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": "/start",
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:47:56.530Z"
     },
     {
       "id": "AMP-020",
@@ -820,7 +1072,17 @@
         "aimp-4.2"
       ],
       "model": "sonnet",
-      "updatedAt": "2026-11-13T17:58:40Z"
+      "updatedAt": "2026-11-13T17:58:40Z",
+      "featureIds": [
+        "C01"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-feature",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": "/tools/aimp-branding",
+      "requiredEvidence": "Local",
+      "currentBlocker": "AMP-005-D (commit held)"
     },
     {
       "id": "AMP-021",
@@ -890,7 +1152,17 @@
         "aimp-3.1"
       ],
       "model": "sonnet",
-      "updatedAt": "2026-11-13T17:21:41Z"
+      "updatedAt": "2026-11-13T17:21:41Z",
+      "featureIds": [
+        "C02"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-feature",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": "/tools/product-factory",
+      "requiredEvidence": "Local",
+      "currentBlocker": "AMP-005-D (commit held)"
     },
     {
       "id": "AMP-022",
@@ -953,7 +1225,18 @@
         "aimp-3.3"
       ],
       "model": "sonnet",
-      "updatedAt": "2026-11-13T17:32:06Z"
+      "updatedAt": "2026-11-13T17:32:06Z",
+      "featureIds": [
+        "C02",
+        "I05"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-feature",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": "/tools/product-review",
+      "requiredEvidence": "Local",
+      "currentBlocker": "AMP-005-D (commit held)"
     },
     {
       "id": "AMP-023",
@@ -1042,7 +1325,18 @@
       "notes": "",
       "legacy": [],
       "model": "sonnet",
-      "updatedAt": "2026-11-13T18:58:00Z"
+      "updatedAt": "2026-11-13T18:58:00Z",
+      "featureIds": [
+        "C04",
+        "C05"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-feature",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": "/tools/catalogue",
+      "requiredEvidence": "Local",
+      "currentBlocker": "AMP-005-D (commit held)"
     },
     {
       "id": "AMP-024",
@@ -1104,7 +1398,18 @@
         "aimp-5.3"
       ],
       "model": "sonnet",
-      "updatedAt": "2026-11-13T17:58:40Z"
+      "updatedAt": "2026-11-13T17:58:40Z",
+      "featureIds": [
+        "C06",
+        "E04"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-backend",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": "/tools/secure-files",
+      "requiredEvidence": "Local",
+      "currentBlocker": "AMP-005-D (commit held)"
     },
     {
       "id": "AMP-030",
@@ -1167,7 +1472,18 @@
         "aimp-4.1",
         "aimp-4.3"
       ],
-      "model": null
+      "model": null,
+      "featureIds": [
+        "D01",
+        "D02"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": null,
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": "lib/aimp/storefront (demo store A, demo-store-b.ts)",
+      "testRoute": "/tools/storefront",
+      "requiredEvidence": "Local",
+      "currentBlocker": "AMP-005-D (commit held)"
     },
     {
       "id": "AMP-031",
@@ -1225,7 +1541,18 @@
       "notes": "Verified locally, UNCOMMITTED (AMP-005-D). Commit: apps/web/lib/aimp/site-versions/ apps/web/app/tools/site-publish/ apps/web/test/aimp-site-versions-lifecycle.test.ts apps/web/test/aimp-site-versions-isolation.test.ts apps/web/test/aimp-site-versions-rework.test.ts. Follow-ups (carry into AMP-032): wire /s/[store] to resolvePublished (paused page, notFound for none) with a shared or DB-backed store; slug length mismatch storefront/tenant.ts 3-63 vs migration 3-42; DB mapping per review (archived rows keep published_at, sites.draft_config/draft_revision, sites.paused, site_events).",
       "legacy": [],
       "model": "sonnet",
-      "updatedAt": "2026-11-13T17:58:40Z"
+      "updatedAt": "2026-11-13T17:58:40Z",
+      "featureIds": [
+        "D03",
+        "I10"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": null,
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": "/tools/site-publish",
+      "requiredEvidence": "Local",
+      "currentBlocker": "AMP-005-D (commit held)"
     },
     {
       "id": "AMP-032",
@@ -1326,7 +1653,18 @@
         "aimp-5.2"
       ],
       "model": "sonnet",
-      "updatedAt": "2026-11-13T18:58:00Z"
+      "updatedAt": "2026-11-13T18:58:00Z",
+      "featureIds": [
+        "D05",
+        "D06"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-backend",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": "AMP-005-D (commit held)"
     },
     {
       "id": "AMP-033",
@@ -1358,7 +1696,17 @@
       "blocker": null,
       "notes": "",
       "legacy": [],
-      "model": null
+      "model": null,
+      "featureIds": [
+        "D05"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-backend",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Live",
+      "currentBlocker": "AMP-033-D"
     },
     {
       "id": "AMP-033-D",
@@ -1389,7 +1737,17 @@
       "blocker": null,
       "notes": "Owner action split from the implementation task (Needs Dylan). Becomes Needs Dylan when AMP-032 is verified.",
       "legacy": [],
-      "model": null
+      "model": null,
+      "featureIds": [
+        "D05"
+      ],
+      "frontendOwner": null,
+      "backendOwner": null,
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null
     },
     {
       "id": "AMP-040",
@@ -1452,7 +1810,17 @@
         "aimp-6.2"
       ],
       "model": "sonnet",
-      "updatedAt": "2026-11-13T17:21:41Z"
+      "updatedAt": "2026-11-13T17:21:41Z",
+      "featureIds": [
+        "E01"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-backend",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": "/tools/seller-readiness",
+      "requiredEvidence": "Local",
+      "currentBlocker": "AMP-005-D (commit held)"
     },
     {
       "id": "AMP-041",
@@ -1536,7 +1904,18 @@
         "aimp-6.3"
       ],
       "model": "sonnet",
-      "updatedAt": "2026-11-13T19:25:00Z"
+      "updatedAt": "2026-11-13T19:25:00Z",
+      "featureIds": [
+        "E02",
+        "E03"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-backend",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": "lib/aimp/checkout fixture provider",
+      "testRoute": "/tools/aimp-checkout",
+      "requiredEvidence": "Local",
+      "currentBlocker": "AMP-005-D (commit held)"
     },
     {
       "id": "AMP-042",
@@ -1608,7 +1987,19 @@
         "aimp-6.4"
       ],
       "model": "fable",
-      "updatedAt": "2026-11-14T10:08:55.880Z"
+      "updatedAt": "2026-11-14T10:08:55.880Z",
+      "featureIds": [
+        "E04",
+        "E06",
+        "G07"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-backend",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": "lib/aimp/fulfilment/demo.ts",
+      "testRoute": "/tools/aimp-fulfilment",
+      "requiredEvidence": "Local",
+      "currentBlocker": "AMP-005-D (commit held)"
     },
     {
       "id": "AMP-043",
@@ -1641,7 +2032,20 @@
       "blocker": null,
       "notes": "",
       "legacy": [],
-      "model": null
+      "model": null,
+      "featureIds": [
+        "E01",
+        "E02",
+        "E03",
+        "E04"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": null,
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": "AMP-043-D"
     },
     {
       "id": "AMP-043-D",
@@ -1682,7 +2086,17 @@
       "legacy": [
         "aimp-6.1"
       ],
-      "model": null
+      "model": null,
+      "featureIds": [
+        "E01"
+      ],
+      "frontendOwner": null,
+      "backendOwner": null,
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": "AMP-043-D"
     },
     {
       "id": "AMP-044",
@@ -1714,7 +2128,18 @@
       "blocker": null,
       "notes": "",
       "legacy": [],
-      "model": null
+      "model": null,
+      "featureIds": [
+        "G08",
+        "I01"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-backend",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": "AMP-043-D"
     },
     {
       "id": "AMP-050",
@@ -1723,7 +2148,7 @@
       "module": "aimp",
       "tier": "P0",
       "owner": "ventra-feature",
-      "state": "implemented",
+      "state": "verified",
       "priority": 1,
       "dependsOn": [
         "AMP-023",
@@ -1742,10 +2167,12 @@
       "branch": "aimp/foundation",
       "worktree": "~/Developer/AIMONEYPRINTER",
       "startedAt": "2026-11-14T09:46:06.953Z",
-      "finishedAt": null,
-      "lastRunId": "c-d90206df",
+      "finishedAt": "2026-11-14T12:47:56.530Z",
+      "lastRunId": "c-82af1724",
       "runIds": [
-        "c-d90206df"
+        "c-d90206df",
+        "c-6c238f0d",
+        "c-82af1724"
       ],
       "commits": [],
       "evidence": [
@@ -1755,15 +2182,60 @@
           "level": "Local",
           "model": "fable",
           "detail": "[cd90] ventra-feature (Fable) returned 13 new files (lib/aimp/campaigns/*, app/tools/aimp-campaign/{page,actions}.tsx, test/aimp-campaign-plan.test.ts with 14 tests), no existing file touched. Coordinator checks with these files present: 1588 tests / 1582 pass / 0 fail / 1 skipped / 5 todo, typecheck clean, lint no output. NOT yet reviewed by ventra-review (budget ran out) and the page is not browser-checked, so it stays implemented. Specialist-reported limits: campaign links are relative paths unless AIMP_STORE_ROOT_DOMAIN or LAUNCHPAD_APP_ORIGIN is set (AMP-052 needs absolute); demo store is assumed live; fixture llm always falls back to the deterministic plan; a flagged niche (e.g. weight loss) yields no campaign."
+        },
+        {
+          "at": "2026-11-14T10:13:29.338Z",
+          "kind": "note",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "[c6c2] Sent to ventra-review (read-only, Sonnet)."
+        },
+        {
+          "at": "2026-11-14T12:21:11.696Z",
+          "kind": "note",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "[c82a] The review sent in c-6c238f0d returned nothing that was recorded (cycle cut off). Sent to ventra-review again."
+        },
+        {
+          "at": "2026-11-14T12:47:56.530Z",
+          "kind": "review",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "[c82a] ventra-review round 1: REQUEST CHANGES. Tenant hole: the store slug came from the caller and was never tied to the business, so business A's campaign links could point at business B's store. Reworked by ventra-feature (Sonnet): store_mismatch check in validate and build (covers regenerate and approve); model output limited to hook, angle, description, callToAction; approve requires expectedVersion; 4 new tests (22 in the file)."
+        },
+        {
+          "at": "2026-11-14T12:47:56.530Z",
+          "kind": "review",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "[c82a] ventra-review round 2 on the rework: PASS WITH FOLLOW-UPS, no blockers. Coordinator saw links.ts:38 (store_mismatch) and generate.ts:161 (copy-only fields)."
+        },
+        {
+          "at": "2026-11-14T12:47:56.530Z",
+          "kind": "test",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "[c82a] Coordinator checks after all reworks: npm test 1671 / 1659 pass / 0 fail / 1 skipped / 11 todo (exit 0); typecheck exit 0; lint exit 0 (--max-warnings 0). Not browser-checked: /tools/aimp-campaign was not opened (curl to 127.0.0.1:3040 needs approval in this session)."
         }
       ],
       "blocker": null,
-      "notes": "",
+      "notes": "Follow-ups for AMP-051/052: links are relative unless a store root domain is set (AMP-052 must require absolute links); server actions use a demo actor and assume the store is live; regenerate overwrites an approved plan in place (no history); niche that trips a claim rule gives an unhelpful error; start date range unchecked; getApprovedCampaign does not recheck store ownership at read time.",
       "legacy": [
         "aimp-7.1"
       ],
-      "model": "fable",
-      "updatedAt": "2026-11-14T10:08:55.880Z"
+      "model": "fable (build) + sonnet (rework)",
+      "updatedAt": "2026-11-14T12:47:56.530Z",
+      "featureIds": [
+        "F01"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-feature",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": "/tools/aimp-campaign",
+      "requiredEvidence": "Local",
+      "currentBlocker": "AMP-005-D (commit held)"
     },
     {
       "id": "AMP-051",
@@ -1787,14 +2259,29 @@
       "worktree": "~/Developer/AIMONEYPRINTER",
       "startedAt": null,
       "finishedAt": null,
-      "lastRunId": null,
-      "runIds": [],
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-82af1724"
+      ],
       "commits": [],
       "evidence": [],
       "blocker": null,
       "notes": "",
       "legacy": [],
-      "model": null
+      "model": null,
+      "featureIds": [
+        "F02",
+        "F07",
+        "S05"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-feature",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:21:11.696Z"
     },
     {
       "id": "AMP-052",
@@ -1829,7 +2316,19 @@
         "aimp-7.2",
         "aimp-7.3"
       ],
-      "model": null
+      "model": null,
+      "featureIds": [
+        "F03",
+        "F04",
+        "F05"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-backend",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": "AMP-052-D"
     },
     {
       "id": "AMP-052-D",
@@ -1870,7 +2369,18 @@
       "legacy": [
         "aimp-7.0"
       ],
-      "model": null
+      "model": null,
+      "featureIds": [
+        "F03",
+        "F05"
+      ],
+      "frontendOwner": null,
+      "backendOwner": null,
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": "AMP-052-D"
     },
     {
       "id": "AMP-053",
@@ -1901,7 +2411,18 @@
       "blocker": null,
       "notes": "",
       "legacy": [],
-      "model": null
+      "model": null,
+      "featureIds": [
+        "F08",
+        "I11"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-backend",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null
     },
     {
       "id": "AMP-054",
@@ -1933,7 +2454,17 @@
       "blocker": null,
       "notes": "",
       "legacy": [],
-      "model": null
+      "model": null,
+      "featureIds": [
+        "F05"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": null,
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": "AMP-052-D"
     },
     {
       "id": "AMP-060",
@@ -2015,7 +2546,19 @@
       "notes": "",
       "legacy": [],
       "model": "sonnet",
-      "updatedAt": "2026-11-13T18:58:00Z"
+      "updatedAt": "2026-11-13T18:58:00Z",
+      "featureIds": [
+        "G01",
+        "G04",
+        "I04"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-backend",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": "/tools/aimp-jobs",
+      "requiredEvidence": "Local",
+      "currentBlocker": "AMP-005-D (commit held)"
     },
     {
       "id": "AMP-061",
@@ -2024,12 +2567,19 @@
       "module": "aimp",
       "tier": "P0",
       "owner": "ventra-feature",
-      "state": "queued",
+      "state": "verified",
       "priority": 1,
       "dependsOn": [
         "AMP-060"
       ],
-      "scope": [],
+      "scope": [
+        "apps/web/lib/aimp/automation/**",
+        "apps/web/app/tools/aimp-automation/**",
+        "apps/web/test/aimp-automation-*.test.ts",
+        "docs/aimp/contracts/G02-G03-automation-approvals-activity.md",
+        "apps/web/lib/aimp/jobs/store.ts (resume line only)",
+        "apps/web/test/aimp-jobs-runner.test.ts (one resume test)"
+      ],
       "acceptance": [
         "An owner can pause future marketing, see what ran, and approve only the actions that require approval."
       ],
@@ -2037,16 +2587,76 @@
       "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
       "branch": "aimp/foundation",
       "worktree": "~/Developer/AIMONEYPRINTER",
-      "startedAt": null,
-      "finishedAt": null,
-      "lastRunId": null,
-      "runIds": [],
+      "startedAt": "2026-11-14T10:13:29.338Z",
+      "finishedAt": "2026-11-14T12:47:56.530Z",
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-6c238f0d",
+        "c-82af1724"
+      ],
       "commits": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "at": "2026-11-14T10:13:29.338Z",
+          "kind": "note",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "[c6c2] Dispatched to ventra-feature on Sonnet (owner directive 18:10: Sonnet for coding and test code)."
+        },
+        {
+          "at": "2026-11-14T12:21:11.696Z",
+          "kind": "note",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "[c82a] Reconcile: c-6c238f0d ended without a wrap-up. Work is present: lib/aimp/automation/{types,store,service,demo,index}.ts, app/tools/aimp-automation/{page.tsx,actions.ts}, test/aimp-automation-{approvals,usage,activity}.test.ts, docs/aimp/contracts/G02-G03-automation-approvals-activity.md. Coordinator checks on the whole tree: typecheck exit 0, lint exit 0, npm test 1633 / 1622 pass / 1 fail (jobs runner, belongs to AMP-067) / 1 skipped / 9 todo. Sent to ventra-review."
+        },
+        {
+          "at": "2026-11-14T12:47:56.530Z",
+          "kind": "review",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "[c82a] ventra-review round 1: REQUEST CHANGES (pausing did not stop already-queued marketing; a rejected or expired approval blocked its key forever; failure alert pointed at a Retry that did not exist; mode change could double-run). Rework 1 by ventra-backend (Sonnet; the fixes are job-engine use): pause sweeps queued and waiting-retry jobs and remembers which it paused, already_decided outcome, retryJob + Retry button, duplicate-of-existing-job check, sequenced event ids, compare-and-set transitionApproval; new test file aimp-automation-jobs.test.ts."
+        },
+        {
+          "at": "2026-11-14T12:47:56.530Z",
+          "kind": "review",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "[c82a] ventra-review round 2: REQUEST CHANGES (a job mid-step escaped the pause; a half-done pause could not be repaired; resume made a future-scheduled job due at once; cap slot accounting on crash recovery). Rework 2 by ventra-backend (Sonnet): running jobs are paused too; setMode re-runs the sweep when the mode is unchanged; jobs/store.ts resume keeps a future run time (Math.max); recovery branch reserves a slot; test that every built-in job kind is gated or explicitly ungated."
+        },
+        {
+          "at": "2026-11-14T12:47:56.530Z",
+          "kind": "review",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "[c82a] ventra-review round 3: PASS WITH FOLLOW-UPS, nothing blocks verified locally. Coordinator saw automation/service.ts:113 and jobs/store.ts:206."
+        },
+        {
+          "at": "2026-11-14T12:47:56.530Z",
+          "kind": "test",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "[c82a] Coordinator checks after all reworks: npm test 1671 / 1659 pass / 0 fail / 1 skipped / 11 todo (exit 0); typecheck exit 0; lint exit 0 (--max-warnings 0). Not browser-checked: /tools/aimp-automation was not opened."
+        }
+      ],
       "blocker": null,
-      "notes": "",
+      "notes": "Follow-ups (AMP-048): pause on a running step leaves the attempt counters incremented, so toggling pause maxAttempts times while a step is mid-flight fails the job; a cap slot can stay reserved if an approval reverts to pending after an earlier crash and then expires. Limits stated in the contract: in-memory stores only, no outbound notifications, no runner-level guard (anything calling jobs.enqueue directly bypasses pause, approval and cap), failed generations keep their cap slot. Assumes canonical-state decision 1 = no job exists until approval (needs sign-off in AMP-006).",
       "legacy": [],
-      "model": null
+      "model": "sonnet",
+      "featureIds": [
+        "G02",
+        "G03",
+        "G04",
+        "G08"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-feature",
+      "contract": "docs/aimp/contracts/G02-G03-automation-approvals-activity.md",
+      "fixture": null,
+      "testRoute": "/tools/aimp-automation",
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:47:56.530Z"
     },
     {
       "id": "AMP-062",
@@ -2077,7 +2687,18 @@
       "blocker": null,
       "notes": "",
       "legacy": [],
-      "model": null
+      "model": null,
+      "featureIds": [
+        "H01",
+        "H02"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": null,
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null
     },
     {
       "id": "AMP-063",
@@ -2109,7 +2730,24 @@
       "blocker": null,
       "notes": "",
       "legacy": [],
-      "model": null
+      "model": null,
+      "featureIds": [
+        "I03",
+        "I04",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-backend",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null
     },
     {
       "id": "AMP-064",
@@ -2125,7 +2763,9 @@
         "AMP-024",
         "AMP-032",
         "AMP-042",
-        "AMP-051"
+        "AMP-051",
+        "AMP-046",
+        "AMP-035"
       ],
       "scope": [],
       "acceptance": [
@@ -2137,8 +2777,10 @@
       "worktree": "~/Developer/AIMONEYPRINTER",
       "startedAt": null,
       "finishedAt": null,
-      "lastRunId": null,
-      "runIds": [],
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-82af1724"
+      ],
       "commits": [],
       "evidence": [],
       "blocker": null,
@@ -2147,7 +2789,124 @@
         "aimp-8.1",
         "aimp-8.2"
       ],
-      "model": null
+      "model": null,
+      "featureIds": [
+        "I02"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": null,
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:47:56.530Z"
+    },
+    {
+      "id": "AMP-067",
+      "title": "First-journey acceptance run on fixtures with two separate test businesses (resume, replayed payment, unpaid download, expired link, cross-business isolation, campaign while authorisation is pending)",
+      "phase": "a",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-backend",
+      "state": "verified",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-042",
+        "AMP-041",
+        "AMP-032",
+        "AMP-031",
+        "AMP-024",
+        "AMP-060"
+      ],
+      "scope": [
+        "apps/web/test/aimp-journey-*.test.ts",
+        "apps/web/lib/aimp/journey/**",
+        "docs/aimp/contracts/first-journey-acceptance.md",
+        "apps/web/lib/aimp/jobs/store.ts",
+        "apps/web/lib/aimp/jobs/service.ts",
+        "apps/web/test/aimp-jobs-business-scope.test.ts",
+        "apps/web/test/aimp-jobs-runner.test.ts"
+      ],
+      "acceptance": [
+        "Two separate test businesses each run intake → five ranked ideas → selection → brand → real product file → published test storefront → fixture checkout → delivery → owner order and delivery status, using the real lib/aimp modules.",
+        "An interrupted build job resumes and finishes without duplicating work.",
+        "A repeated payment event produces exactly one order and one delivery.",
+        "Pending or unpaid orders cannot download.",
+        "An expired link has a working recovery path.",
+        "Business A cannot read business B's data, orders or files.",
+        "The campaign draft is produced and usable while no publishing account is connected.",
+        "Lint, typecheck and npm test pass; no existing test weakened."
+      ],
+      "verifyLevel": "local",
+      "plan": "Owner directive 2026-11-14 18:10 item 3; build brief section 8 step 5",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": "2026-11-14T12:21:11.696Z",
+      "finishedAt": "2026-11-14T12:47:56.530Z",
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-6c238f0d",
+        "c-82af1724"
+      ],
+      "commits": [],
+      "evidence": [
+        {
+          "at": "2026-11-14T10:13:29.338Z",
+          "kind": "note",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "[c6c2] Dispatched to ventra-backend on Sonnet (owner directive 18:10: Sonnet for coding and test code)."
+        },
+        {
+          "at": "2026-11-14T12:21:11.696Z",
+          "kind": "note",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "[c82a] Reconcile: c-6c238f0d ended without a wrap-up. Work is present: lib/aimp/journey/{fixtures,world}.ts, test/aimp-journey-acceptance.test.ts (4 test.todo gaps), docs/aimp/contracts/first-journey-acceptance.md, plus an out-of-scope change to lib/aimp/jobs/{store,service}.ts (idempotency key now scoped per business) with new test/aimp-jobs-business-scope.test.ts. That change breaks 1 existing test: test/aimp-jobs-runner.test.ts:375 expects the same key from another business to be a conflict. Sent back once to ventra-backend (Sonnet) to settle the rule and make the suite pass without weakening coverage."
+        },
+        {
+          "at": "2026-11-14T12:47:56.530Z",
+          "kind": "test",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "[c82a] Send-back 1 (ventra-backend, Sonnet): job idempotency key is scoped by workspace, business and kind (a job with no business is its own scope); aimp-jobs-runner.test.ts:370 now asserts the new rule (other business gets its own job, null scope separate, different input or run time still conflicts). No test deleted or skipped."
+        },
+        {
+          "at": "2026-11-14T12:47:56.530Z",
+          "kind": "review",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "[c82a] ventra-review: PASS WITH FOLLOW-UPS. Harness is honest for intake to delivery on the real services; three claims were larger than the proof. Send-back 2 applied them: resume test retitled and now reads the real stores; campaign test renamed and its cannot-fail assertions replaced; added journey 2b (second event id, concurrent first deliveries: still one order, one fulfilment, one grant, one email) and journey 5b (two businesses in ONE workspace, ten subtests). The second send-back was not re-reviewed."
+        },
+        {
+          "at": "2026-11-14T12:47:56.530Z",
+          "kind": "test",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "[c82a] Coordinator checks after all reworks: npm test 1671 / 1659 pass / 0 fail / 1 skipped / 11 todo (exit 0); typecheck exit 0; lint exit 0 (--max-warnings 0). Journey file alone: 19 pass, 0 fail, 6 todo."
+        }
+      ],
+      "blocker": null,
+      "notes": "What is proven: Local, on fixtures, at service level. NOT proven (six test.todo GAP entries, also in docs/aimp/contracts/first-journey-acceptance.md): no production job builds a business; the storefront buy button is off (checkoutBuilt = false) so checkout is driven directly; nothing turns a published site version into the checkout store directory; campaigns have no publishing-account input; idempotency of the real build services under a repeated call; and a REAL DEFECT: files grants (listGrants, issueGrant, reissueGrant) take only a workspace id, so two businesses in one workspace are not separated (AMP-046). The same run on Stripe test mode is AMP-043.",
+      "legacy": [],
+      "model": "sonnet",
+      "updatedAt": "2026-11-14T12:47:56.530Z",
+      "featureIds": [
+        "E02",
+        "E03",
+        "E04",
+        "G01",
+        "G04",
+        "I02"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-backend",
+      "contract": "docs/aimp/contracts/first-journey-acceptance.md",
+      "fixture": "lib/aimp/journey (two test businesses)",
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null
     },
     {
       "id": "AMP-065",
@@ -2155,11 +2914,16 @@
       "phase": "a",
       "module": "aimp",
       "tier": "P0",
-      "owner": "ventra-web-design",
+      "owner": "aimp-website",
       "state": "queued",
       "priority": 1,
       "dependsOn": [
-        "AMP-064"
+        "AMP-064",
+        "AMP-068",
+        "AMP-069",
+        "AMP-070",
+        "AMP-071",
+        "AMP-072"
       ],
       "scope": [],
       "acceptance": [
@@ -2171,14 +2935,25 @@
       "worktree": "~/Developer/AIMONEYPRINTER",
       "startedAt": null,
       "finishedAt": null,
-      "lastRunId": null,
-      "runIds": [],
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-82af1724"
+      ],
       "commits": [],
       "evidence": [],
       "blocker": null,
-      "notes": "",
+      "notes": "Owner note 2026-11-14 18:31: assigned to aimp-website and split into AMP-068 to AMP-073. This task is the roll-up (demonstration store, pilot onboarding, policy drafts, measurement plan) and closes when the parts are verified.",
       "legacy": [],
-      "model": null
+      "model": null,
+      "featureIds": [],
+      "frontendOwner": "aimp-website",
+      "backendOwner": null,
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:21:11.696Z"
     },
     {
       "id": "AMP-066",
@@ -2213,7 +2988,15 @@
       "blocker": null,
       "notes": "",
       "legacy": [],
-      "model": null
+      "model": null,
+      "featureIds": [],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": null,
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Live",
+      "currentBlocker": "AMP-066-D"
     },
     {
       "id": "AMP-066-D",
@@ -2244,7 +3027,15 @@
       "blocker": null,
       "notes": "Owner action split from the implementation task (Needs Dylan). Becomes Needs Dylan when AMP-065 is verified.",
       "legacy": [],
-      "model": null
+      "model": null,
+      "featureIds": [],
+      "frontendOwner": null,
+      "backendOwner": null,
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null
     },
     {
       "id": "AMP-110",
@@ -2275,7 +3066,18 @@
       "blocker": null,
       "notes": "",
       "legacy": [],
-      "model": null
+      "model": null,
+      "featureIds": [
+        "C03",
+        "E05"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-feature",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null
     },
     {
       "id": "AMP-111",
@@ -2307,7 +3109,18 @@
       "blocker": null,
       "notes": "",
       "legacy": [],
-      "model": null
+      "model": null,
+      "featureIds": [
+        "D04",
+        "D05"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": null,
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null
     },
     {
       "id": "AMP-112",
@@ -2324,7 +3137,8 @@
       ],
       "scope": [],
       "acceptance": [
-        "An owner can review a proposed change and trace it back to store performance."
+        "An owner can review a proposed change and trace it back to store performance.",
+        "A seller can create a coupon code; checkout applies it exactly once and shows the reduced price (and the campaign claims rule that forbids discounts becomes coupon-aware)."
       ],
       "verifyLevel": "local",
       "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
@@ -2332,14 +3146,29 @@
       "worktree": "~/Developer/AIMONEYPRINTER",
       "startedAt": null,
       "finishedAt": null,
-      "lastRunId": null,
-      "runIds": [],
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-82af1724"
+      ],
       "commits": [],
       "evidence": [],
       "blocker": null,
       "notes": "",
       "legacy": [],
-      "model": null
+      "model": null,
+      "featureIds": [
+        "C04",
+        "C07",
+        "E07"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-feature",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:47:56.530Z"
     },
     {
       "id": "AMP-113",
@@ -2371,7 +3200,18 @@
       "blocker": null,
       "notes": "",
       "legacy": [],
-      "model": null
+      "model": null,
+      "featureIds": [
+        "F06",
+        "F07"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-backend",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null
     },
     {
       "id": "AMP-114",
@@ -2396,14 +3236,30 @@
       "worktree": "~/Developer/AIMONEYPRINTER",
       "startedAt": null,
       "finishedAt": null,
-      "lastRunId": null,
-      "runIds": [],
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-82af1724"
+      ],
       "commits": [],
       "evidence": [],
       "blocker": null,
       "notes": "",
       "legacy": [],
-      "model": null
+      "model": null,
+      "featureIds": [
+        "E06",
+        "F10",
+        "G07",
+        "S06"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-feature",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:21:11.696Z"
     },
     {
       "id": "AMP-115",
@@ -2420,7 +3276,8 @@
       ],
       "scope": [],
       "acceptance": [
-        "Recommendations cite the store data behind them and show where evidence is limited."
+        "Recommendations cite the store data behind them and show where evidence is limited.",
+        "A seller can type in an expense with an amount, date and category, and it reduces the margin figure in their reports."
       ],
       "verifyLevel": "local",
       "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
@@ -2428,14 +3285,32 @@
       "worktree": "~/Developer/AIMONEYPRINTER",
       "startedAt": null,
       "finishedAt": null,
-      "lastRunId": null,
-      "runIds": [],
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-82af1724"
+      ],
       "commits": [],
       "evidence": [],
       "blocker": null,
       "notes": "",
       "legacy": [],
-      "model": null
+      "model": null,
+      "featureIds": [
+        "D07",
+        "F11",
+        "G06",
+        "H02",
+        "H03",
+        "H04"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-feature",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:47:56.530Z"
     },
     {
       "id": "AMP-116",
@@ -2467,7 +3342,203 @@
       "blocker": null,
       "notes": "",
       "legacy": [],
-      "model": null
+      "model": null,
+      "featureIds": [
+        "A04"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-feature",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null
+    },
+    {
+      "id": "AMP-117",
+      "title": "Scheduled management routines: recurring store, catalogue and campaign checks on the durable job engine, with owner-visible results",
+      "phase": "p1",
+      "module": "aimp",
+      "tier": "P1",
+      "owner": "ventra-backend",
+      "state": "queued",
+      "priority": 3,
+      "dependsOn": [
+        "AMP-060",
+        "AMP-061",
+        "AMP-064"
+      ],
+      "scope": [],
+      "acceptance": [
+        "A routine runs on its schedule for one business only, survives a restart, records what it checked and raises an owner action when something needs attention.",
+        "Each morning a seller can see one mobile-sized summary of yesterday's sales, deliveries and required actions; a test checks the numbers."
+      ],
+      "verifyLevel": "local",
+      "plan": "Build brief G05 (no task existed)",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-6c238f0d",
+        "c-82af1724"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null,
+      "updatedAt": "2026-11-14T12:47:56.530Z",
+      "featureIds": [
+        "G05"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-backend",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null
+    },
+    {
+      "id": "AMP-118",
+      "title": "Automated email follow-up with recorded consent and working opt-out (suppression)",
+      "phase": "p1",
+      "module": "aimp",
+      "tier": "P1",
+      "owner": "ventra-backend",
+      "state": "queued",
+      "priority": 3,
+      "dependsOn": [
+        "AMP-053",
+        "AMP-064"
+      ],
+      "scope": [],
+      "acceptance": [
+        "Follow-up emails go only to subscribers with recorded consent; an opt-out suppresses every later send and is visible to the owner.",
+        "A buyer who ticked the consent box and left checkout gets exactly one reminder email; no email goes to a buyer who did not opt in or who opted out."
+      ],
+      "verifyLevel": "local",
+      "plan": "Build brief F09; directive item 3 (follow-up, consent and opt-outs)",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-6c238f0d",
+        "c-82af1724"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null,
+      "updatedAt": "2026-11-14T12:47:56.530Z",
+      "featureIds": [
+        "F09",
+        "I11"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-backend",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null
+    },
+    {
+      "id": "AMP-119",
+      "title": "Marketing experiments: one controlled variation at a time, with a recorded result and a plain recommendation",
+      "phase": "p1",
+      "module": "aimp",
+      "tier": "P1",
+      "owner": "ventra-feature",
+      "state": "queued",
+      "priority": 3,
+      "dependsOn": [
+        "AMP-051",
+        "AMP-064"
+      ],
+      "scope": [],
+      "acceptance": [
+        "An owner can start one experiment on a campaign asset, see which variation did better from recorded visits and orders, and keep or discard it."
+      ],
+      "verifyLevel": "local",
+      "plan": "Build brief F11; directive item 3 (experiments)",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-6c238f0d",
+      "runIds": [
+        "c-6c238f0d"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null,
+      "updatedAt": "2026-11-14T10:13:29.338Z",
+      "featureIds": [
+        "F11"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-feature",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null
+    },
+    {
+      "id": "AMP-120",
+      "title": "Local discovery: local-search listing content and location pages for stores that serve an area",
+      "phase": "p1",
+      "module": "aimp",
+      "tier": "P1",
+      "owner": "ventra-feature",
+      "state": "queued",
+      "priority": 3,
+      "dependsOn": [
+        "AMP-051",
+        "AMP-064"
+      ],
+      "scope": [],
+      "acceptance": [
+        "A store that serves a named area gets listing copy and a location page that pass the built-in SEO checks; stores without an area are unaffected."
+      ],
+      "verifyLevel": "local",
+      "plan": "Directive item 3 (local discovery); build brief F07",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-6c238f0d",
+      "runIds": [
+        "c-6c238f0d"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null,
+      "updatedAt": "2026-11-14T10:13:29.338Z",
+      "featureIds": [
+        "F07"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-feature",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null
     },
     {
       "id": "AMP-210",
@@ -2498,7 +3569,18 @@
       "blocker": null,
       "notes": "",
       "legacy": [],
-      "model": null
+      "model": null,
+      "featureIds": [
+        "C08",
+        "E07"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-backend",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null
     },
     {
       "id": "AMP-211",
@@ -2529,7 +3611,15 @@
       "blocker": null,
       "notes": "",
       "legacy": [],
-      "model": null
+      "model": null,
+      "featureIds": [],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-backend",
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null
     },
     {
       "id": "AMP-212",
@@ -2560,7 +3650,15 @@
       "blocker": null,
       "notes": "",
       "legacy": [],
-      "model": null
+      "model": null,
+      "featureIds": [],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-feature",
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null
     },
     {
       "id": "AMP-213",
@@ -2591,7 +3689,17 @@
       "blocker": null,
       "notes": "",
       "legacy": [],
-      "model": null
+      "model": null,
+      "featureIds": [
+        "F12"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-feature",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null
     },
     {
       "id": "AMP-214",
@@ -2622,7 +3730,17 @@
       "blocker": null,
       "notes": "",
       "legacy": [],
-      "model": null
+      "model": null,
+      "featureIds": [
+        "H05"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": null,
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null
     },
     {
       "id": "AMP-215",
@@ -2653,7 +3771,15 @@
       "blocker": null,
       "notes": "",
       "legacy": [],
-      "model": null
+      "model": null,
+      "featureIds": [],
+      "frontendOwner": null,
+      "backendOwner": null,
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null
     },
     {
       "id": "AMP-216",
@@ -2684,7 +3810,15 @@
       "blocker": null,
       "notes": "",
       "legacy": [],
-      "model": null
+      "model": null,
+      "featureIds": [],
+      "frontendOwner": null,
+      "backendOwner": null,
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null
     },
     {
       "state": "verified",
@@ -2735,7 +3869,17 @@
       "updatedAt": "2026-11-13T19:25:00Z",
       "id": "AMP-034",
       "title": "Align storefront slug rules with the database: storefront/schema.ts and site-versions/store.ts use hosts matchesSitesSlugCheck (3-42 chars) instead of 3-63",
-      "owner": "ventra-web-design"
+      "owner": "ventra-web-design",
+      "featureIds": [
+        "D05"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": null,
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": "AMP-005-D (commit held)"
     },
     {
       "state": "verified",
@@ -2814,7 +3958,1008 @@
       "updatedAt": "2026-11-13T19:16:33.316Z",
       "id": "AMP-045",
       "title": "Provider idempotency keys: every side-effecting provider adapter (llm generate, email send, social queuePost, storage) accepts and forwards an idempotency key; jobs handlers pass the per-step key",
-      "owner": "ventra-backend"
+      "owner": "ventra-backend",
+      "featureIds": [
+        "E03"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-backend",
+      "contract": "docs/aimp/contracts/README.md (feature row; per-feature file not written yet)",
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": "AMP-005-D (commit held)"
+    },
+    {
+      "id": "AMP-068",
+      "title": "Public site 1/6: audit /plant-lab and /plant-lab/build against the Website CTA Strategy and the public-site screen list; written gap list",
+      "phase": "a",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "aimp-website",
+      "state": "verified",
+      "priority": 2,
+      "dependsOn": [],
+      "scope": [
+        "docs/aimp/website/AUDIT.md"
+      ],
+      "acceptance": [
+        "Every public-site screen and CTA rule in the strategy and brief is listed as present, partial or missing, with the file that holds it.",
+        "Route mismatches against the page-by-page spec are flagged, not renamed.",
+        "Claims check: no guaranteed earnings, no invented testimonials or urgency, draft pricing labelled draft, brand name only from site-config.ts.",
+        "The gap list is ordered into the next build tasks (AMP-069 to AMP-072)."
+      ],
+      "verifyLevel": "Local",
+      "plan": "Owner note 2026-11-14 18:31; docs/aimp/reference/text/Website_CTA_Strategy.txt; build brief public-site screens",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": "2026-11-14T12:24:00Z",
+      "finishedAt": "2026-11-14T12:47:56.530Z",
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-82af1724"
+      ],
+      "commits": [],
+      "evidence": [
+        {
+          "at": "2026-11-14T12:47:56.530Z",
+          "kind": "diff",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "[c82a] aimp-website (Sonnet) wrote docs/aimp/website/AUDIT.md and changed no code. Coordinator read the head of the file: routes table, 36 screen and CTA rows (14 present, 15 partial, 7 missing), claims check with file:line, hand-off seam, plan for AMP-069 to AMP-073, 8 owner questions. Evidence is code reading only: nothing was rendered or measured."
+        }
+      ],
+      "blocker": null,
+      "notes": "Main gaps: the visitor's preview is dropped at sign-up (launch-step.tsx:27 links to /workspace, the old VENTRA page); hero copy breaks the claims rules (plant-lab/page.tsx:84 \"6-figure\", :86 \"financial freedom\", :93-97 income statistics); no privacy, terms, contact or sign-in recovery pages; hero_view and skip_animation events never fire; app/robots.ts allows / while the pages rely on page-level noindex.",
+      "legacy": [],
+      "model": "sonnet",
+      "featureIds": [],
+      "frontendOwner": "aimp-website",
+      "backendOwner": null,
+      "contract": null,
+      "fixture": null,
+      "testRoute": "/plant-lab",
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:47:56.530Z"
+    },
+    {
+      "id": "AMP-069",
+      "title": "Public site 2/6: carry the visitor's two-click business preview into /start sign-up",
+      "phase": "a",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "aimp-website",
+      "state": "queued",
+      "priority": 2,
+      "dependsOn": [
+        "AMP-068"
+      ],
+      "scope": [
+        "apps/web/app/plant-lab/**",
+        "apps/web/lib/aimp/plant/**",
+        "apps/web/lib/aimp/site-config.ts",
+        "apps/web/public/plant/**",
+        "assets-src/plant/**",
+        "apps/web/test/aimp-plant-*",
+        "apps/web/test/aimp-website-*"
+      ],
+      "acceptance": [
+        "The preview a visitor builds on the public site is available after they reach /start, without editing app/start/** (hand-off through a documented seam).",
+        "Lint, typecheck and npm test pass."
+      ],
+      "verifyLevel": "Local",
+      "plan": "Owner note 2026-11-14 18:31; docs/aimp/reference/text/Website_CTA_Strategy.txt; build brief public-site screens",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-82af1724"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "app/start/** is reserved (AMP-015). If the hand-off needs a change there, record it as a request for the frontend agent. Audit finding: launch-step.tsx:27 links to /workspace?plan=...&from=build and drops model, niche and brand name. Seam: a hand-off module in lib/aimp/plant/ plus a link to /start; the reader inside /start must come from the frontend agent (AMP-015 paths).",
+      "legacy": [],
+      "model": null,
+      "featureIds": [],
+      "frontendOwner": "aimp-website",
+      "backendOwner": null,
+      "contract": null,
+      "fixture": null,
+      "testRoute": "/plant-lab/build",
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:47:56.530Z"
+    },
+    {
+      "id": "AMP-070",
+      "title": "Public site 3/6: how it works, examples, pricing and plan comparison, FAQ, contact, privacy and terms",
+      "phase": "a",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "aimp-website",
+      "state": "queued",
+      "priority": 2,
+      "dependsOn": [
+        "AMP-068"
+      ],
+      "scope": [
+        "apps/web/app/plant-lab/**",
+        "apps/web/lib/aimp/plant/**",
+        "apps/web/lib/aimp/site-config.ts",
+        "apps/web/public/plant/**",
+        "assets-src/plant/**",
+        "apps/web/test/aimp-plant-*",
+        "apps/web/test/aimp-website-*"
+      ],
+      "acceptance": [
+        "Each page exists, is mobile-first (no horizontal scroll at 320/390/1280) and stays noindex.",
+        "Pricing is labelled draft; no earnings guarantees, invented testimonials or urgency.",
+        "Lint, typecheck and npm test pass."
+      ],
+      "verifyLevel": "Local",
+      "plan": "Owner note 2026-11-14 18:31; docs/aimp/reference/text/Website_CTA_Strategy.txt; build brief public-site screens",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-82af1724"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "Build with the earnings claims removed by default (AMP-068-D holds the final wording). Add aimp-website-* tests; none exist today.",
+      "legacy": [],
+      "model": null,
+      "featureIds": [],
+      "frontendOwner": "aimp-website",
+      "backendOwner": null,
+      "contract": null,
+      "fixture": null,
+      "testRoute": "/plant-lab",
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:47:56.530Z"
+    },
+    {
+      "id": "AMP-071",
+      "title": "Public site 4/6: measurement events and the first headline A/B test",
+      "phase": "a",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "aimp-website",
+      "state": "queued",
+      "priority": 2,
+      "dependsOn": [
+        "AMP-070"
+      ],
+      "scope": [
+        "apps/web/app/plant-lab/**",
+        "apps/web/lib/aimp/plant/**",
+        "apps/web/lib/aimp/site-config.ts",
+        "apps/web/public/plant/**",
+        "assets-src/plant/**",
+        "apps/web/test/aimp-plant-*",
+        "apps/web/test/aimp-website-*"
+      ],
+      "acceptance": [
+        "Events are defined and fired through one module, with no third-party script until the owner approves a provider.",
+        "One headline variation is assigned deterministically and recorded."
+      ],
+      "verifyLevel": "Local",
+      "plan": "Owner note 2026-11-14 18:31; docs/aimp/reference/text/Website_CTA_Strategy.txt; build brief public-site screens",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-82af1724"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null,
+      "featureIds": [],
+      "frontendOwner": "aimp-website",
+      "backendOwner": null,
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:21:11.696Z"
+    },
+    {
+      "id": "AMP-072",
+      "title": "Public site 5/6: real-device iPhone Safari and Lighthouse checks",
+      "phase": "a",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-qa",
+      "state": "queued",
+      "priority": 2,
+      "dependsOn": [
+        "AMP-070"
+      ],
+      "scope": [],
+      "acceptance": [
+        "Lighthouse mobile results recorded for each public page.",
+        "iPhone Safari check recorded, or marked Needs Dylan if no device is reachable from the session."
+      ],
+      "verifyLevel": "Local",
+      "plan": "Owner note 2026-11-14 18:31; docs/aimp/reference/text/Website_CTA_Strategy.txt; build brief public-site screens",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-82af1724"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null,
+      "featureIds": [],
+      "frontendOwner": "aimp-website",
+      "backendOwner": null,
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:21:11.696Z"
+    },
+    {
+      "id": "AMP-073",
+      "title": "Public site 6/6: homepage integration (replace the root page with the public site)",
+      "phase": "a",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "aimp-website",
+      "state": "queued",
+      "priority": 2,
+      "dependsOn": [
+        "AMP-070",
+        "AMP-073-D"
+      ],
+      "scope": [
+        "apps/web/app/plant-lab/**",
+        "apps/web/lib/aimp/plant/**",
+        "apps/web/lib/aimp/site-config.ts",
+        "apps/web/public/plant/**",
+        "assets-src/plant/**",
+        "apps/web/test/aimp-plant-*",
+        "apps/web/test/aimp-website-*"
+      ],
+      "acceptance": [
+        "The root route serves the approved public site; noindex is lifted only with written owner approval."
+      ],
+      "verifyLevel": "Local",
+      "plan": "Owner note 2026-11-14 18:31; docs/aimp/reference/text/Website_CTA_Strategy.txt; build brief public-site screens",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-82af1724"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null,
+      "featureIds": [],
+      "frontendOwner": "aimp-website",
+      "backendOwner": null,
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:21:11.696Z"
+    },
+    {
+      "id": "AMP-073-D",
+      "title": "Approve the public site as the homepage (and when it may be indexed)",
+      "phase": "a",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "owner",
+      "state": "queued",
+      "priority": 2,
+      "dependsOn": [
+        "AMP-070"
+      ],
+      "scope": [],
+      "acceptance": [
+        "Dylan has approved homepage integration in writing."
+      ],
+      "verifyLevel": "Local",
+      "plan": "Owner note 2026-11-14 18:31; docs/aimp/reference/text/Website_CTA_Strategy.txt; build brief public-site screens",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-82af1724"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "Becomes a Needs Dylan item when AMP-070 is verified. Nothing is deployed by the coordinator.",
+      "legacy": [],
+      "model": null,
+      "featureIds": [],
+      "frontendOwner": null,
+      "backendOwner": null,
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:21:11.696Z"
+    },
+    {
+      "id": "AMP-121",
+      "title": "S01 AI Setter for stores: qualify inbound enquiries and book or hand off, reusing the VENTRA Setter after verifying it in code",
+      "phase": "p1",
+      "module": "aimp",
+      "tier": "P1",
+      "owner": "ventra-feature",
+      "state": "queued",
+      "priority": 3,
+      "dependsOn": [
+        "AMP-064",
+        "AMP-125"
+      ],
+      "scope": [],
+      "acceptance": [
+        "The VENTRA Setter in apps/web/lib/front-office/ is verified in code and the reuse or rebuild decision is recorded.",
+        "A typed enquiry on a test route gets a reply from approved business knowledge, a qualification decision and a recorded lead; hand-off to the owner works.",
+        "Frontend, backend and verification parts are split out when the task starts."
+      ],
+      "verifyLevel": "Local",
+      "plan": "Owner note 2026-11-14 18:22; Master Business Plan agent maps (section 4); FEATURE_CHECKLIST.md S01-S08",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-82af1724"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "Release tier is the owner's decision (plan says P1); planned as Next and must not delay the first customer journey. No unrestricted cold outbound, no mass unsolicited DMs, recorded consent before follow-up (Spam Act); nothing is sent live without owner approval.",
+      "legacy": [],
+      "model": null,
+      "featureIds": [
+        "S01"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-feature",
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:21:11.696Z"
+    },
+    {
+      "id": "AMP-122",
+      "title": "S02 Organic Lead Gen Agent: business finder, lead scorer, website auditor, email writer and lead log",
+      "phase": "p1",
+      "module": "aimp",
+      "tier": "P1",
+      "owner": "ventra-backend",
+      "state": "queued",
+      "priority": 3,
+      "dependsOn": [
+        "AMP-064"
+      ],
+      "scope": [],
+      "acceptance": [
+        "Leads come only from supported, permissioned sources; each has a score with its reasons and a source.",
+        "Outreach emails are drafts in a review queue; nothing is sent without consent on record and owner approval.",
+        "Every lead and action is in the lead log."
+      ],
+      "verifyLevel": "Local",
+      "plan": "Owner note 2026-11-14 18:22; Master Business Plan agent maps (section 4); FEATURE_CHECKLIST.md S01-S08",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-82af1724"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "Release tier is the owner's decision (plan says P1); planned as Next and must not delay the first customer journey. No unrestricted cold outbound, no mass unsolicited DMs, recorded consent before follow-up (Spam Act); nothing is sent live without owner approval.",
+      "legacy": [],
+      "model": null,
+      "featureIds": [
+        "S02"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-backend",
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:21:11.696Z"
+    },
+    {
+      "id": "AMP-123",
+      "title": "S03 Inbox Agent: one inbox for enquiries with drafted replies and owner approval",
+      "phase": "p1",
+      "module": "aimp",
+      "tier": "P1",
+      "owner": "ventra-backend",
+      "state": "queued",
+      "priority": 3,
+      "dependsOn": [
+        "AMP-064",
+        "AMP-125"
+      ],
+      "scope": [],
+      "acceptance": [
+        "Inbound messages on fixtures appear in one list per business with a drafted reply; sending needs approval; opt-outs are honoured."
+      ],
+      "verifyLevel": "Local",
+      "plan": "Owner note 2026-11-14 18:22; Master Business Plan agent maps (section 4); FEATURE_CHECKLIST.md S01-S08",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-82af1724"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "Release tier is the owner's decision (plan says P1); planned as Next and must not delay the first customer journey. No unrestricted cold outbound, no mass unsolicited DMs, recorded consent before follow-up (Spam Act); nothing is sent live without owner approval.",
+      "legacy": [],
+      "model": null,
+      "featureIds": [
+        "S03"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-backend",
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:21:11.696Z"
+    },
+    {
+      "id": "AMP-124",
+      "title": "S04 Leads and Booking workspace: lead list, stages, booking and history in the glass UI",
+      "phase": "p1",
+      "module": "aimp",
+      "tier": "P1",
+      "owner": "ventra-web-design",
+      "state": "queued",
+      "priority": 3,
+      "dependsOn": [
+        "AMP-064",
+        "AMP-122"
+      ],
+      "scope": [],
+      "acceptance": [
+        "An owner can see leads, move a stage, and see or make a booking, on real lib/aimp logic.",
+        "Uses the aimp-glass library; mobile-first."
+      ],
+      "verifyLevel": "Local",
+      "plan": "Owner note 2026-11-14 18:22; Master Business Plan agent maps (section 4); FEATURE_CHECKLIST.md S01-S08",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-82af1724"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "Release tier is the owner's decision (plan says P1); planned as Next and must not delay the first customer journey. No unrestricted cold outbound, no mass unsolicited DMs, recorded consent before follow-up (Spam Act); nothing is sent live without owner approval.",
+      "legacy": [],
+      "model": null,
+      "featureIds": [
+        "S04"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-backend",
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:21:11.696Z"
+    },
+    {
+      "id": "AMP-125",
+      "title": "S07 Business knowledge base: approved services, offers, prices, FAQs and policies per business, shared by the sales agents",
+      "phase": "p1",
+      "module": "aimp",
+      "tier": "P1",
+      "owner": "ventra-backend",
+      "state": "queued",
+      "priority": 3,
+      "dependsOn": [
+        "AMP-064"
+      ],
+      "scope": [],
+      "acceptance": [
+        "One store per business holds approved answers with version and approval state; agents read only approved entries; another business cannot read them."
+      ],
+      "verifyLevel": "Local",
+      "plan": "Owner note 2026-11-14 18:22; Master Business Plan agent maps (section 4); FEATURE_CHECKLIST.md S01-S08",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-82af1724"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "Release tier is the owner's decision (plan says P1); planned as Next and must not delay the first customer journey. No unrestricted cold outbound, no mass unsolicited DMs, recorded consent before follow-up (Spam Act); nothing is sent live without owner approval.",
+      "legacy": [],
+      "model": null,
+      "featureIds": [
+        "S07"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-backend",
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:21:11.696Z"
+    },
+    {
+      "id": "AMP-126",
+      "title": "Confirm the \"plan details not found on any board task\" list against the code and attach each to a task",
+      "phase": "a",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-research",
+      "state": "verified",
+      "priority": 2,
+      "dependsOn": [],
+      "scope": [],
+      "acceptance": [
+        "Each item (Google/Apple sign-in and password reset, trademark screening, spreadsheet and image exports, publish smoke test, abandoned-checkout follow-up, coupons and quantities, daily summaries, manual expenses) is marked present, partial or missing with the file that shows it.",
+        "Each missing item is named in the acceptance criteria of the right AMP task (the coordinator writes the board)."
+      ],
+      "verifyLevel": "Local",
+      "plan": "Owner note 2026-11-14 18:22; Master Business Plan agent maps (section 4); FEATURE_CHECKLIST.md S01-S08",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": "2026-11-14T12:37:00Z",
+      "finishedAt": "2026-11-14T12:47:56.530Z",
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-82af1724"
+      ],
+      "commits": [],
+      "evidence": [
+        {
+          "at": "2026-11-14T12:47:56.530Z",
+          "kind": "note",
+          "level": "Local",
+          "model": "sonnet",
+          "detail": "[c82a] ventra-research (Sonnet, read-only) checked the 8 checklist items (FEATURE_CHECKLIST.md:142-152) against app, lib and test. None fully present. PARTIAL: account export (lib/account-export.ts:8, JSON drafts only), publish smoke test (contracts.ts:75; handlers.ts:132-135 is a stub that always passes), multiple quantities (contracts.ts:77 allows it; checkout/service.ts:102-114 charges one). MISSING: Google/Apple sign-in and password reset, account deletion, trademark screening, spreadsheet and image exports, abandoned-checkout follow-up, coupons, daily summaries, manual expenses. Not checked: supabase migrations and docs. The coordinator attached each to a task (new AMP-016, 025, 026, 035, 047; acceptance added to AMP-112, 115, 117, 118)."
+        }
+      ],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": "sonnet",
+      "featureIds": [],
+      "frontendOwner": null,
+      "backendOwner": null,
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:47:56.530Z"
+    },
+    {
+      "id": "AMP-068-D",
+      "title": "Public site copy decisions: headline, income claims, status labels, domain and support email, policies",
+      "phase": "a",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "owner",
+      "state": "blocked",
+      "priority": 2,
+      "dependsOn": [],
+      "scope": [],
+      "acceptance": [
+        "Dylan has answered the 8 questions at the end of docs/aimp/website/AUDIT.md."
+      ],
+      "verifyLevel": "Local",
+      "plan": "AMP-068 audit",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-82af1724"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": {
+        "reason": "The public site's hero says \"Your 6-figure business is just a few clicks away\", has a \"9-5 to financial freedom\" line and third-party income statistics. The claims rules forbid earnings promises; the replacement wording is the owner's call.",
+        "needsApproval": true,
+        "owner": true,
+        "action": "Answer the 8 questions in section 8 of the audit: approve the brief headline \"The AI boom is here. Build a business from it.\"; allow removal of the financial-freedom line and income statistics; soften \"Live now\", \"Exactly once, every time\" and \"Most people start here\"; confirm domain and support email; where the extra pages live; who writes privacy, terms and cancellation terms; the A/B headline and where events go; hand-off to /start instead of /workspace.",
+        "where": "~/Developer/AIMONEYPRINTER/docs/aimp/website/AUDIT.md (section 8); reply through the Telegram Master console or OWNER_NOTES.md",
+        "why": "Marketing claims and legal pages are owner decisions; nothing is deployed and /plant-lab stays noindex meanwhile.",
+        "unlocks": "AMP-070 copy and policy pages, AMP-071 headline test, AMP-073 homepage integration.",
+        "continuing": "AMP-069 (carry the preview into sign-up) and the structure of AMP-070 can be built with claims removed by default; the earnings lines will be taken out unless Dylan says otherwise.",
+        "since": "2026-11-14T12:47:56.530Z"
+      },
+      "notes": "",
+      "legacy": [],
+      "model": null,
+      "featureIds": [],
+      "frontendOwner": null,
+      "backendOwner": null,
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": "Owner copy decisions (8 questions)",
+      "updatedAt": "2026-11-14T12:47:56.530Z"
+    },
+    {
+      "id": "AMP-016",
+      "title": "Account basics: password reset by email, Google (and Apple) sign-in, account export of all workspace data, account deletion",
+      "phase": "o",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-backend",
+      "state": "queued",
+      "priority": 2,
+      "dependsOn": [],
+      "scope": [],
+      "acceptance": [
+        "A visitor can reset a forgotten password by email; a test covers the path.",
+        "A visitor can sign in with Google (and Apple, if the owner enables it); a test covers each path on fixtures.",
+        "A signed-in user downloads a file with their workspace data and the test confirms it holds only their own records.",
+        "A signed-in user can delete their account and workspace after confirming; afterwards their data cannot be read."
+      ],
+      "verifyLevel": "Local",
+      "plan": "Found by review or research in cycle c-82af1724",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-82af1724"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "Today: email and password only (app/api/workspace/route.ts:75). Google and Apple sign-in need the owner's OAuth credentials and a decision on Apple: split that part into AMP-016-D when the task starts and build the rest. The account form is under app/start/** (AMP-015 reservation).",
+      "legacy": [],
+      "model": null,
+      "featureIds": [
+        "A01"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-backend",
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:47:56.530Z"
+    },
+    {
+      "id": "AMP-025",
+      "title": "Product Factory exports: XLSX with checked formulas and PNG/JPG, each with a licence note",
+      "phase": "p1",
+      "module": "aimp",
+      "tier": "P1",
+      "owner": "ventra-feature",
+      "state": "queued",
+      "priority": 3,
+      "dependsOn": [
+        "AMP-064"
+      ],
+      "scope": [],
+      "acceptance": [
+        "A generated product can be exported as an XLSX file whose formulas calculate correctly in a test, and as a PNG/JPG image; each export carries a licence note."
+      ],
+      "verifyLevel": "Local",
+      "plan": "Found by review or research in cycle c-82af1724",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-82af1724"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "Only PDF and ZIP exist today.",
+      "legacy": [],
+      "model": null,
+      "featureIds": [
+        "C02"
+      ],
+      "frontendOwner": null,
+      "backendOwner": "ventra-feature",
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:47:56.530Z"
+    },
+    {
+      "id": "AMP-026",
+      "title": "Business-name clash warning (name-similarity check, clearly not legal clearance)",
+      "phase": "b",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-feature",
+      "state": "queued",
+      "priority": 2,
+      "dependsOn": [],
+      "scope": [],
+      "acceptance": [
+        "Each business-name option shows a plain \"possible clash\" warning from a name-similarity check, with a notice that it is not legal clearance."
+      ],
+      "verifyLevel": "Local",
+      "plan": "Found by review or research in cycle c-82af1724",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-82af1724"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "Today branding only disclaims (branding/validate.ts:13). A real trademark register lookup would need a provider: owner decision.",
+      "legacy": [],
+      "model": null,
+      "featureIds": [
+        "C01"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-feature",
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:47:56.530Z"
+    },
+    {
+      "id": "AMP-035",
+      "title": "Real publish smoke test: published pages load and checkout can start, or the publish fails and rolls back",
+      "phase": "w",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-backend",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-031"
+      ],
+      "scope": [],
+      "acceptance": [
+        "Publishing runs a real check that the public pages load and checkout can start; the publish fails and rolls back if the check fails."
+      ],
+      "verifyLevel": "Local",
+      "plan": "Found by review or research in cycle c-82af1724",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-82af1724"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "lib/aimp/jobs/handlers.ts:132-135 is a demo stub that always passes. Related journey gaps: no production job builds a business; checkoutBuilt = false in storefront/load.ts.",
+      "legacy": [],
+      "model": null,
+      "featureIds": [
+        "D03"
+      ],
+      "frontendOwner": null,
+      "backendOwner": "ventra-backend",
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:47:56.530Z"
+    },
+    {
+      "id": "AMP-046",
+      "title": "Files: separate two businesses inside one workspace (grants take only a workspace id today)",
+      "phase": "p",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-backend",
+      "state": "queued",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-024"
+      ],
+      "scope": [
+        "apps/web/lib/aimp/files/**",
+        "apps/web/test/aimp-files-*.test.ts",
+        "apps/web/test/aimp-journey-acceptance.test.ts (turn the GAP todo into a passing test)"
+      ],
+      "acceptance": [
+        "listGrants, issueGrant and reissueGrant take the business and answer another business's order item as not found, also inside one workspace.",
+        "The test.todo \"GAP: files does not separate two businesses in one workspace\" in aimp-journey-acceptance.test.ts becomes a passing test.",
+        "Lint, typecheck and npm test pass."
+      ],
+      "verifyLevel": "Local",
+      "plan": "Found by review or research in cycle c-82af1724",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-82af1724"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "Found by AMP-067 journey 5b: files.issueGrant({ workspaceId }, <other business's order item>) issued a token and listGrants returned 1. Other reads (orders, fulfilment, catalogue, checkout) isolate correctly. Touches secure downloads: needs ventra-review.",
+      "legacy": [],
+      "model": null,
+      "featureIds": [
+        "I02",
+        "E04"
+      ],
+      "frontendOwner": null,
+      "backendOwner": "ventra-backend",
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:47:56.530Z"
+    },
+    {
+      "id": "AMP-047",
+      "title": "Checkout quantities above one (unit price times quantity through order, fulfilment and refund)",
+      "phase": "p1",
+      "module": "aimp",
+      "tier": "P1",
+      "owner": "ventra-backend",
+      "state": "queued",
+      "priority": 3,
+      "dependsOn": [
+        "AMP-064"
+      ],
+      "scope": [],
+      "acceptance": [
+        "Checkout can take a quantity above 1 and charges the unit price times that quantity; order, delivery and refund records agree."
+      ],
+      "verifyLevel": "Local",
+      "plan": "Found by review or research in cycle c-82af1724",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-82af1724"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "contracts.ts:77 allows a quantity; checkout/service.ts:102-114 charges one item. Changes verified AMP-041 behaviour: re-run checkout and fulfilment tests. Coupons are on AMP-112.",
+      "legacy": [],
+      "model": null,
+      "featureIds": [
+        "E02"
+      ],
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": "ventra-backend",
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:47:56.530Z"
+    },
+    {
+      "id": "AMP-048",
+      "title": "Job engine: pausing a running step must not use up an attempt; release a cap slot when an approval reverts to pending",
+      "phase": "a",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-backend",
+      "state": "queued",
+      "priority": 2,
+      "dependsOn": [
+        "AMP-061"
+      ],
+      "scope": [
+        "apps/web/lib/aimp/jobs/store.ts",
+        "apps/web/lib/aimp/automation/service.ts",
+        "apps/web/test/aimp-jobs-runner.test.ts",
+        "apps/web/test/aimp-automation-*.test.ts"
+      ],
+      "acceptance": [
+        "Pausing and resuming an area four times while a step is mid-flight (maxAttempts 3) does not fail the job.",
+        "A cap slot is released whenever an approval reverts to pending."
+      ],
+      "verifyLevel": "Local",
+      "plan": "Found by review or research in cycle c-82af1724",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-82af1724",
+      "runIds": [
+        "c-82af1724"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "From ventra-review round 3 on AMP-061 (jobs/store.ts:194-199; automation/service.ts:339).",
+      "legacy": [],
+      "model": null,
+      "featureIds": [
+        "G01",
+        "G02"
+      ],
+      "frontendOwner": null,
+      "backendOwner": "ventra-backend",
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:47:56.530Z"
     }
   ]
 }

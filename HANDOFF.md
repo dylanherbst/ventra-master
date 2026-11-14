@@ -15,6 +15,28 @@ Dylan asked for the mobile app preview link to be sent to him on Telegram. Send 
 
 ## Master Coordinator (auto)
 
+- Last cycle: c-82af1724 at 2026-11-14 20:14 AWST · 4 dispatched (AMP-067 fix, AMP-068 audit, AMP-126 research, plus reviews) + 5 reviews + 4 rework rounds, all Sonnet · 5 verified locally · 0 committed · 1 new owner item (AMP-068-D)
+- Integration branch: agent/develop @ f3c82ed (board commit follows). AMP repo: ~/Developer/AIMONEYPRINTER aimp/foundation + UNCOMMITTED work. Coordinator checks after all reworks: npm test 1671 / 1659 pass / 0 fail / 1 skipped / 11 todo (exit 0); typecheck exit 0; lint exit 0 (--max-warnings 0).
+- The earlier cycle c-6c238f0d was cut off without a wrap-up (it had added the board fields and feature IDs and dispatched AMP-061 and AMP-067). Its work was reconciled this cycle; nothing was lost.
+- AMP-050 launch campaign: Verified locally. Review found that the store slug was never tied to the business (links could point at another business's store); fixed and re-reviewed.
+  - Commit files: apps/web/lib/aimp/campaigns/ apps/web/app/tools/aimp-campaign/ apps/web/test/aimp-campaign-plan.test.ts
+- AMP-061 merchant automation: Verified locally after three review rounds. Pausing an area now holds queued, waiting-retry and running jobs and resumes only what it paused; resume keeps a future run time.
+  - Commit files (after AMP-060): apps/web/lib/aimp/automation/ apps/web/app/tools/aimp-automation/ apps/web/test/aimp-automation-*.test.ts docs/aimp/contracts/G02-G03-automation-approvals-activity.md, plus the resume line in apps/web/lib/aimp/jobs/store.ts and its test in apps/web/test/aimp-jobs-runner.test.ts
+- AMP-067 first-journey acceptance run: Verified locally, on fixtures, at service level, two businesses. Job idempotency keys are now scoped per business.
+  - Commit files (after AMP-042, AMP-050, AMP-060): apps/web/lib/aimp/journey/ apps/web/test/aimp-journey-acceptance.test.ts apps/web/test/aimp-jobs-business-scope.test.ts docs/aimp/contracts/first-journey-acceptance.md, plus the key-scope change in apps/web/lib/aimp/jobs/{store,service}.ts and apps/web/test/aimp-jobs-runner.test.ts
+  - Not proven (six test.todo GAP entries): no production job builds a business; storefront buy button is off (checkoutBuilt = false); no seam from a published site to the checkout store directory; campaigns have no publishing-account input; real build services not called twice; files grants are not separated between two businesses in one workspace (real defect, AMP-046).
+- AMP-068 public-site audit: docs/aimp/website/AUDIT.md (code reading only). Hero copy breaks the claims rules; the preview is dropped at sign-up.
+- AMP-126: the eight "plan details" were checked in code; none fully present. Attached to AMP-016, 025, 026, 035, 047 (new) and AMP-112, 115, 117, 118.
+- New tasks: AMP-016 account basics, AMP-025 exports, AMP-026 name clash warning, AMP-035 real publish smoke test, AMP-046 files isolation, AMP-047 quantities, AMP-048 job pause attempts, AMP-068 to AMP-073 public site, AMP-121 to AMP-125 sales and lead-gen agents (S01, S02, S03, S04, S07).
+- AMP-014 / AMP-015: still reserved by the owner's Cowork session (17:36 note); untouched.
+- Not checked this cycle: no page was opened in a browser (curl to 127.0.0.1:3040 needs approval here), so whether the preview server is up is unknown.
+- Pending foreign changes left in place (owner Cowork session): .claude/agents/*.md, README.md, docs/agents/COORDINATOR.md, docs/agents/STATUS.md, scripts/agents/ventra-coord, ventra-coordinator, ventra-master, docs/agents/AIMP_FEATURE_MAP.json, docs/agents/briefs/.
+- Blocked, needs the owner: AMP-005-D (allow ~/Developer/AIMONEYPRINTER for coordinator cycles; 25 verified tasks waiting to commit), AMP-068-D (public-site copy: 8 questions in the audit), AMP-043-D Stripe test keys, AMP-052-D Pinterest app.
+- Leftover temp files (safe to delete, not committed): docs/agents/.cycle-* and scripts/agents/.cycle-*.
+- Next up: AMP-046 (files isolation, then review), AMP-006 (contracts and the five state decisions), AMP-051 (campaign content, now unblocked), AMP-053 (lead capture), AMP-069 (public-site hand-off), AMP-035 (publish smoke test); AMP-062 and AMP-014 review wait for the AMP-015 hand-back.
+
+### Previous cycle c-d90206df
+
 - Last cycle: c-d90206df at 2026-11-14 17:44 AWST · 2 dispatched (AMP-050 build, AMP-042 rework; both Fable) + 1 review · 0 committed · 0 new owner blockers
 - Integration branch: agent/develop @ 01301c6 (board commit follows). AMP repo: ~/Developer/AIMONEYPRINTER aimp/foundation + UNCOMMITTED work. Coordinator checks at end of cycle: npm test 1588 / 1582 pass / 0 fail / 1 skipped / 5 todo; typecheck clean; lint no output.
 - AMP-042: Verified locally: ventra-review PASS WITH FOLLOW-UPS; duplicate-email-after-timeout defect reworked (grant reuse, stable email key, reissue guard, 6 new tests); coordinator checks green after the rework. The rework itself was not re-reviewed.
@@ -30,8 +52,6 @@ Dylan asked for the mobile app preview link to be sent to him on Telegram. Send 
 - Blocked, needs the owner: AMP-005-D (allow ~/Developer/AIMONEYPRINTER for coordinator cycles; 20+ tasks waiting to commit), AMP-043-D Stripe test keys, AMP-052-D Pinterest app.
 - Leftover temp files (safe to delete, not committed): docs/agents/.cycle-* and scripts/agents/.cycle-*.
 - Next up: handle the 18:05 note; reconcile AMP-050 if not verified; then AMP-051 (after AMP-050), AMP-053, AMP-061, AMP-062 (must use aimp-glass); review AMP-014/015 when handed back.
-
-
 
 ### Previous cycle c-712dc75a
 
@@ -346,12 +366,17 @@ Tracker Phase 0: 0.1 scope freeze, 0.2 orchestrator, 0.3 lead store + state mach
 ## Git state (auto)
 
 <!-- git-state:start -->
-_Generated 2026-11-14 18:09 by `ventra-handoff snapshot`. Do not hand-edit this block._
+_Generated 2026-11-14 20:48 by `ventra-handoff snapshot`. Do not hand-edit this block._
 - Branch: `agent/develop`
-- HEAD: `81d0248 chore(coordinator): cycle c-d90206df board and handoff; AMP-042 fulfilment reviewed and reworked for exactly-once delivery email (Fable, implemented), AMP-050 launch campaign running, held uncommitted in the AMP repo by AMP-005-D`
-- Lock: coordinator (pid 2259, 24 min old)
+- HEAD: `f3c82ed chore(coordinator): cycle c-d90206df final board and handoff; AMP-042 fulfilment verified locally (reviewed, reworked, 1588 tests 0 fail), AMP-050 launch campaign implemented (needs review), held uncommitted in the AMP repo by AMP-005-D`
+- Lock: coordinator (pid 94642, 33 min old)
 - Uncommitted changes:
 ```text
+ M .claude/agents/ventra-backend.md
+ M .claude/agents/ventra-feature.md
+ M .claude/agents/ventra-frontend.md
+ M .claude/agents/ventra-qa.md
+ M .claude/agents/ventra-web-design.md
  M HANDOFF.md
  M README.md
  M docs/agents/AIMP_BOARD.json
@@ -362,7 +387,9 @@ _Generated 2026-11-14 18:09 by `ventra-handoff snapshot`. Do not hand-edit this 
  M scripts/agents/ventra-coord
  M scripts/agents/ventra-coordinator
  M scripts/agents/ventra-master
+?? .claude/agents/aimp-website.md
 ?? docs/agents/.cycle-c0e5.mjs
+?? docs/agents/.cycle-c6c2.mjs
 ?? docs/agents/.cycle-c712-1.json
 ?? docs/agents/.cycle-c712-2.json
 ?? docs/agents/.cycle-c712-3.json
@@ -375,6 +402,8 @@ _Generated 2026-11-14 18:09 by `ventra-handoff snapshot`. Do not hand-edit this 
 ?? docs/agents/.cycle-c79d-2.json
 ?? docs/agents/.cycle-c79d-start.jq
 ?? docs/agents/.cycle-c79d.mjs
+?? docs/agents/.cycle-c82a-end.mjs
+?? docs/agents/.cycle-c82a-start.mjs
 ?? docs/agents/.cycle-c960-1.json
 ?? docs/agents/.cycle-c960-2.json
 ?? docs/agents/.cycle-c960-3.json
@@ -383,37 +412,32 @@ _Generated 2026-11-14 18:09 by `ventra-handoff snapshot`. Do not hand-edit this 
 ?? docs/agents/.cycle-c960-sample.pdf
 ?? docs/agents/.cycle-c960.jq
 ?? docs/agents/.cycle-c960.mjs
-?? docs/agents/.cycle-cd90-handoff.mjs
-?? docs/agents/.cycle-cd90-start.jq
-?? docs/agents/.cycle-cd90-start.mjs
-?? docs/agents/.cycle-cd90.mjs
-?? docs/agents/.cycle-cf42-1.json
-?? docs/agents/.cycle-cf42-2.json
-?? docs/agents/.cycle-cf42-3.json
-?? docs/agents/.cycle-cf42-4.json
-?? docs/agents/.cycle-cf42-5.json
 ```
 - Diff stat vs HEAD:
 ```text
- HANDOFF.md                        |  7 +++---
- README.md                         |  2 ++
- docs/agents/AIMP_BOARD.json       | 37 +++++++++++++++++++++---------
- docs/agents/COORDINATOR.md        | 47 ++++++++++++++++++++++++++++++++++++++-
- docs/agents/OWNER_NOTES.md        |  9 +++++---
- docs/agents/STATUS.md             |  2 ++
- docs/agents/TASKS.md              |  4 ++--
- scripts/agents/ventra-coord       |  6 +++++
- scripts/agents/ventra-coordinator | 33 ++++++++++++++++-----------
- scripts/agents/ventra-master      |  3 ++-
- 10 files changed, 116 insertions(+), 34 deletions(-)
+ .claude/agents/ventra-feature.md    |    3 +
+ .claude/agents/ventra-frontend.md   |    3 +
+ .claude/agents/ventra-qa.md         |    3 +
+ .claude/agents/ventra-web-design.md |    3 +
+ HANDOFF.md                          |   24 +-
+ README.md                           |    2 +
+ docs/agents/AIMP_BOARD.json         | 2373 +++++++++++++++++++++++++++++++++--
+ docs/agents/COORDINATOR.md          |   47 +-
+ docs/agents/OWNER_NOTES.md          |  185 ++-
+ docs/agents/STATUS.md               |    2 +
+ docs/agents/TASKS.md                |    5 +-
+ scripts/agents/ventra-coord         |    6 +
+ scripts/agents/ventra-coordinator   |   33 +-
+ scripts/agents/ventra-master        |    3 +-
+ 15 files changed, 2559 insertions(+), 136 deletions(-)
 ```
 - Recent commits:
 ```text
+f3c82ed chore(coordinator): cycle c-d90206df final board and handoff; AMP-042 fulfilment verified locally (reviewed, reworked, 1588 tests 0 fail), AMP-050 launch campaign implemented (needs review), held uncommitted in the AMP repo by AMP-005-D
 81d0248 chore(coordinator): cycle c-d90206df board and handoff; AMP-042 fulfilment reviewed and reworked for exactly-once delivery email (Fable, implemented), AMP-050 launch campaign running, held uncommitted in the AMP repo by AMP-005-D
 01301c6 chore(coordinator): cycle c-0e5a5416 board and handoff; AMP-045 provider idempotency keys verified locally (Sonnet, reviewed PASS, 1513 tests 0 fail), held uncommitted in the AMP repo by AMP-005-D
 eb68f76 chore(coordinator): cycle c-79d5e30f board and handoff; AMP-041 checkout/orders and AMP-034 slug rule verified locally (Sonnet, reviewed, 1508 tests 0 fail), held uncommitted in the AMP repo by AMP-005-D
 a94d531 chore(coordinator): cycle c-712dc75a board and handoff; AMP-023, AMP-032, AMP-060 verified locally (Sonnet, reviewed, reworked, 1487 tests 0 fail), held uncommitted in the AMP repo by AMP-005-D; follow-ups AMP-034, AMP-045
-d03c51c chore(coordinator): cycle c-f428b679 board and handoff; AMP-020, AMP-024, AMP-031 verified locally (Sonnet, reviewed, reworked, 1376 tests 0 fail), held uncommitted in the AMP repo by AMP-005-D
 ```
 <!-- git-state:end -->
 
