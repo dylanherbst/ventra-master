@@ -7,7 +7,9 @@
 //   take_message are performed.
 // - enquiry_only: commitments are refused (the AI takes a message instead); transfer and take_message are performed.
 // - take_message is not a PendingActionKind: capturing what someone wants is never a commitment, so it is always allowed.
-// - transfer (a live hand-off to a person) is always allowed: a customer asking for a human must never be blocked.
+// - transfer (a live hand-off to a person) is always allowed in all three modes (owner decision 2026-11-14, A-14): a
+//   customer asking for a human is never blocked or held. The 'transfer' PendingActionKind is therefore never produced
+//   by gate(); the type stays because other code uses it.
 // - A reply inside a conversation the customer started is not a 'send'. 'send' means a message the business starts
 //   (a confirmation, an outbound text or email); 'follow_up' a scheduled one.
 // - Anything unknown is treated safely: an unknown mode is read as DEFAULT_OPERATING_MODE, an unknown action is refused.

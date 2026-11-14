@@ -14,9 +14,11 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 /** How much the AI may do on its own, per business and per product (Setter, Receptionist).
- * automatic: performs bookings, changes, sends and transfers within the business rules.
+ * automatic: performs bookings, changes and sends within the business rules.
+ * Transfer to a person (owner decision 2026-11-14): always performed in every mode, never held or refused.
+ * (The 'transfer' pending-action kind is therefore unreachable via gate(); kept because other code uses the type.)
  * owner_approval: prepares the action, holds it as a PendingAction, commits only after the owner approves.
- * enquiry_only: answers from approved information and captures the enquiry; never books, changes, sends or transfers. */
+ * enquiry_only: answers from approved information and captures the enquiry; never books, changes or sends. */
 export const operatingModes = ['automatic', 'owner_approval', 'enquiry_only'] as const;
 export type OperatingMode = typeof operatingModes[number];
 /** The safe default until the owner chooses: nothing is committed. */
@@ -574,8 +576,9 @@ export function parseReceptionistRunResult(input: unknown): ParseResult<Receptio
       mode: oneOf(operatingModes, o.mode, 'Mode'),
       pendingActionIds: ids(o.pendingActionIds, 'Pending actions'),
     };
-    const commits = r.outcomes.some(x => x === 'booked' || x === 'rescheduled' || x === 'cancelled' || x === 'transfer') || r.action === 'transfer';
-    if (commits && r.mode !== 'automatic') throw new Invalid('Only automatic mode books, changes or transfers directly.');
+    // Owner decision 2026-11-14 (A-14): a transfer to a person happens in every mode, so it is not a commitment here.
+    const commits = r.outcomes.some(x => x === 'booked' || x === 'rescheduled' || x === 'cancelled');
+    if (commits && r.mode !== 'automatic') throw new Invalid('Only automatic mode books or changes directly.');
     if (r.pendingActionIds.length && r.mode !== 'owner_approval') throw new Invalid('Only owner approval mode holds actions.');
     return r;
   });

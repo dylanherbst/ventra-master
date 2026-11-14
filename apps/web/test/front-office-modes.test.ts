@@ -58,6 +58,15 @@ for (const mode of operatingModes) {
   }
 }
 
+// Owner decision 2026-11-14 (A-14): the AI always transfers when someone asks for a person, in every mode.
+for (const mode of operatingModes) {
+  test(`permissions: transfer is performed in ${mode} (a request for a person is never blocked or held)`, () => {
+    const p = decide(mode, 'transfer');
+    assert.equal(p.decision, 'perform');
+    assert.equal(p.say, '');
+  });
+}
+
 test('permissions: unknown mode falls back to enquiry_only; unknown action is refused; never throws', () => {
   assert.equal(decide('yolo', 'book').decision, 'refuse');
   assert.equal(decide('yolo', 'book').mode, 'enquiry_only');

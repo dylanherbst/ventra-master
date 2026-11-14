@@ -153,7 +153,10 @@ test('Setter and Receptionist run results respect the operating mode', () => {
   ok(parseReceptionistRunResult({ ...r, outcomes: ['booked'], mode: 'automatic' }));
   ok(parseReceptionistRunResult({ ...r, outcomes: ['message'], action: 'end' }));
   bad(parseReceptionistRunResult({ ...r, outcomes: ['booked'] }), /Only automatic mode/);
-  bad(parseReceptionistRunResult({ ...r, action: 'transfer', mode: 'owner_approval' }), /Only automatic mode/);
+  // Owner decision 2026-11-14 (A-14): a transfer to a person is accepted in every mode.
+  for (const mode of ['automatic', 'owner_approval', 'enquiry_only']) {
+    ok(parseReceptionistRunResult({ ...r, action: 'transfer', outcomes: ['transfer'], mode }));
+  }
   bad(parseReceptionistRunResult({ ...r, action: 'hold' }), /Action must be one of/);
 });
 

@@ -26,9 +26,12 @@ shapes may gain optional fields; existing fields do not change meaning without a
   `verified`.
 - **Operating modes** (`OperatingMode`, per business, per product): `automatic` performs within the business rules;
   `owner_approval` holds the action as a `PendingAction` and commits only after approval; `enquiry_only` answers and
-  captures the enquiry but never books, changes, sends or transfers. Default `enquiry_only`. Every book, reschedule,
+  captures the enquiry but never books, changes or sends. Default `enquiry_only`. Every book, reschedule,
   cancel, send, follow-up and transfer goes through one shared permission check (A-2), which answers `perform`,
-  `hold_for_approval` or `refuse` (`PermissionDecision`).
+  `hold_for_approval` or `refuse` (`PermissionDecision`). **Transfer rule (owner decision 2026-11-14, A-14): the AI always
+  transfers when a caller or customer asks for a person, in all three modes; a request for a human is never blocked or
+  held.** `decide(mode, 'transfer')` is `perform` in every mode, and `parseReceptionistRunResult` accepts a `transfer`
+  outcome or action in any mode. The `transfer` pending-action kind stays in the type list but is no longer produced.
 
 ## Endpoints that exist today
 
@@ -219,8 +222,9 @@ business: the same generic `403 no_workspace_access` (nothing about the other bu
   - Channel not configured here: `409 conflict`, the item stays pending.
 
 ### Receptionist actions (A-7)
-- Existing Vapi endpoints enforce the mode: `owner_approval` holds book, reschedule, cancel and transfer and the caller is
-  told honestly ("I have asked the team to confirm"); `enquiry_only` takes a message instead. Each caller turn produces a
+- Existing Vapi endpoints enforce the mode: `owner_approval` holds book, reschedule and cancel and the caller is
+  told honestly ("I have asked the team to confirm"); `enquiry_only` takes a message instead. Transfer to a person is
+  performed in every mode (A-14). Each caller turn produces a
   `ReceptionistRunResult` (logged; `pendingActionIds` lists what was held).
 - `POST /api/front-office/receptionist/simulate` `{ conversation: { role: "user" | "assistant", content }[], caller?: E.164,
   callId?: string }` -> `{ result: ReceptionistRunResult, call: CallRecord | null }`. Sandbox only: scripted model unless
