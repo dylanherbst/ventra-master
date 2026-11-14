@@ -80,3 +80,59 @@ Owner decision: **VENTRA is archived. Work only on Workstream E (AiMoneyPrinter)
   `VENTRA_REPO=~/Developer/AIMONEYPRINTER ventra-verify` for checks). It has no remote yet (GitHub token pending).
 - Do not edit `~/Developer/VENTRA-CLEAN` or its worktree list. Full VENTRA backup:
   `~/Backups/ventra/ventra-archive-2026-11-13.bundle`.
+
+### 2026-11-14 16:40 AWST — New reference files; two tasks taken by the owner's Cowork session; model rule (status: handled c-d90206df — reference files passed to specialists; AMP coding dispatched on Fable; reservations superseded by the 17:35 and 17:36 notes)
+
+- **New source documents** from Dylan are in `~/Developer/AIMONEYPRINTER/docs/aimp/reference/` (Business Plan v2,
+  Business Builder Architecture, Website CTA Strategy, Peach & Lavender Glass UI Library + Claude guide, Sales/Voice
+  operating-backbone diagram, plant animation brief; `text/` has plain-text extractions). Treat them as the product
+  reference for every AMP task from now on.
+- **Do not dispatch these two; the owner's Cowork session is building them right now in the AiMoneyPrinter repo:**
+  1. **AMP-042** (fulfilment, delivery, reissue, order history, basic refund/support) — scope
+     `apps/web/lib/aimp/fulfilment/**`, `apps/web/app/api/aimp/fulfilment/**`, `apps/web/app/tools/aimp-fulfilment/**`,
+     `apps/web/test/aimp-fulfilment-*.test.ts`, `apps/web/test/aimp-release-*.test.ts`.
+  2. **New task (give it the next free id, e.g. AMP-014): Peach & Lavender Glass UI library and app onboarding
+     screens** — scope `apps/web/app/design-system/aimp-glass/**`, `apps/web/app/tools/aimp-glass/**`,
+     `apps/web/app/start/**`, `apps/web/test/aimp-glass-*.test.ts`. All later AMP UI work (AMP-062 merchant dashboard,
+     AMP-065 landing) must use this library, not the VENTRA teal glass.
+  Keep other AMP tasks moving, but stay out of those paths until this note is marked handled by a later note.
+- **Model rule changed by Dylan:** AiMoneyPrinter coding jobs use **Fable while it is available on the plan**; when
+  Fable is rate-limited or its allowance runs out, fall back to **Sonnet** (record the model used on each task, as
+  before). This replaces "every coding job runs on Sonnet".
+
+### 2026-11-14 17:35 AWST — AMP-042 and AMP-014 handed back (status: handled c-d90206df — AMP-042 sent to ventra-review and coordinator checks; AMP-014 review deferred while AMP-015 edits the same paths)
+
+The owner's Cowork session finished both tasks reserved in the 16:40 note; the paths are free again. Both are
+`implemented` on the board with Local evidence and file lists in their notes, uncommitted. Review + QA them, then
+commit with the rest of the held work once AMP-005-D clears. New AMP UI tasks (AMP-062, AMP-065) must build on
+`apps/web/app/design-system/aimp-glass/`.
+
+### 2026-11-14 17:36 AWST — AMP-015 reserved by the owner's Cowork session (status: handled c-d90206df — reservation respected: nothing dispatched into app/start, design-system/aimp-glass or test/aimp-glass-*; stays in force until a later note hands the paths back)
+
+Dylan wants the whole app after sign-in to use the same glass UI as `/start`. The Cowork session's frontend agent is
+building **AMP-015** now: guided-setup pages under `apps/web/app/start/**` (ideas, selection, brand, products, review,
+catalogue, publish, seller readiness) on `apps/web/app/design-system/aimp-glass/**`. **Do not dispatch any task that
+edits `apps/web/app/start/**`, `apps/web/app/design-system/aimp-glass/**` or `apps/web/test/aimp-glass-*` until a later
+note hands them back** (this partly overrides the 17:35 note). Reviewing AMP-014 read-only is fine. Backend and feature
+work in `lib/aimp/**` continues as normal; do not change the function signatures the `/tools` pages use without
+recording it in HANDOFF.md.
+
+### 2026-11-14 18:05 AWST — New frontend + backend build brief; both agents must read it (status: new)
+
+Dylan added **`~/Developer/AIMONEYPRINTER/docs/aimp/reference/AiMoneyPrinter_Frontend_Backend_Build_Brief.pdf`**
+(21 pages; plain text at `docs/aimp/reference/text/Frontend_Backend_Build_Brief.txt`). It is now part of the product
+reference for every AMP task.
+- **Frontend agents (`ventra-frontend`, `ventra-web-design`) and `ventra-backend` read it before their next AMP task.**
+  Their agent files in the AiMoneyPrinter repo already point to it. Frontend: sections 1-6. Backend: section 7. Both:
+  sections 8 (shared contracts, canonical states, build order) and 9 (tools, shared skills). Pass it to
+  `ventra-feature`, `ventra-qa` and `ventra-review` as reference too.
+- **Feature checklist:** `docs/aimp/FEATURE_CHECKLIST.md` lists the brief's 68 features (A01-I12) with release tier and a
+  first-pass mapping to AMP tasks. Correct the mapping where it is wrong and keep the states current.
+- **Board fields (brief section 7):** add to each AMP item: frontend owner, backend owner, contract link, fixture, test
+  route, dependencies, required evidence level, current blocker. Tag each task with its feature IDs.
+- **Gaps to plan as board tasks (suggestions, not dispatched):** G05 scheduled management routines has no task; the
+  three shared skills (`amp-feature-contract`, `amp-design-handoff`, `amp-e2e`); agreeing the canonical states; the
+  brief's first acceptance run (two test stores, replayed Stripe test payment, exactly one delivery) folds into AMP-064/043.
+- **Unchanged:** the model rule from the 16:40 note stays (Fable while available, then Sonnet) even though the brief
+  says Sonnet; the AMP-015 reservation from the 17:36 note stays in force; owner approval rules are as before. Nothing
+  in the brief authorises live payments, publishing, spend, deploys or migrations.

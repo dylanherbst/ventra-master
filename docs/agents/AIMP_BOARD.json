@@ -2,7 +2,7 @@
   "version": 1,
   "project": "aimp",
   "app": "aimoneyprinter",
-  "updatedAt": "2026-11-13T19:16:33.316Z",
+  "updatedAt": "2026-11-14T10:04:12.194Z",
   "integrationBranch": "aimp/foundation",
   "worktree": "~/Developer/AIMONEYPRINTER",
   "codingModel": "sonnet",
@@ -54,10 +54,10 @@
     }
   ],
   "lastRun": {
-    "id": "c-0e5a5416",
-    "startedAt": "2026-11-13T19:11:57Z",
-    "endedAt": "2026-11-13T19:16:33.316Z",
-    "summary": "AMP-045 provider idempotency keys verified locally (Sonnet, reviewed PASS, 1513 tests 0 fail); held uncommitted by AMP-005-D."
+    "id": "c-d90206df",
+    "startedAt": "2026-11-14T09:44:00Z",
+    "endedAt": "2026-11-14T10:04:12.194Z",
+    "summary": "AMP-042 fulfilment reviewed (PASS with follow-ups) and reworked for exactly-once delivery email (Fable): implemented. AMP-050 launch campaign (Fable): running. AMP-014 review waits for AMP-015 to be handed back. Still held uncommitted by AMP-005-D."
   },
   "tasks": [
     {
@@ -278,14 +278,15 @@
       "worktree": "~/Developer/AIMONEYPRINTER",
       "startedAt": "2026-11-13T16:40:00Z",
       "finishedAt": null,
-      "lastRunId": "c-79d5e30f",
+      "lastRunId": "c-d90206df",
       "runIds": [
         "c-aa359f36",
         "c-a7fe8df1",
         "c-960d5bfe",
         "c-f428b679",
         "c-712dc75a",
-        "c-79d5e30f"
+        "c-79d5e30f",
+        "c-d90206df"
       ],
       "commits": [],
       "evidence": [
@@ -328,6 +329,13 @@
           "at": "2026-11-13T18:45:00Z",
           "kind": "note",
           "detail": "Re-checked c-79d5e30f: cd into ~/Developer/AIMONEYPRINTER refused (only VENTRA-FEATURES allowed). Not worked around. 18 verified tasks waiting."
+        },
+        {
+          "at": "2026-11-14T10:04:12.194Z",
+          "kind": "note",
+          "level": "Local",
+          "model": "fable",
+          "detail": "[cd90] Re-checked: still blocked. git -C status/log are readable, but the session's only allowed directory is VENTRA-FEATURES (ls and cd into ~/Developer/AIMONEYPRINTER refused), so ventra-git commit cannot run there. Not worked around."
         }
       ],
       "blocker": {
@@ -344,7 +352,7 @@
       "notes": "Never worked around: no settings or guard edits by the coordinator.",
       "legacy": [],
       "model": null,
-      "updatedAt": "2026-11-13T19:25:00Z"
+      "updatedAt": "2026-11-14T10:04:12.194Z"
     },
     {
       "id": "AMP-004",
@@ -662,6 +670,97 @@
       ],
       "model": "sonnet",
       "updatedAt": "2026-11-13T17:21:41Z"
+    },
+    {
+      "id": "AMP-014",
+      "title": "Peach & Lavender Glass UI library (shared tokens + components), showcase, and the real app entry screens: welcome, create account, feature tour, goals",
+      "phase": "o",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-web-design",
+      "state": "implemented",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-010"
+      ],
+      "scope": [
+        "apps/web/app/design-system/aimp-glass/**",
+        "apps/web/app/tools/aimp-glass/**",
+        "apps/web/app/start/**",
+        "apps/web/test/aimp-glass-*.test.ts"
+      ],
+      "acceptance": [
+        "The three reference compositions match docs/aimp/reference/glass-ui-page-1.png at 390 px (waves, quiet glass, white primary pill, single peach-purple tile).",
+        "No horizontal scroll or clipped labels at 320, 390 and desktop widths; 44 px targets; visible focus; text contrast passes on the composited background.",
+        "/start signs up or signs in through the existing auth endpoint and the goals step reuses lib/aimp/onboarding unchanged (leave and resume keeps answers).",
+        "Lint, typecheck and npm test pass."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": "2026-11-14T09:00:10Z",
+      "finishedAt": "2026-11-14T09:21:08Z",
+      "lastRunId": "c-d90206df",
+      "runIds": [
+        "c-d90206df"
+      ],
+      "commits": [],
+      "evidence": [
+        {
+          "at": "2026-11-14T09:21:08Z",
+          "level": "Local",
+          "model": "fable",
+          "by": "owner Cowork session",
+          "result": "npm test 1568/1563 pass/0 fail; tsc clean; eslint clean on scope; 23 new tests; rendered in headless Chromium at 320/390/1280 and compared with docs/aimp/reference/glass-ui-page-1.png"
+        },
+        {
+          "at": "2026-11-14T10:04:12.194Z",
+          "kind": "note",
+          "level": "Local",
+          "model": "fable",
+          "detail": "[cd90] Review + QA not started this cycle: AMP-015 (owner Cowork session) is editing the same paths (app/start, design-system/aimp-glass, test/aimp-glass-*), so a review now would read a moving target. Do it when the owner hands the paths back."
+        }
+      ],
+      "notes": "Built by the owner's Cowork session (frontend agent, Fable), 2026-11-14. UNCOMMITTED. Files: apps/web/app/design-system/aimp-glass/ apps/web/app/start/ apps/web/app/tools/aimp-glass/page.tsx apps/web/test/aimp-glass-*.test.ts docs/aimp/glass-ui-notes.md. Routes: /start, /start/account, /start/tour, /start/goals, /start/showcase. Needs coordinator review + QA, a real sign-up test with Supabase configured, and real Safari/phone check. All later AMP UI work uses this library.",
+      "model": "fable",
+      "updatedAt": "2026-11-14T10:04:12.194Z"
+    },
+    {
+      "id": "AMP-015",
+      "title": "Guided setup in the Peach & Lavender glass UI: ideas, idea preview and selection, brand, products and review, catalogue and pricing, store publish, seller readiness (real logic from the /tools pages, new /start/* routes)",
+      "phase": "o",
+      "module": "aimp",
+      "tier": "P0",
+      "owner": "ventra-web-design",
+      "state": "running",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-014"
+      ],
+      "scope": [
+        "apps/web/app/design-system/aimp-glass/**",
+        "apps/web/app/start/**",
+        "apps/web/test/aimp-glass-*.test.ts"
+      ],
+      "acceptance": [
+        "Every step after the goals questions uses the aimp-glass library and the same backdrop as /start; no VENTRA shell.",
+        "Each page calls the same lib/aimp logic as its /tools test page (no mocks that differ); /tools pages stay as they are.",
+        "No horizontal scroll at 320/390/1280; 44 px targets; focus visible; contrast passes.",
+        "Lint, typecheck and npm test pass."
+      ],
+      "verifyLevel": "local",
+      "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": "2026-11-14T09:34:26Z",
+      "finishedAt": null,
+      "lastRunId": null,
+      "runIds": [],
+      "commits": [],
+      "evidence": [],
+      "notes": "Owner request 2026-11-14 17:35 AWST: the app after sign-in must look like the login screens. Being built by the owner's Cowork session (frontend agent, Fable); coordinator must not dispatch or edit these paths until handed back.",
+      "model": "fable"
     },
     {
       "id": "AMP-020",
@@ -1446,13 +1545,19 @@
       "module": "aimp",
       "tier": "P0",
       "owner": "ventra-backend",
-      "state": "queued",
+      "state": "implemented",
       "priority": 1,
       "dependsOn": [
         "AMP-041",
         "AMP-024"
       ],
-      "scope": [],
+      "scope": [
+        "apps/web/lib/aimp/fulfilment/**",
+        "apps/web/app/api/aimp/fulfilment/**",
+        "apps/web/app/tools/aimp-fulfilment/**",
+        "apps/web/test/aimp-fulfilment-*.test.ts",
+        "apps/web/test/aimp-release-*.test.ts"
+      ],
       "acceptance": [
         "A paid order delivers the correct file once. A failed delivery can retry, and support can reissue access for the right order."
       ],
@@ -1460,18 +1565,43 @@
       "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
       "branch": "aimp/foundation",
       "worktree": "~/Developer/AIMONEYPRINTER",
-      "startedAt": null,
-      "finishedAt": null,
-      "lastRunId": null,
-      "runIds": [],
+      "startedAt": "2026-11-14T09:00:10Z",
+      "finishedAt": "2026-11-14T09:21:08Z",
+      "lastRunId": "c-d90206df",
+      "runIds": [
+        "c-d90206df"
+      ],
       "commits": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "at": "2026-11-14T09:21:08Z",
+          "level": "Local",
+          "model": "fable",
+          "by": "owner Cowork session",
+          "result": "npm test 1568 tests, 1563 pass, 0 fail, 5 todo; tsc --noEmit clean; eslint clean on scope; 32 new tests (delivery 10, support 9, walk 2, release-first 6, hardening 5); proposal SQL applied in PGlite"
+        },
+        {
+          "at": "2026-11-14T10:04:12.194Z",
+          "kind": "review",
+          "level": "Local",
+          "model": "fable",
+          "detail": "[cd90 review] ventra-review read the untracked AMP-042 files: PASS WITH FOLLOW-UPS, no blocker for the acceptance line on fixtures; its own test run 1568 tests / 1562 pass / 0 fail / 1 skipped / 5 todo. Checked fine: duplicate paid events, tenant isolation (scopedOrder, seller account match on refund webhook), idempotent refunds, tokens not stored or logged. Medium defect 1: every delivery attempt reissued the grant, so a provider timeout or a crash after send produced a second email."
+        },
+        {
+          "at": "2026-11-14T10:04:12.194Z",
+          "kind": "diff",
+          "level": "Local",
+          "model": "fable",
+          "detail": "[cd90 rework] ventra-backend (Fable) fixed defect 1: retries and lease takeovers reuse the order line's working grant and re-derive the same HMAC token (new fulfilment/link.ts, coordinator read it), so the email key is stable per delivery; support reissue gained an atomic claimReissue guard (requestKey, or same person+reason within 2 min). Changed: fulfilment/{service,types,store,handlers,demo,index}.ts, new fulfilment/link.ts, new test/aimp-fulfilment-once.test.ts (6 tests; coordinator read its assertions), test/aimp-fulfilment-delivery.test.ts (two grant-count assertions 2->1 and 3->1: they asserted the defect), docs/aimp/fulfilment-notes.md. Signature additions: FulfilmentDeps.grantToken (required), reissueAccess requestKey, store claimReissue/releaseReissue. Specialist-reported (not coordinator evidence): lint 0, typecheck 0, 1574 tests 0 fail."
+        }
+      ],
       "blocker": null,
-      "notes": "",
+      "notes": "Built by the owner's Cowork session (backend agent, Fable), 2026-11-14. UNCOMMITTED. Files: apps/web/lib/aimp/fulfilment/ apps/web/app/api/aimp/fulfilment/ apps/web/app/tools/aimp-fulfilment/ apps/web/test/aimp-fulfilment-*.test.ts apps/web/test/aimp-release-first.test.ts docs/aimp/proposed/aimp_fulfilment.sql docs/aimp/fulfilment-notes.md; additive OrderStore.markRefunded in lib/aimp/orders/{types,store}.ts. Needs coordinator review + QA to move to verified. Follow-ups in docs/aimp/fulfilment-notes.md (DB-backed stores, support route auth always 401, buyer-lookup rate limit, paid hook should enqueue the job). Test page not browser-rendered (next dev cannot run in the Cowork VM). Leftover gitignored folder apps/web/.next-amp042 can be deleted. c-d90206df: reviewed and reworked. Open follow-ups before live email/public routes: buyer-lookup rate limit; support route auth (authorize always 401, fails closed); paid hook should enqueue the delivery job; webhook body cap is checked after the full read; aimp_fulfilment.sql needs a reissue_request column; token payload duplicated in fulfilment/link.ts and files/service.ts (move to a files tokenFor); DB-backed stores unproven. Held uncommitted by AMP-005-D.",
       "legacy": [
         "aimp-6.4"
       ],
-      "model": null
+      "model": "fable",
+      "updatedAt": "2026-11-14T10:04:12.194Z"
     },
     {
       "id": "AMP-043",
@@ -1586,13 +1716,17 @@
       "module": "aimp",
       "tier": "P0",
       "owner": "ventra-feature",
-      "state": "queued",
+      "state": "running",
       "priority": 1,
       "dependsOn": [
         "AMP-023",
         "AMP-020"
       ],
-      "scope": [],
+      "scope": [
+        "apps/web/lib/aimp/campaigns/**",
+        "apps/web/app/tools/aimp-campaign/**",
+        "apps/web/test/aimp-campaign-*.test.ts"
+      ],
       "acceptance": [
         "The campaign links to the right products and uses the approved brand and claims."
       ],
@@ -1600,10 +1734,12 @@
       "plan": "AiMoneyPrinter Master Business Plan; owner backlog 2026-11-13",
       "branch": "aimp/foundation",
       "worktree": "~/Developer/AIMONEYPRINTER",
-      "startedAt": null,
+      "startedAt": "2026-11-14T09:46:06.953Z",
       "finishedAt": null,
-      "lastRunId": null,
-      "runIds": [],
+      "lastRunId": "c-d90206df",
+      "runIds": [
+        "c-d90206df"
+      ],
       "commits": [],
       "evidence": [],
       "blocker": null,
@@ -1611,7 +1747,8 @@
       "legacy": [
         "aimp-7.1"
       ],
-      "model": null
+      "model": "fable",
+      "updatedAt": "2026-11-14T10:04:12.194Z"
     },
     {
       "id": "AMP-051",
