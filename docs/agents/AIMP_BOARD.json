@@ -2,7 +2,7 @@
   "version": 1,
   "project": "aimp",
   "app": "aimoneyprinter",
-  "updatedAt": "2026-11-14T12:47:56.530Z",
+  "updatedAt": "2026-11-14T13:27:54.127Z",
   "integrationBranch": "aimp/foundation",
   "worktree": "~/Developer/AIMONEYPRINTER",
   "codingModel": "sonnet",
@@ -54,10 +54,10 @@
     }
   ],
   "lastRun": {
-    "id": "c-82af1724",
-    "startedAt": "2026-11-14T12:14:00Z",
-    "endedAt": "2026-11-14T12:47:56.530Z",
-    "summary": "Reconciled the cut-off cycle c-6c238f0d. Verified locally (reviewed, reworked, 1671 tests 0 fail): AMP-050 launch campaign, AMP-061 merchant automation, AMP-067 first-journey acceptance run, AMP-068 public-site audit, AMP-126 plan-details check. Nothing committed in the AMP repo (AMP-005-D). New: AMP-046 files isolation defect, AMP-068-D public-site copy decisions."
+    "id": "c-f99f89a5",
+    "startedAt": "2026-11-14T12:49:00Z",
+    "endedAt": "2026-11-14T13:27:54.127Z",
+    "summary": "Owner note 20:37 (after-launch workspace) planned as AMP-080 to AMP-089. Verified locally (Sonnet, reviewed, reworked, 1740 tests 0 fail, lint clean): AMP-046 files isolation per business, AMP-080 Business Overview read model. AMP-081 Business Overview page /app/[business] implemented and reworked, not verified (no browser check, rework not re-reviewed). Typecheck fails only on a stale generated types folder (AMP-090, needs the owner). Nothing committed in the AMP repo (AMP-005-D)."
   },
   "tasks": [
     {
@@ -312,7 +312,7 @@
       "worktree": "~/Developer/AIMONEYPRINTER",
       "startedAt": "2026-11-13T16:40:00Z",
       "finishedAt": null,
-      "lastRunId": "c-82af1724",
+      "lastRunId": "c-f99f89a5",
       "runIds": [
         "c-aa359f36",
         "c-a7fe8df1",
@@ -321,7 +321,8 @@
         "c-712dc75a",
         "c-79d5e30f",
         "c-d90206df",
-        "c-82af1724"
+        "c-82af1724",
+        "c-f99f89a5"
       ],
       "commits": [],
       "evidence": [
@@ -391,10 +392,10 @@
         "continuing": "Specialists still build and the coordinator still verifies with npm --prefix; work is held uncommitted with per-task file lists.",
         "since": "2026-11-13T16:40:00Z"
       },
-      "notes": "Never worked around: no settings or guard edits by the coordinator.",
+      "notes": "Never worked around: no settings or guard edits by the coordinator. c-f99f89a5 re-check: still blocked (ventra-git and cd into the AMP repo are refused; 27 verified tasks now wait to commit). Also refused here: 'next typegen' for .next-prod (AMP-090) and curl to 127.0.0.1:3040 (browser checks).",
       "legacy": [],
       "model": null,
-      "updatedAt": "2026-11-14T12:47:56.530Z",
+      "updatedAt": "2026-11-14T13:27:53.353Z",
       "featureIds": [],
       "frontendOwner": null,
       "backendOwner": null,
@@ -2685,7 +2686,7 @@
       "commits": [],
       "evidence": [],
       "blocker": null,
-      "notes": "",
+      "notes": "2026-11-14: the owner-facing overview is now AMP-080/081 (screen 10); keep AMP-062 for the fuller dashboard and do not duplicate.",
       "legacy": [],
       "model": null,
       "featureIds": [
@@ -2698,7 +2699,8 @@
       "fixture": null,
       "testRoute": null,
       "requiredEvidence": "Local",
-      "currentBlocker": null
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:51:07.345Z"
     },
     {
       "id": "AMP-063",
@@ -4822,7 +4824,7 @@
       "module": "aimp",
       "tier": "P0",
       "owner": "ventra-backend",
-      "state": "queued",
+      "state": "verified",
       "priority": 1,
       "dependsOn": [
         "AMP-024"
@@ -4841,18 +4843,55 @@
       "plan": "Found by review or research in cycle c-82af1724",
       "branch": "aimp/foundation",
       "worktree": "~/Developer/AIMONEYPRINTER",
-      "startedAt": null,
-      "finishedAt": null,
-      "lastRunId": "c-82af1724",
+      "startedAt": "2026-11-14T12:51:07.345Z",
+      "finishedAt": "2026-11-14T13:27:53.353Z",
+      "lastRunId": "c-f99f89a5",
       "runIds": [
-        "c-82af1724"
+        "c-82af1724",
+        "c-f99f89a5"
       ],
       "commits": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "at": "2026-11-14T13:27:53.353Z",
+          "model": "sonnet",
+          "kind": "review",
+          "level": "Local",
+          "detail": "ventra-review (Sonnet) on the first pass: PASS WITH FOLLOW-UPS. No production path crossed businesses; optional businessId was fail-open; audit(ctx) was workspace-only. Sent back once: businessId made required, audit scoped. The rework itself was not re-reviewed."
+        },
+        {
+          "at": "2026-11-14T13:27:53.353Z",
+          "model": "sonnet",
+          "kind": "diff",
+          "level": "Local",
+          "detail": "Coordinator read lib/aimp/files/service.ts after the rework: need(ctx) refuses a missing or empty businessId (:64); issue answers another business's line as order_not_found (:108); revoke (:178), listGrants (:191) and audit (:231) filter on workspace and business; redeem still binds to the stored grant. Files are untracked, so no git diff exists."
+        },
+        {
+          "at": "2026-11-14T13:27:53.353Z",
+          "model": "sonnet",
+          "kind": "test",
+          "level": "Local",
+          "detail": "Coordinator, after all reworks: npm test exit 0, 1740 tests / 1729 pass / 0 fail / 1 skipped / 10 todo (todo was 11: the GAP todo is now a passing test). Baseline before the cycle 1671."
+        },
+        {
+          "at": "2026-11-14T13:27:53.353Z",
+          "model": "sonnet",
+          "kind": "lint",
+          "level": "Local",
+          "detail": "Coordinator: eslint . --max-warnings 0, exit 0."
+        },
+        {
+          "at": "2026-11-14T13:27:53.353Z",
+          "model": "sonnet",
+          "kind": "typecheck",
+          "level": "Local",
+          "detail": "Coordinator: tsc --noEmit exit 1 with exactly two errors, both in the generated file .next/dev/types/validator.ts (route '/app' from AMP-081 is missing from the stale .next-prod/types). No error in any source file. See AMP-090."
+        }
+      ],
       "blocker": null,
-      "notes": "Found by AMP-067 journey 5b: files.issueGrant({ workspaceId }, <other business's order item>) issued a token and listGrants returned 1. Other reads (orders, fulfilment, catalogue, checkout) isolate correctly. Touches secure downloads: needs ventra-review.",
+      "notes": "Found by AMP-067 journey 5b: files.issueGrant({ workspaceId }, <other business's order item>) issued a token and listGrants returned 1. Other reads (orders, fulfilment, catalogue, checkout) isolate correctly. Touches secure downloads: needs ventra-review. c-f99f89a5: FilesCtx.businessId is now REQUIRED; issue, reissue, list, revoke, storeMaster/storePreview and audit are scoped by business. UNCOMMITTED (AMP-005-D). Commit files (after AMP-024, AMP-042, AMP-067): apps/web/lib/aimp/files/{types,service,demo}.ts apps/web/lib/aimp/fulfilment/{service,demo}.ts apps/web/lib/aimp/journey/world.ts apps/web/test/aimp-files-business-scope.test.ts apps/web/test/aimp-files-delivery.test.ts apps/web/test/aimp-journey-acceptance.test.ts apps/web/test/aimp-release-first.test.ts apps/web/test/aimp-orders-paid.test.ts apps/web/test/aimp-fulfilment-{delivery,hardening,once,support}.test.ts. Follow-ups: a future download_grants table needs business_id not null; cross-workspace answers wrong_tenant while missing answers order_not_found (pre-existing, low); only the in-memory grant store is proven.",
       "legacy": [],
-      "model": null,
+      "model": "sonnet",
       "featureIds": [
         "I02",
         "E04"
@@ -4864,7 +4903,7 @@
       "testRoute": null,
       "requiredEvidence": "Local",
       "currentBlocker": null,
-      "updatedAt": "2026-11-14T12:47:56.530Z"
+      "updatedAt": "2026-11-14T13:27:53.353Z"
     },
     {
       "id": "AMP-047",
@@ -4960,6 +4999,670 @@
       "requiredEvidence": "Local",
       "currentBlocker": null,
       "updatedAt": "2026-11-14T12:47:56.530Z"
+    },
+    {
+      "phase": "p",
+      "module": "aimp",
+      "tier": "P0",
+      "state": "verified",
+      "priority": 1,
+      "dependsOn": [],
+      "verifyLevel": "Local",
+      "plan": "Owner note 2026-11-14 20:37 (after-launch workspace) / Page_By_Page_Build_Specification.md",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": "2026-11-14T12:51:07.345Z",
+      "finishedAt": "2026-11-14T13:27:53.353Z",
+      "lastRunId": "c-f99f89a5",
+      "runIds": [
+        "c-f99f89a5"
+      ],
+      "commits": [],
+      "evidence": [
+        {
+          "at": "2026-11-14T13:03:13.576Z",
+          "model": "sonnet",
+          "kind": "note",
+          "level": "Local",
+          "detail": "Specialist (Sonnet) returned: 10 new files under lib/aimp/overview, app/tools/aimp-overview, test/aimp-overview-*, docs/aimp/contracts/H01-business-overview.md. Coordinator checks and review pending."
+        },
+        {
+          "at": "2026-11-14T13:27:53.353Z",
+          "model": "sonnet",
+          "kind": "review",
+          "level": "Local",
+          "detail": "ventra-review (Sonnet): PASS WITH FOLLOW-UPS. Isolation of orders/deliveries/money events, per-currency sums, real state names and determinism were sound. Must-fixes sent back once: data_stale was unreachable through the entry point; scope passing to the unscoped deps was untested. Also fixed: refunded deliveries in the summary, partial refunds for unknown orders, href id validation, invalid expiry date. The rework itself was not re-reviewed."
+        },
+        {
+          "at": "2026-11-14T13:27:53.353Z",
+          "model": "sonnet",
+          "kind": "diff",
+          "level": "Local",
+          "detail": "Coordinator read lib/aimp/overview/collect.ts after the rework: plain-id check on the scope, every dep called with workspace and business, tenant re-check on orders, deliveries and money events, optional freshness.asOf drives collectedAt. Files are untracked, so no git diff exists."
+        },
+        {
+          "at": "2026-11-14T13:27:53.353Z",
+          "model": "sonnet",
+          "kind": "test",
+          "level": "Local",
+          "detail": "Coordinator, after all reworks: npm test exit 0, 1740 tests / 1729 pass / 0 fail / 1 skipped / 10 todo."
+        },
+        {
+          "at": "2026-11-14T13:27:53.353Z",
+          "model": "sonnet",
+          "kind": "lint",
+          "level": "Local",
+          "detail": "Coordinator: eslint exit 0."
+        },
+        {
+          "at": "2026-11-14T13:27:53.353Z",
+          "model": "sonnet",
+          "kind": "typecheck",
+          "level": "Local",
+          "detail": "Coordinator: tsc exit 1, two errors, both in generated .next/dev/types/validator.ts (route '/app'); no source error. See AMP-090."
+        }
+      ],
+      "blocker": null,
+      "notes": "c-f99f89a5: UNCOMMITTED (AMP-005-D). Commit files: apps/web/lib/aimp/overview/ apps/web/app/tools/aimp-overview/ apps/web/test/aimp-overview-{build,collect,rework}.test.ts docs/aimp/contracts/H01-business-overview.md. Entry point getBusinessOverview(deps, scope). Not real yet: no analytics source (visits stay unknown), no cache or scheduled refresh of the brief, totals are all-time, approvals/activity/seller/store/steps must be pre-scoped by the adapter (stated in H01). /tools/aimp-overview was never opened in a browser. Follow-up: reuse the existing plural/formatMoney helpers.",
+      "legacy": [],
+      "model": "sonnet",
+      "frontendOwner": null,
+      "backendOwner": "ventra-feature",
+      "contract": "docs/aimp/contracts/H01-business-overview.md",
+      "fixture": null,
+      "testRoute": "/tools/aimp-overview",
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T13:27:53.353Z",
+      "id": "AMP-080",
+      "title": "Business Overview read model (screen 10): summary, needs-you list, launch progress, daily brief",
+      "owner": "ventra-feature",
+      "featureIds": [
+        "H01",
+        "H04",
+        "G03",
+        "G06"
+      ],
+      "scope": [
+        "apps/web/lib/aimp/overview/**",
+        "apps/web/app/tools/aimp-overview/**",
+        "apps/web/test/aimp-overview-*.test.ts",
+        "docs/aimp/contracts/H01-business-overview.md"
+      ],
+      "acceptance": [
+        "One tenant-scoped function returns summary (visits, orders, gross sales, refunds, delivery, store URL, last update), a ranked needs-you list with action, impact and destination, launch progress and a deterministic daily brief.",
+        "Missing analytics is reported as unknown, never as zero.",
+        "An expired payment or failed delivery produces a concrete action (spec acceptance).",
+        "States covered by tests: new setup, live, zero orders, data stale, degraded checkout; a second business sees nothing of the first.",
+        "Test page /tools/aimp-overview with DEMO indicator. Lint, typecheck, npm test pass."
+      ]
+    },
+    {
+      "phase": "p",
+      "module": "aimp",
+      "tier": "P0",
+      "state": "implemented",
+      "priority": 1,
+      "dependsOn": [
+        "AMP-080"
+      ],
+      "verifyLevel": "Local",
+      "plan": "Owner note 2026-11-14 20:37 (after-launch workspace) / Page_By_Page_Build_Specification.md",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": "2026-11-14T13:03:13.576Z",
+      "finishedAt": "2026-11-14T13:27:53.353Z",
+      "lastRunId": "c-f99f89a5",
+      "runIds": [
+        "c-f99f89a5"
+      ],
+      "commits": [],
+      "evidence": [
+        {
+          "at": "2026-11-14T13:27:53.353Z",
+          "model": "sonnet",
+          "kind": "review",
+          "level": "Local",
+          "detail": "ventra-review (Sonnet) on the first pass: PASS WITH FOLLOW-UPS. No tenant leak, no production exposure, no write path. Must-fixes sent back once: outage wording for a business that simply has not connected payments; primary action led to a 404; no test on the real services; approvals/activity adapters untested. Rework not re-reviewed."
+        },
+        {
+          "at": "2026-11-14T13:27:53.353Z",
+          "model": "sonnet",
+          "kind": "test",
+          "level": "Local",
+          "detail": "Coordinator, after the rework: npm test exit 0, 1740 tests / 0 fail (24 tests in aimp-app-overview*.test.ts ran inside it)."
+        },
+        {
+          "at": "2026-11-14T13:27:53.353Z",
+          "model": "sonnet",
+          "kind": "lint",
+          "level": "Local",
+          "detail": "Coordinator: eslint exit 0."
+        },
+        {
+          "at": "2026-11-14T13:27:53.353Z",
+          "model": "sonnet",
+          "kind": "typecheck",
+          "level": "Local",
+          "detail": "Coordinator: tsc exit 1, two errors in generated .next/dev/types/validator.ts because the new /app route is not in the stale .next-prod/types; no source error."
+        },
+        {
+          "at": "2026-11-14T13:27:53.353Z",
+          "model": "sonnet",
+          "kind": "diff",
+          "level": "Local",
+          "detail": "Coordinator: git status in the AMP repo shows only new paths apps/web/app/app/ and lib/aimp/overview/ plus the files rework; app/start, design-system/aimp-glass, proxy.ts, package.json unchanged by this cycle (proxy.ts and tsconfig.json were already modified before it)."
+        }
+      ],
+      "blocker": null,
+      "notes": "c-f99f89a5: built and reworked once after review; NOT verified. Missing before verified: a browser check at 390px and 1440px (no page was opened; curl to localhost needs approval in coordinator sessions), a re-review of the rework, and a clean typecheck (AMP-090). UNCOMMITTED (AMP-005-D). Commit files (after AMP-080, AMP-014): apps/web/app/app/ apps/web/test/aimp-app-overview.test.ts apps/web/test/aimp-app-overview-real.test.ts. Wired: setup steps, store state and business name from the /start demo runtime; orders, approvals and activity from the checkout and automation demo stores (which only hold their own fixed demo businesses). Absent: analytics, fulfilment and money events, seller readiness (a published /start business shows 'Payments are not connected yet'). Every destination except the overview is tagged Coming soon and not clickable (BUILT_APP_PAGES). The real-services test rebuilds the runtime wiring because node cannot load app/start/_server/runtime.ts (imports without .ts extensions), so runtime() itself and the Next page are not exercised by tests. Demo-only collision: a /start business with the id demo-business would show the shared automation demo data.",
+      "legacy": [],
+      "model": "sonnet",
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": null,
+      "contract": null,
+      "fixture": null,
+      "testRoute": "/app/[business]",
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T13:27:53.353Z",
+      "id": "AMP-081",
+      "title": "Business Overview page /app/[business] in the Peach & Lavender glass UI (screen 10)",
+      "owner": "ventra-web-design",
+      "featureIds": [
+        "H01",
+        "H04",
+        "G03",
+        "G06"
+      ],
+      "scope": [
+        "apps/web/app/app/**",
+        "apps/web/test/aimp-app-overview*.test.ts"
+      ],
+      "acceptance": [
+        "/app/[business] renders the AMP-080 read model for a business built through /start (same demo runtime), using the aimp-glass library without editing it.",
+        "Explicit states: new setup, live, zero orders, stale data, degraded checkout, unknown business.",
+        "Primary action \"Fix next issue\" links to the top needs-you destination.",
+        "Works at 390px and 1440px; DEMO indicator; off in production unless tools are enabled. Lint, typecheck, npm test pass."
+      ]
+    },
+    {
+      "phase": "p",
+      "module": "aimp",
+      "tier": "P0",
+      "state": "queued",
+      "priority": 2,
+      "dependsOn": [
+        "AMP-081"
+      ],
+      "verifyLevel": "Local",
+      "plan": "Owner note 2026-11-14 20:37 (after-launch workspace) / Page_By_Page_Build_Specification.md",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-f99f89a5",
+      "runIds": [
+        "c-f99f89a5"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null,
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": null,
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:51:07.345Z",
+      "id": "AMP-082",
+      "title": "Brand kit page /app/[business]/brand (screen 11), reusing brandAction and the branding service",
+      "owner": "ventra-web-design",
+      "featureIds": [
+        "C01",
+        "C06",
+        "I05",
+        "I06"
+      ],
+      "scope": [
+        "apps/web/app/app/[business]/brand/**",
+        "apps/web/test/aimp-app-brand*.test.ts"
+      ],
+      "acceptance": [
+        "Works on an existing business, not only during setup; no brand logic re-implemented.",
+        "An approved palette change is previewable without altering the live store."
+      ]
+    },
+    {
+      "phase": "p",
+      "module": "aimp",
+      "tier": "P0",
+      "state": "queued",
+      "priority": 2,
+      "dependsOn": [
+        "AMP-081"
+      ],
+      "verifyLevel": "Local",
+      "plan": "Owner note 2026-11-14 20:37 (after-launch workspace) / Page_By_Page_Build_Specification.md",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-f99f89a5",
+      "runIds": [
+        "c-f99f89a5"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null,
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": null,
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:51:07.345Z",
+      "id": "AMP-083",
+      "title": "Products and bundles page /app/[business]/products (screen 12), reusing the product and catalogue services",
+      "owner": "ventra-web-design",
+      "featureIds": [
+        "C02",
+        "C03",
+        "C04",
+        "C05",
+        "C06",
+        "E07"
+      ],
+      "scope": [
+        "apps/web/app/app/[business]/products/**",
+        "apps/web/test/aimp-app-products*.test.ts"
+      ],
+      "acceptance": [
+        "Catalogue list with URL-backed status filters; create and archive through existing services.",
+        "Archival preserves historical order and purchased-version references. Bundles are out of scope here (AMP-112)."
+      ]
+    },
+    {
+      "phase": "p",
+      "module": "aimp",
+      "tier": "P0",
+      "state": "queued",
+      "priority": 2,
+      "dependsOn": [
+        "AMP-083"
+      ],
+      "verifyLevel": "Local",
+      "plan": "Owner note 2026-11-14 20:37 (after-launch workspace) / Page_By_Page_Build_Specification.md",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-f99f89a5",
+      "runIds": [
+        "c-f99f89a5"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null,
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": null,
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:51:07.345Z",
+      "id": "AMP-084",
+      "title": "Product editor and asset review /app/[business]/products/[productId] (screen 13)",
+      "owner": "ventra-web-design",
+      "featureIds": [
+        "C02",
+        "C03",
+        "C05",
+        "C06",
+        "C07",
+        "I05",
+        "I10"
+      ],
+      "scope": [
+        "apps/web/app/app/[business]/products/[productId]/**"
+      ],
+      "acceptance": [
+        "Edit listing, see buyer files, approve a product version through the existing product lifecycle.",
+        "A paid order still resolves the originally purchased file after a new version is published."
+      ]
+    },
+    {
+      "phase": "p",
+      "module": "aimp",
+      "tier": "P0",
+      "state": "queued",
+      "priority": 2,
+      "dependsOn": [
+        "AMP-046"
+      ],
+      "verifyLevel": "Local",
+      "plan": "Owner note 2026-11-14 20:37 (after-launch workspace) / Page_By_Page_Build_Specification.md",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-f99f89a5",
+      "runIds": [
+        "c-f99f89a5"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "Feature IDs to be set from FEATURE_CHECKLIST.md when dispatched. c-f99f89a5: AMP-046 is verified locally, so this is unblocked.",
+      "legacy": [],
+      "model": null,
+      "frontendOwner": null,
+      "backendOwner": "ventra-backend",
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T13:27:53.353Z",
+      "id": "AMP-085",
+      "title": "Owner orders and fulfilment queue read model and actions (screens 19-20) over the existing orders and fulfilment services",
+      "owner": "ventra-backend",
+      "featureIds": [],
+      "scope": [
+        "apps/web/lib/aimp/owner-orders/**",
+        "apps/web/test/aimp-owner-orders-*.test.ts"
+      ],
+      "acceptance": [
+        "Tenant-scoped order list and order detail with delivery state and the allowed recovery actions (resend, reissue, refund status).",
+        "Confirm AMP-041/042/045 tests still pass before building on them."
+      ]
+    },
+    {
+      "phase": "p",
+      "module": "aimp",
+      "tier": "P0",
+      "state": "queued",
+      "priority": 2,
+      "dependsOn": [
+        "AMP-085",
+        "AMP-081"
+      ],
+      "verifyLevel": "Local",
+      "plan": "Owner note 2026-11-14 20:37 (after-launch workspace) / Page_By_Page_Build_Specification.md",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-f99f89a5",
+      "runIds": [
+        "c-f99f89a5"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null,
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": null,
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:51:07.345Z",
+      "id": "AMP-086",
+      "title": "Orders queue and order detail pages /app/[business]/orders (screens 19-20)",
+      "owner": "ventra-web-design",
+      "featureIds": [],
+      "scope": [
+        "apps/web/app/app/[business]/orders/**"
+      ],
+      "acceptance": [
+        "Owner sees orders, delivery state and recovery actions wired to AMP-085."
+      ]
+    },
+    {
+      "phase": "p",
+      "module": "aimp",
+      "tier": "P0",
+      "state": "queued",
+      "priority": 2,
+      "dependsOn": [
+        "AMP-081"
+      ],
+      "verifyLevel": "Local",
+      "plan": "Owner note 2026-11-14 20:37 (after-launch workspace) / Page_By_Page_Build_Specification.md",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-f99f89a5",
+      "runIds": [
+        "c-f99f89a5"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "Overlaps AMP-111 (AI editor, tier Next): only the first-release part here.",
+      "legacy": [],
+      "model": null,
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": null,
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:51:07.345Z",
+      "id": "AMP-087",
+      "title": "Website Studio after launch /app/[business]/website (screen 16): edit, preview, publish, roll back with site versions",
+      "owner": "ventra-web-design",
+      "featureIds": [],
+      "scope": [
+        "apps/web/app/app/[business]/website/**"
+      ],
+      "acceptance": [
+        "Uses the AMP-031 site-version store; publish and rollback work on an existing business."
+      ]
+    },
+    {
+      "phase": "p",
+      "module": "aimp",
+      "tier": "P0",
+      "state": "queued",
+      "priority": 3,
+      "dependsOn": [
+        "AMP-081"
+      ],
+      "verifyLevel": "Local",
+      "plan": "Owner note 2026-11-14 20:37 (after-launch workspace) / Page_By_Page_Build_Specification.md",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-f99f89a5",
+      "runIds": [
+        "c-f99f89a5"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null,
+      "frontendOwner": "ventra-web-design",
+      "backendOwner": null,
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:51:07.345Z",
+      "id": "AMP-088",
+      "title": "Domains and availability page (screen 17) and seller payments and payouts page (screen 18)",
+      "owner": "ventra-web-design",
+      "featureIds": [],
+      "scope": [
+        "apps/web/app/app/[business]/domains/**",
+        "apps/web/app/app/[business]/payments/**"
+      ],
+      "acceptance": [
+        "Shows real connection states from lib/aimp/hosts and lib/aimp/sellers; provider parts stay on fixtures until AMP-033-D and AMP-043-D clear."
+      ]
+    },
+    {
+      "phase": "p",
+      "module": "aimp",
+      "tier": "P0",
+      "state": "queued",
+      "priority": 3,
+      "dependsOn": [
+        "AMP-081"
+      ],
+      "verifyLevel": "Local",
+      "plan": "Owner note 2026-11-14 20:37 (after-launch workspace) / Page_By_Page_Build_Specification.md",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-f99f89a5",
+      "runIds": [
+        "c-f99f89a5"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "",
+      "legacy": [],
+      "model": null,
+      "frontendOwner": null,
+      "backendOwner": null,
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T12:51:07.345Z",
+      "id": "AMP-089",
+      "title": "Plan screens 25-43 (growth, communication, automation, reporting, account, operations console) into board tasks by release label",
+      "owner": "ventra-research",
+      "featureIds": [],
+      "scope": [],
+      "acceptance": [
+        "Each screen mapped to an existing or new AMP task with its release tier; nothing labelled Next or Expansion is scheduled ahead of screens 10-20."
+      ]
+    },
+    {
+      "phase": "p",
+      "module": "aimp",
+      "tier": "P0",
+      "state": "blocked",
+      "priority": 1,
+      "dependsOn": [],
+      "verifyLevel": "Local",
+      "plan": "Found in cycle c-f99f89a5",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-f99f89a5",
+      "runIds": [
+        "c-f99f89a5"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": {
+        "reason": "tsc --noEmit fails with two errors in the generated file .next/dev/types/validator.ts: the new /app route (AMP-081) is in the dev server types but not in the stale .next-prod/types. Regenerating needs a command the coordinator session is not allowed to run.",
+        "needsApproval": true,
+        "owner": true,
+        "action": "Run \"Run AIMP Production Preview.command\" once (it rebuilds .next-prod), or allow coordinator cycles to run: NEXT_DIST_DIR=.next-prod npm --prefix ~/Developer/AIMONEYPRINTER/apps/web exec -- next typegen",
+        "where": "The Mac mini, in ~/Developer/AIMONEYPRINTER",
+        "why": "Typecheck cannot be clean until the generated types know the new route; no source file has an error.",
+        "unlocks": "A clean typecheck for AMP-081 and every later /app page.",
+        "continuing": "Lint and the full test suite still gate every task; source type errors are still visible in the tsc output.",
+        "since": "2026-11-14T13:27:54.127Z"
+      },
+      "notes": "Alternative for a later cycle: ask whether tsconfig.json should stop including both .next/dev/types and .next-prod/types (tsconfig.json has foreign uncommitted edits, so it was not touched).",
+      "legacy": [],
+      "model": null,
+      "featureIds": [],
+      "frontendOwner": null,
+      "backendOwner": null,
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T13:27:54.127Z",
+      "id": "AMP-090",
+      "title": "Typecheck: regenerate the production-preview route types (.next-prod) so tsc passes again",
+      "owner": "ventra-devops",
+      "scope": [],
+      "acceptance": [
+        "npm --prefix apps/web run typecheck exits 0 with the /app route present."
+      ]
+    },
+    {
+      "phase": "p",
+      "module": "aimp",
+      "tier": "P0",
+      "state": "queued",
+      "priority": 2,
+      "dependsOn": [
+        "AMP-081"
+      ],
+      "verifyLevel": "Local",
+      "plan": "Found in cycle c-f99f89a5",
+      "branch": "aimp/foundation",
+      "worktree": "~/Developer/AIMONEYPRINTER",
+      "startedAt": null,
+      "finishedAt": null,
+      "lastRunId": "c-f99f89a5",
+      "runIds": [
+        "c-f99f89a5"
+      ],
+      "commits": [],
+      "evidence": [],
+      "blocker": null,
+      "notes": "From the AMP-080 and AMP-081 reports: these sources are absent on the page today.",
+      "legacy": [],
+      "model": null,
+      "featureIds": [
+        "H01",
+        "H04"
+      ],
+      "frontendOwner": null,
+      "backendOwner": "ventra-backend",
+      "contract": null,
+      "fixture": null,
+      "testRoute": null,
+      "requiredEvidence": "Local",
+      "currentBlocker": null,
+      "updatedAt": "2026-11-14T13:27:54.127Z",
+      "id": "AMP-091",
+      "title": "Business Overview data sources for /start businesses: seller readiness, fulfilment and money events, analytics visits, snapshot cache",
+      "owner": "ventra-backend",
+      "scope": [
+        "apps/web/lib/aimp/overview/**",
+        "apps/web/test/aimp-overview-*.test.ts"
+      ],
+      "acceptance": [
+        "Adapters for seller readiness, fulfilment, money events and a visits source that are scoped per business and tested at the real adapter.",
+        "A cached snapshot with a refresh time so data_stale can appear on the page."
+      ]
     }
   ]
 }

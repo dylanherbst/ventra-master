@@ -267,7 +267,7 @@ No app code was changed by this Cowork session for this request; this is the kic
 and contracts were. Next coordinator cycle should pick this up as the primary reference for any screen it assigns.
 
 
-### 2026-11-14 20:37 AWST — Priority: finish the after-launch front and backend (owner workspace, screens 10-43) (status: new)
+### 2026-11-14 20:37 AWST — Priority: finish the after-launch front and backend (owner workspace, screens 10-43) (status: handled c-f99f89a5 — planned as AMP-080 to AMP-089; Business Overview read model (AMP-080) dispatched first, page AMP-081 next; screens 11-20 queued in the note's order; 25-43 to be planned by AMP-089)
 
 Dylan (20:37): "now we need to finish the after launch front and backend." Context: the Cowork session just proved the
 Welcome -> Account -> Goals -> Ideas -> Brand -> Products -> Catalogue -> Store funnel (screens 01-09 of the new
@@ -313,3 +313,17 @@ direct edit outside the board tonight, for Dylan's own phone testing, not part o
 
 Standing rules unchanged: owner approval still required for merges, deploys, migrations, env vars, live payments,
 publishing, customer messages and spend.
+
+## 2026-11-14 21:27 AWST — Owner decisions: 4 pending approvals (A-14, A-60, A-79, A-64)
+
+Dylan reviewed the approvals queue via the dashboard and decided:
+
+- **A-14 (transfer rule)** — APPROVED, coordinator's own recommendation: the AI always transfers when a caller/customer asks for a person, in every mode. Never block a request for a human. Align `permissions.ts` `decide()`, `contracts.ts` `parseReceptionistRunResult` (~559) and `API_CONTRACTS.md` (~29, 104-) to this rule and close A-14.
+
+- **A-60 (price estimates)** — APPROVED: yes, the AI Receptionist may give a rough price estimate ("from $X") using prices the business has already entered into the system. It must still route anything beyond a simple from-price (custom quotes, negotiated pricing) to a person for confirmation — this only covers stating an existing authorised price, not creating new pricing. Implement G6 estimate tier and close A-60.
+
+- **A-79 (email-first reminders)** — APPROVED, keep as-is per coordinator's own recommendation: 24h/2h reminders and no-show rescues go by email first even when the contact has a mobile on file, and stay exempt from the SMS consent check when they fall back to SMS (reminders are transactional). No code change needed — just confirm/close A-79.
+
+- **A-64 (fixed customer lines)** — APPROVED with latitude: approve the fallback line exactly as drafted ("Thanks for your message. Someone from the team will get back to you shortly."). For the other three lines (BOOKING_CHANGE_SAY move/cancel, RETURNING_HANDOFF_SAY, NO_BOOKING_SAY) whose exact wording wasn't shown on the board, the agent (ventra-voice) may finalize them itself in the same plain, polite, non-pushy tone as the fallback line — no need to re-surface for a second owner pass unless a line makes a promise, commitment or claim beyond basic acknowledgement/hand-off. Apply the review nits mentioned in A-64's evidence at the same time. Close A-64 once applied and tested.
+
+Coordinator: action these four on the next cycle (code changes + test updates), mark them resolved on the board, and unblock whatever was waiting on them (ventra-voice was blocked on A-14).
